@@ -1,0 +1,15 @@
+---
+
+- hosts: router
+
+  connection: network_cli
+  gather_facts: 'no'
+
+  tasks:
+    - name: Configure remote
+      vyos_config:
+        lines:
+          - set system login user vyos authentication public-keys aibix@doodlemox key 'AAAAC3NzaC1lZDI1NTE5AAAAIJhIGgYUf/Sl4xr4uv+nrMbpDhulZWQxynX5OBTvalsz'
+          - set system login user vyos authentication public-keys aibix@doodlemox type 'ssh-ed25519'
+        save: true
+        

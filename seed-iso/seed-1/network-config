@@ -1,0 +1,16 @@
+version: 2
+ethernets:
+  eth0:
+    dhcp4: true
+    dhcp6: false
+    mtu: 1400
+  eth1:
+    dhcp4: true
+    dhcp6: false
+    mtu: 1500
+  eth2:
+    mtu: 1400
+  eth3:
+    mtu: 1400
+  eth4:
+    mtu: 1400
