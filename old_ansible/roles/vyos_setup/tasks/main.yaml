@@ -84,7 +84,7 @@
     vyos_config:
       lines:
           set protocols ospf default-information originate {{ ospf.v4.default_information }}
-    tags: ospf
+    tags: ospf,ospf_default_information
     when: os == "vyos" and ospf.v4.default_information is defined
 
   - name: configure_bgp_parameters

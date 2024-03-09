@@ -94,7 +94,7 @@
     vyos_config:
       lines:
           delete protocols ospf default-information originate {{ ospf.v4.default_information }}
-    tags: ospf
+    tags: ospf,ospf_default_information
     when: os == "vyos" and ospf.v4.default_information is defined
 
   - name: remove_ospf_protocol
