@@ -1,5 +1,7 @@
 ### LNR
 
+![network schema]("/doku drawios/LNR-network-v2.drawio.png")
+
 Configs und Backups der verschiedenen Streams und doodles dazwischen
 
 ### Zu beachten
