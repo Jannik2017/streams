@@ -221,6 +221,9 @@ router:
         - interface: eth1
           interface_type: ethernet
           ipv4_address: 10.2.34.4/24
+        - interface: eth2
+          interface_type: ethernet
+          ipv4_address: 10.124.2.1/24
         - interface: eth3
           interface_type: ethernet
           ipv4_address: 10.124.3.1/30
