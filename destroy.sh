@@ -52,7 +52,7 @@ then
     for r in $(seq 1 ${routers})
     do
 	echo -n "Setze HA-Gruppe P3 fuer VM $r ... "
-	sudo ha-manager set vm:${node}0${provider}00${r} --group "P3"
+	sudo ha-manager set vm:${node}0${provider}00${r} --group "P2"
 	if [[ $? -eq 0 ]]
 	then
 	    echo "fertig."
@@ -72,7 +72,7 @@ then
 		## (sie wird durch Cluster-Regeln nach dem setzen der Gruppe P3 oben automatisch migriert, hier nur warten)
 		sleep 1
 		output=`sudo ha-manager status | grep ${node}0${provider}00${r}`
-		if [[ $? -eq 0 && `echo $output | grep nanomox` ]]
+		if [[ $? -eq 0 && `echo $output | grep minismox` ]]
 		then
 		    echo " fertig."
 		    break
