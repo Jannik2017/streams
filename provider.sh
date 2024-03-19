@@ -177,9 +177,9 @@ do
 	    0)
 		sudo pvesr create-local-job ${node}0${provider}00${r}-0 doodlemox --schedule "*/3"
 		;;
-	    1)
-		sudo pvesr create-local-job ${node}0${provider}00${r}-1 minismox --schedule "*/3"
-		;;
+	    # 1)
+	    # 	sudo pvesr create-local-job ${node}0${provider}00${r}-1 nanomox --schedule "*/3"
+	    # 	;;
 	esac
     done
 done
@@ -190,11 +190,12 @@ do
     echo -n "Prüfe ob sync abgeschlossen ist "
     while true
     do
-	STATUS1=$(sudo pvesr status --guest ${node}0${provider}00${r} | awk "/${node}0${provider}00${r}-0/ { print \$8 }")
-	LAST1=$(sudo pvesr status --guest ${node}0${provider}00${r} | awk "/${node}0${provider}00${r}-0/ { print \$4 }")
-	STATUS2=$(sudo pvesr status --guest ${node}0${provider}00${r} | awk "/${node}0${provider}00${r}-1/ { print \$8 }")
-	LAST2=$(sudo pvesr status --guest ${node}0${provider}00${r} | awk "/${node}0${provider}00${r}-1/ { print \$4 }")
-	if [[ $STATUS1 == "OK" && $LAST1 != "-" && $STATUS2 == "OK" && $LAST2 != "-" ]]
+	STATUS=$(sudo pvesr status --guest ${node}0${provider}00${r} | awk "/${node}0${provider}00${r}-0/ { print \$8 }")
+	LAST=$(sudo pvesr status --guest ${node}0${provider}00${r} | awk "/${node}0${provider}00${r}-0/ { print \$4 }")
+	# STATUS2=$(sudo pvesr status --guest ${node}0${provider}00${r} | awk "/${node}0${provider}00${r}-1/ { print \$8 }")
+	# LAST2=$(sudo pvesr status --guest ${node}0${provider}00${r} | awk "/${node}0${provider}00${r}-1/ { print \$4 }")
+	#if [[ $STATUS == "OK" && $LAST != "-" && $STATUS2 == "OK" && $LAST2 != "-" ]]
+	if [[ $STATUS == "OK" && $LAST != "-" ]]
 	then
 	    echo " fertig"
 	    sudo ha-manager add vm:${node}0${provider}00${r} --group "P${provider}" --type vm
