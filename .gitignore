@@ -65,4 +65,4 @@ tags
 *.iso.gz
 
 ansible-venv/
-
+.*-venv/
