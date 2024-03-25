@@ -308,7 +308,9 @@ router:
       bgp:
         router_id: 10.2.255.25
         as: 65002
-        #networks:
+        networks:
+          ipv4_unicast:
+            - 172.16.25.0/24
         neighbors_rr_client:
           - ipv4_address: 10.2.255.26
             description: p2r6v

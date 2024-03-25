@@ -238,6 +238,7 @@ router:
         as: 65003
         networks:
           ipv4_unicast:
+            - 10.134.2.0/24
             - 10.134.3.0/24
         neighbors:
           - ipv4_address: 10.3.255.31
