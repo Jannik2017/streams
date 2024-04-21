@@ -5,6 +5,8 @@ router:
     aibix_pubkey_type: 'ssh-ed25519'
     ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
     #-o UserKnownHostsFile=/dev/null'
+    ansible_user: vyos
+    ansible_network_os: vyos.vyos.vyos
     
 #######################################################################
 #######################################################################
