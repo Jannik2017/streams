@@ -41,6 +41,7 @@ router:
         - interface: eth1
           interface_type: ethernet
           ipv4_address: dhcp
+          ipv6_address: autoconf
         - interface: eth2
           interface_type: ethernet
           ipv4_address: 10.1.11.1/24
@@ -64,6 +65,13 @@ router:
               network: 10.1.15.0/24
             - interface: lo
               network: 10.1.255.11/32
+        v6:
+          area: 0
+          default_information: always
+          interfaces:
+            - interface: eth3
+            - interface: eth4
+            - interface: lo
       bgp:
         router_id: 10.1.255.11
         as: 65001

@@ -106,6 +106,38 @@
     tags: ospf
     when: os == "vyos"
 
+  - name: remove_ospf_parameters
+    vyos_config:
+      lines:
+        - delete protocols ospfv3 parameters router-id {{ ospf.router_id }}
+    tags: ospfv3
+    when: os == "vyos"
+
+  - name: remove_ospf_interface_and_area
+    vyos_config:
+      lines:
+        - delete protocols ospfv3 interface {{ item.interface }} area {{ ospf.v6.area }}
+    loop: "{{ ospf.v6.interfaces }}"
+    loop_control:
+      label: "{{ item.interface }}"
+    tags: ospfv3
+    when: os == "vyos"
+
+  - name: remove_ospf_default_information
+    vyos_config:
+      lines:
+          delete protocols ospfv3 default-information originate {{ ospf.v6.default_information }}
+    tags: ospfv3,ospfv3_default_information
+    when: os == "vyos" and ospf.v6.default_information is defined
+
+  - name: remove_ospf_protocol
+    vyos_config:
+      lines:
+        - delete protocols ospfv3 default-information
+        - delete protocols ospfv3 parameters
+    tags: ospfv3
+    when: os == "vyos"
+
   - name: remove_static_routes
     vyos_config:
       lines:
@@ -116,7 +148,7 @@
     tags: static_routes
     when: os == "vyos" and static is defined
     
-  - name: remove_interface_vyos
+  - name: remove_interface_v4_vyos
     vyos_config:
       lines:
         #-  delete interfaces {{ item.interface_type }} {{ item.interface }} address {{ item.ipv4_address }}
@@ -124,8 +156,18 @@
     loop: "{{ interfaces }}"
     loop_control:
       label: "{{ item.interface }}"
-    tags: interfaces
+    tags: interfaces_v4
     when: os == "vyos"
+
+  - name: remove_interface_v6_vyos
+    vyos_config:
+      lines:
+        -  delete interfaces {{ item.interface_type }} {{ item.interface }} ipv6
+    loop: "{{ interfaces }}"
+    loop_control:
+      label: "{{ item.interface }}"
+    tags: interfaces_v6
+    when: os == "vyos" and item.ipv6_address is defined
 
   - name: save config
     vyos_config:

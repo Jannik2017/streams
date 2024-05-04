@@ -7,7 +7,7 @@
     tags: hostname
     when: os == "vyos"
     
-  - name: set_interface_vyos
+  - name: set_interface_v4_vyos
     vyos_config:
       lines:
         - set interfaces {{ item.interface_type }} {{ item.interface }} address '{{ item.ipv4_address }}'
@@ -15,9 +15,19 @@
     loop: "{{ interfaces }}"
     loop_control:
       label: "{{ item.interface }}"
-    tags: interfaces
+    tags: interfaces_v4
     when: os == "vyos"
 
+  - name: set_interface_v6_vyos
+    vyos_config:
+      lines:
+        - set interfaces {{ item.interface_type }} {{ item.interface }} ipv6 address '{{ item.ipv6_address }}'
+    loop: "{{ interfaces }}"
+    loop_control:
+      label: "{{ item.interface }}"
+    tags: interfaces_v6
+    when: os == "vyos" and item.ipv6_address is defined
+    
   # - name: delete_hw_addresses_management
   #   vyos_config:
   #     lines:
@@ -86,6 +96,30 @@
           set protocols ospf default-information originate {{ ospf.v4.default_information }}
     tags: ospf,ospf_default_information
     when: os == "vyos" and ospf.v4.default_information is defined
+
+  - name: configure_ospf_parameters
+    vyos_config:
+      lines:
+        - set protocols ospfv3 parameters router-id {{ ospf.router_id }}
+    tags: ospfv3
+    when: os == "vyos"
+
+  - name: configure_ospf_interface_and_area
+    vyos_config:
+      lines:
+        - set protocols ospfv3 interface {{ item.interface }} area {{ ospf.v6.area }}
+    loop: "{{ ospf.v6.interfaces }}"
+    loop_control:
+      label: "{{ item.interface }}"
+    tags: ospfv3
+    when: os == "vyos"
+
+  - name: configure_ospf_default_information
+    vyos_config:
+      lines:
+          set protocols ospfv3 default-information originate {{ ospf.v6.default_information }}
+    tags: ospfv3,ospfv3_default_information
+    when: os == "vyos" and ospf.v6.default_information is defined
 
   - name: configure_bgp_parameters
     vyos_config:
