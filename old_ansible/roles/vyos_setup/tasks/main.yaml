@@ -97,14 +97,14 @@
     tags: ospf,ospf_default_information
     when: os == "vyos" and ospf.v4.default_information is defined
 
-  - name: configure_ospf_parameters
+  - name: configure_ospfv3_parameters
     vyos_config:
       lines:
         - set protocols ospfv3 parameters router-id {{ ospf.router_id }}
     tags: ospfv3
-    when: os == "vyos"
+    when: os == "vyos" and ospf.v6 is defined
 
-  - name: configure_ospf_interface_and_area
+  - name: configure_ospfv3_interface_and_area
     vyos_config:
       lines:
         - set protocols ospfv3 interface {{ item.interface }} area {{ ospf.v6.area }}
@@ -112,9 +112,9 @@
     loop_control:
       label: "{{ item.interface }}"
     tags: ospfv3
-    when: os == "vyos"
+    when: os == "vyos" and ospf.v6 is defined
 
-  - name: configure_ospf_default_information
+  - name: configure_ospfv3_default_information
     vyos_config:
       lines:
           set protocols ospfv3 default-information originate {{ ospf.v6.default_information }}
