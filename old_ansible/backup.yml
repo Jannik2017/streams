@@ -15,18 +15,4 @@
         filename: "{{ inventory_hostname }}"
         dir_path: "/home/aibix/streams/ansible_out"
 
-- name: push
-  hosts: localhost
-  gather_facts: no
-  collections:
-    - lvrfrc87.git_acp
 
-  tasks:
-  - name: push to github
-    # run_once: true
-    git_acp:
-      path: "/home/aibix/streams"
-      add: [ "." ]
-      branch: main
-      comment: "auto-run: {{ now() }}"
-      url: "git@github.com:aibix0001/streams.git"
