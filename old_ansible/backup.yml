@@ -13,7 +13,7 @@
       backup: yes
       backup_options:
         filename: "{{ inventory_hostname }}"
-        dir_path: "/home/aibix/lnr/ansible_out"
+        dir_path: "/home/aibix/streams/ansible_out"
 
 - name: push
   hosts: localhost
@@ -25,8 +25,8 @@
   - name: push to github
     # run_once: true
     git_acp:
-      path: "/home/aibix/lnr"
+      path: "/home/aibix/streams"
       add: [ "." ]
       branch: main
       comment: "auto-run: {{ now() }}"
-      url: "git@github.com:aibix0001/lnr.git"
+      url: "git@github.com:aibix0001/streams.git"
