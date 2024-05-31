@@ -9,7 +9,7 @@
   connection: network_cli
   
   tasks:
-  - name: configurable backup path
+  - name: Configurable backup path
     vyos_config:
       backup: yes
       backup_options:

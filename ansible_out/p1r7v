@@ -1,0 +1,73 @@
+set interfaces ethernet eth0 address 'dhcp'
+set interfaces ethernet eth0 hw-id '00:24:18:a1:07:00'
+set interfaces ethernet eth0 mtu '1400'
+set interfaces ethernet eth0 offload gro
+set interfaces ethernet eth0 offload gso
+set interfaces ethernet eth0 offload sg
+set interfaces ethernet eth0 offload tso
+set interfaces ethernet eth1 address '10.1.67.7/24'
+set interfaces ethernet eth1 hw-id '00:24:18:f1:07:01'
+set interfaces ethernet eth1 mtu '1400'
+set interfaces ethernet eth1 offload gro
+set interfaces ethernet eth1 offload gso
+set interfaces ethernet eth1 offload sg
+set interfaces ethernet eth1 offload tso
+set interfaces ethernet eth2 address '10.1.37.7/24'
+set interfaces ethernet eth2 hw-id '00:24:18:f1:07:02'
+set interfaces ethernet eth2 mtu '1400'
+set interfaces ethernet eth2 offload gro
+set interfaces ethernet eth2 offload gso
+set interfaces ethernet eth2 offload sg
+set interfaces ethernet eth2 offload tso
+set interfaces ethernet eth3 address '10.1.78.7/24'
+set interfaces ethernet eth3 hw-id '00:24:18:f1:07:03'
+set interfaces ethernet eth3 mtu '1400'
+set interfaces ethernet eth3 offload gro
+set interfaces ethernet eth3 offload gso
+set interfaces ethernet eth3 offload sg
+set interfaces ethernet eth3 offload tso
+set interfaces ethernet eth4 address '10.1.79.7/24'
+set interfaces ethernet eth4 hw-id '00:24:18:f1:07:04'
+set interfaces ethernet eth4 mtu '1400'
+set interfaces ethernet eth4 offload gro
+set interfaces ethernet eth4 offload gso
+set interfaces ethernet eth4 offload sg
+set interfaces ethernet eth4 offload tso
+set interfaces loopback lo address '10.1.255.17/32'
+set protocols bgp neighbor 10.1.255.16 address-family ipv4-unicast nexthop-self
+set protocols bgp neighbor 10.1.255.16 description 'p1r6v'
+set protocols bgp neighbor 10.1.255.16 remote-as '65001'
+set protocols bgp neighbor 10.1.255.16 update-source 'lo'
+set protocols bgp parameters router-id '10.1.255.17'
+set protocols bgp system-as '65001'
+set protocols ospf area 0 network '10.1.67.0/24'
+set protocols ospf area 0 network '10.1.37.0/24'
+set protocols ospf area 0 network '10.1.78.0/24'
+set protocols ospf area 0 network '10.1.79.0/24'
+set protocols ospf area 0 network '10.1.255.17/32'
+set protocols ospf interface eth1
+set protocols ospf interface eth2
+set protocols ospf interface eth3
+set protocols ospf interface eth4
+set protocols ospf interface lo
+set protocols ospf parameters router-id '10.1.255.17'
+set protocols ospfv3 parameters router-id '10.1.255.17'
+set service ntp server 1.pool.ntp.org
+set service ntp server 2.pool.ntp.org
+set service ssh client-keepalive-interval '180'
+set service ssh port '22'
+set system config-management commit-revisions '100'
+set system conntrack modules ftp
+set system conntrack modules h323
+set system conntrack modules nfs
+set system conntrack modules pptp
+set system conntrack modules sip
+set system conntrack modules sqlnet
+set system conntrack modules tftp
+set system host-name 'p1r7v'
+set system login user vyos authentication encrypted-password '$6$rounds=656000$41RS0nOHBC6JIbLM$lO8a1vjhY1Mhpldyk9iHr0TQiJ2QvSzcz8iwbaq87L/rWPhfENaKBdf9j.Md.R9nQtedLqmDKDenl9ZI4c96F0'
+set system login user vyos authentication public-keys aibix@admin2 key 'AAAAC3NzaC1lZDI1NTE5AAAAIE5m1XvL7TLfEQyZs6IaySJxAoIS22V2TenKvqboXZqN'
+set system login user vyos authentication public-keys aibix@admin2 type 'ssh-ed25519'
+set system login user vyos authentication public-keys aibix@minismox key 'AAAAC3NzaC1lZDI1NTE5AAAAIJPRSV+ocoYTP26UwMYUXsd0gVKSmrFC3WaOVJwEY0L1'
+set system login user vyos authentication public-keys aibix@minismox type 'ssh-ed25519'
+set system name-server '1.1.1.1'
