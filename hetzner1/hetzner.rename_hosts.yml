@@ -1,0 +1,12 @@
+---
+- name: "Rename hosts"
+  hosts: all
+  user: root
+  gather_facts: true
+
+  tasks:
+    - name: "Rename hosts"
+      lineinfile:
+        dest: /etc/hostname
+        line: "{{ ansible_hostname }}"
+        regexp: '^.*$'

@@ -1,0 +1,18 @@
+---
+- name: "Create hetzner cloud server"
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  user: root
+  tasks:
+    - name: "Create hetzner cloud server"
+      hetzner.hcloud.hcloud_server:
+        api_token: "{{ lookup('env', 'HCLOUD_TOKEN') }}"
+        location: "fsn1"
+        name: "test-{{ item }}"
+        server_type: cx11
+        image: ubuntu-20.04
+        ssh_keys:
+          - aibix@minismox
+        state: present
+      with_sequence: count=2

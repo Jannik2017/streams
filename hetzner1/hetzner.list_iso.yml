@@ -1,0 +1,15 @@
+---
+- name: "Gather hcloud ISO type infos"
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  user: root
+  tasks:
+  - name: "Gather hcloud ISO type infos"
+    hetzner.hcloud.iso_info:
+    register: output
+
+  - name: "Print the gathered infos"
+    debug:
+      var: output.hcloud_iso_info
+    

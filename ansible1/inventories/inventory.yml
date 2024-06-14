@@ -1,0 +1,13 @@
+router:
+  hosts:
+    r11m:
+        ansible_host: 10.20.30.111
+    r12m:
+        ansible_host: 10.20.30.112
+    r13m:
+        ansible_host: 10.20.30.113
+
+  vars:
+      ansible_user: admin
+      ansible_connection: network_cli
+      ansible_network_os: routeros

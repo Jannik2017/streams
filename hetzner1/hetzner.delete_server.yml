@@ -1,0 +1,14 @@
+---
+- name: "Delete hetzner cloud server"
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  user: root
+  tasks:
+    - name: "Delete hetzner cloud server"
+      hetzner.hcloud.hcloud_server:
+        api_token: "{{ lookup('env', 'HCLOUD_TOKEN') }}"
+        location: "fsn1"
+        name: "test-{{ item }}"
+        state: absent
+      with_sequence: count=2

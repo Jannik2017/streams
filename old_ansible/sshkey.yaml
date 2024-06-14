@@ -1,15 +1,14 @@
 ---
 
-- hosts: router
-
+- name: "Add ssh keys to routers"
+  hosts: router
   connection: network_cli
   gather_facts: 'no'
 
   tasks:
     - name: Configure remote
-      vyos_config:
+      vyos.vyos.vyos_config:
         lines:
-          - set system login user vyos authentication public-keys aibix@admin2 key 'AAAAC3NzaC1lZDI1NTE5AAAAIE5m1XvL7TLfEQyZs6IaySJxAoIS22V2TenKvqboXZqN'
-          - set system login user vyos authentication public-keys aibix@admin2 type 'ssh-ed25519'
+          - set system login user vyos authentication public-keys aibix@doodlemox key 'AAAAC3NzaC1lZDI1NTE5AAAAIJhIGgYUf/Sl4xr4uv+nrMbpDhulZWQxynX5OBTvalsz'
+          - set system login user vyos authentication public-keys aibix@doodlemox type 'ssh-ed25519'
         save: true
-        

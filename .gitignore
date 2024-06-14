@@ -67,3 +67,5 @@ tags
 .abx*/
 ansible-venv/
 .*-venv/
+hetzner-api.txt
+

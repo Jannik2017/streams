@@ -1,0 +1,9 @@
+---
+- name: tmux installieren
+  hosts: all
+  remote_user: root
+  tasks:
+  - name: tmux installieren
+    apt:
+      name: tmux
+      state: present

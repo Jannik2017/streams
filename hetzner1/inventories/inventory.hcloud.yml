@@ -1,0 +1,9 @@
+---
+# Example with locations, types, status
+plugin: hetzner.hcloud.hcloud
+locations:
+  - fsn1
+types:
+  - cx11
+status:
+  - running
