@@ -1,4 +1,8 @@
 ---
-
-- name: Just doodling
-  
+- name: Write hostname
+  hosts: localhost
+  tasks:
+  - name: Write hostname using jinja2
+    ansible.builtin.template:
+      src: templates/test.j2
+      dest: out/doodle1-hostname.txt

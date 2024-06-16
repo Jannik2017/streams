@@ -1,0 +1,4 @@
+set interfaces bridge br100 address '10.131.0.1/24'
+set interfaces bridge br100 member interface eth2
+set interfaces bridge br100 member interface eth5
+set interfaces bridge br100 mtu '1401'

@@ -1,0 +1,4 @@
+set interfaces {{ item.interface_type }} {{ item.interface }} address '{{ item.ipv4_address }}'
+set interfaces {{ item.interface_type }} {{ item.interface }} member interface eth2
+set interfaces {{ item.interface_type }} {{ item.interface }} member interface eth5
+set interfaces {{ item.interface_type }} {{ item.interface }} mtu '{{ item.mtu }}'
