@@ -14,3 +14,7 @@
       label: "{{ item.interface }}"
     when: os == "vyos"
     delegate_to: localhost
+
+  - name: Remove Whitespace
+    ansible.builtin.command:
+      cmd: sed -i 's/^\s*//' out/test.txt

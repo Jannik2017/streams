@@ -30,4 +30,6 @@ router:
           members:
             - eth2
             - eth5
+            - eth6
+            - eth7
           mtu: 1400

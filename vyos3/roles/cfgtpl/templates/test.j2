@@ -6,6 +6,6 @@
         {% endfor %}
     {% endif %}
     {% if item.mtu is defined %}
-    set interfaces {{ item.interface_type }} {{ item.interface }} mtu '{{ item.mtu }}'
+        set interfaces {{ item.interface_type }} {{ item.interface }} mtu '{{ item.mtu }}'
     {% endif %}
 {% endfor %}
