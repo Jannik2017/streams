@@ -1,15 +1,12 @@
 ---
 
-- hosts: router
+
+
+- hosts: localhost
+  connection: local
   gather_facts: "no"
 
-  connection: network_cli
-
   roles:
-    - role: vyos_setup
+    - role: cfgtpl
       tags: vyos
       when: os == "vyos"
-    - role: mtk_setup
-      tags: mikrotik
-      when: os == "mikrotik"
-    

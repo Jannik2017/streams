@@ -1,13 +1,16 @@
 ---
 - name: Fill template
-  hosts: localhost
-  #gather_facts: false
+  hosts: router
+  connection: local
+  gather_facts: false
+
   tasks:
   - name: Fill template using jinja2
     ansible.builtin.template:
-      src: templates/test.j2
-      dest: /home/aibix/streams/vyos3/out/test.txt
+      src: roles/cfgtpl/templates/test.j2
+      dest: out/test.txt
     loop: "{{ interfaces }}"
     loop_control:
       label: "{{ item.interface }}"
     when: os == "vyos"
+    delegate_to: localhost

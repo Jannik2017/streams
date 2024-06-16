@@ -1,4 +1,11 @@
-set interfaces {{ item.interface_type }} {{ item.interface }} address '{{ item.ipv4_address }}'
-set interfaces {{ item.interface_type }} {{ item.interface }} member interface eth2
-set interfaces {{ item.interface_type }} {{ item.interface }} member interface eth5
-set interfaces {{ item.interface_type }} {{ item.interface }} mtu '{{ item.mtu }}'
+{% for item in interfaces %}
+    set interfaces {{ item.interface_type }} {{ item.interface }} address '{{ item.ipv4_address }}'
+    {% if item.interface_type == "bridge" %}
+        {% for i in item.members %}
+            set interfaces {{ item.interface_type }} {{ item.interface }} member interface {{ i }}
+        {% endfor %}
+    {% endif %}
+    {% if item.mtu is defined %}
+    set interfaces {{ item.interface_type }} {{ item.interface }} mtu '{{ item.mtu }}'
+    {% endif %}
+{% endfor %}

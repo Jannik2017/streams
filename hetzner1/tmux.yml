@@ -1,0 +1,13 @@
+---
+- name: tmux installieren
+  hosts: all
+  remote_user: root
+  tasks:
+  - name: apt update
+    apt:
+      update_cache: true
+      cache_valid_time: 3600
+  - name: mc installieren
+    apt:
+      name: mc
+      state: present

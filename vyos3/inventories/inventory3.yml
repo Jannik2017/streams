@@ -1,0 +1,33 @@
+router:
+
+  hosts:
+    p3r1v:
+      os: "vyos"
+      ansible_host: 10.20.30.31
+      ansible_hostname: "p3r1v"
+      interfaces:
+        - interface: lo
+          interface_type: loopback
+          ipv4_address: 10.3.255.31/32
+        - interface: eth0
+          interface_type: ethernet
+          ipv4_address: dhcp
+        - interface: eth1
+          interface_type: ethernet
+          ipv4_address: dhcp
+          mtu: 1400
+        - interface: eth3
+          interface_type: ethernet
+          ipv4_address: 10.3.12.1/24
+          mtu: 1400
+        - interface: eth4
+          interface_type: ethernet
+          ipv4_address: 10.3.15.1/24
+          mtu: 1400      
+        - interface: br100
+          interface_type: bridge
+          ipv4_address: 10.131.0.1/24
+          members:
+            - eth2
+            - eth5
+          mtu: 1400
