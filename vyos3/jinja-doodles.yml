@@ -8,7 +8,7 @@
   - name: Fill template using jinja2
     ansible.builtin.template:
       src: roles/cfgtpl/templates/test.j2
-      dest: out/test.txt
+      dest: out/{{ ansible_hostname }}.cfg
     loop: "{{ interfaces }}"
     loop_control:
       label: "{{ item.interface }}"
@@ -17,4 +17,4 @@
 
   - name: Remove Whitespace
     ansible.builtin.command:
-      cmd: sed -i 's/^\s*//' out/test.txt
+      cmd: sed -i 's/^\s*//' out/{{ ansible_hostname }}.cfg
