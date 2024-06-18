@@ -3,6 +3,7 @@
 - name: Vyos Kram
   hosts: all
   vars:
+    ansible_user: vyos
     ansible_network_os: vyos.vyos.vyos
   # throttle: 1
   gather_facts: false
@@ -13,5 +14,5 @@
     vyos_config:
       backup: true
       backup_options:
-        filename: "{{ inventory_hostname }}"
-        dir_path: "/home/aibix/streams/vyos3/out"
+        filename: "{{ inventory_hostname }}.config"
+        dir_path: "/home/aibix/isp-cfgs"

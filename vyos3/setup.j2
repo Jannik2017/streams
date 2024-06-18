@@ -1,0 +1,150 @@
+{# interfaces #}
+{% for item in interfaces %}
+    {% if item.interface != "eth0" %}
+        delete interfaces {{ item.interface_type }} {{ item.interface }}
+    {% endif %}
+    set interfaces {{ item.interface_type }} {{ item.interface }} address '{{ item.ipv4_address }}'
+    {% if item.interface_type == "bridge" %}
+        {% for m in item.members %}
+            set interfaces {{ item.interface_type }} {{ item.interface }} member interface {{ m }}
+        {% endfor %}
+    {% endif %}
+    {% if item.interface_type == "wireguard" %}
+        {% for p in item.peers %}
+            set interfaces wireguard wg0 description '{{ p.peer }}'
+            set interfaces wireguard wg0 peer {{ p.peer }} address '{{ p.address }}'
+            set interfaces wireguard wg0 peer {{ p.peer }} allowed-ips '{{ p.allowed_ips }}'
+            set interfaces wireguard wg0 peer {{ p.peer }} port '{{ p.port }}'
+            set interfaces wireguard wg0 peer {{ p.peer }} public-key '{{ p.public_key }}='
+        {% endfor %}
+        set interfaces wireguard wg0 port '{{ item.port }}'
+        set interfaces wireguard wg0 private-key '{{ item.private_key }}'
+    {% endif %}
+    {% if item.mtu is defined %}
+        set interfaces {{ item.interface_type }} {{ item.interface }} mtu '{{ item.mtu }}'
+    {% endif %}
+{% endfor %}
+
+{# policy #}
+{% if policy is defined %}
+    {% for p in policy %}
+        {# route-map #}
+        {% if p.route_maps is defined %}
+            {% for rm in p.route_maps %}
+                set policy route-map {{ rm.route_map }} description {{ rm.description }}
+                {% for r in rm.rules %}
+                    set policy route-map {{ rm.route_map }} rule {{ r.rule }} action {{ r.action }}
+                    {% if r.match is defined %}
+                        set policy route-map {{ rm.route_map }} rule {{ r.rule }} match {{ r.match }}
+                    {% endif %}
+                    {% if r.set is defined %}
+                        set policy route-map {{ rm.route_map }} rule {{ r.rule }} set {{ r.set }}
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+{# bgp #}
+{% if bgp is defined %}
+    {# parameters #}
+    set protocols bgp parameters router-id '{{ bgp.router_id }}'
+    set protocols bgp system-as '{{ bgp.as }}'
+    {# 'global' afis #}
+    {% if bgp.afis is defined %}
+        {% for af in bgp.afis %}
+            {% if af.aggregates is defined %}
+                {% for aggregate in af.aggregates %}
+                    set protocols bgp address-family {{ af.afi }} aggregate-address {{ aggregate }}
+                {% endfor %}
+            {% endif %}
+            {% if af.networks is defined %}
+                {% for network in af.networks %}
+                    set protocols bgp address-family {{ af.afi }} network {{ network }}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    {# neighbors #}
+    {% for n in bgp.neighbors %}
+        set protocols bgp neighbor {{ n.ipv4_address }} description '{{ n.description }}'
+        set protocols bgp neighbor {{ n.ipv4_address }} remote-as '{{ n.remote_as }}'
+        set protocols bgp neighbor {{ n.ipv4_address }} update-source '{{ n.update_source }}'
+        {% if n.afis is defined %}
+            {% for af in n.afis %}
+                {% if af.next_hop is defined %}
+                    set protocols bgp neighbor {{ n.ipv4_address }} address-family {{ af.afi }} {{ af.next_hop }}
+                {% endif %}
+                {% if af.route_maps.route_map_export is defined %}
+                    set protocols bgp neighbor {{ n.ipv4_address }} address-family {{ af.afi }} route-map export '{{ af.route_maps.route_map_export }}'
+                {% endif %}
+                {% if af.route_maps.route_map_import is defined %}
+                    set protocols bgp neighbor {{ n.ipv4_address }} address-family {{ af.afi }} route-map import '{{ af.route_maps.route_map_import }}'
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+{# mpls #}
+{% if mpls is defined %}
+    {% for i in mpls.interfaces %}
+        set protocols mpls interface '{{ i.interface }}'
+    {% endfor %}
+    {% if mpls.ldp is defined %}
+        set protocols mpls ldp router-id '{{ mpls.ldp.router_id }}'
+        set protocols mpls ldp discovery transport-ipv4-address '{{ mpls.ldp.router_id }}'
+        {% if mpls.ldp.interfaces is defined %}
+            {% for i in mpls.ldp.interfaces %}
+                set protocols mpls ldp interface '{{ i.interface }}'
+            {% endfor %}
+        {% endif %}
+    {% endif %}
+{% endif %}
+
+{# ospf #}
+{% if ospf is defined %}
+    set protocols ospf parameters router-id '{{ ospf.router_id }}'
+    {% for a in ospf.areas %}
+        {% for n in a.networks %}
+            set protocols ospf area {{ a.area }} network '{{ n }}'
+        {% endfor %}
+    {% endfor %}
+    {% for i in ospf.interfaces %}
+        {% if i.passive is defined and i.passive == true %}
+            set protocols ospf interface {{ i.interface }} passive
+        {% else %}
+            set protocols ospf interface {{ i.interface }}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+{# static #}
+{% if static is defined %}
+    {% for route in static.routes %}
+        set protocols static route {{ route.route }} next-hop {{ route.next_hop }}
+    {% endfor %}
+{% endif %}
+
+{# common stuff #}
+set service ntp server 1.pool.ntp.org
+set service ntp server 2.pool.ntp.org
+set service ssh client-keepalive-interval '180'
+set service ssh port '22'
+set system config-management commit-revisions '100'
+set system conntrack modules ftp
+set system conntrack modules h323
+set system conntrack modules nfs
+set system conntrack modules pptp
+set system conntrack modules sip
+set system conntrack modules sqlnet
+set system conntrack modules tftp
+set system host-name '{{ ansible_hostname }}'
+set system login user vyos authentication encrypted-password '$6$rounds=656000$5/Y/ohzSSjTR9jNp$n7lIywCqAQgwRLULDtdIGBAG9V7mRbTV5ECWX1VbplUn1AJVOskc5cEZZk4YquB.9HBB25aYh6pstcjsYCHQD0'
+set system login user vyos authentication public-keys aibix@admin2 key 'AAAAC3NzaC1lZDI1NTE5AAAAIE5m1XvL7TLfEQyZs6IaySJxAoIS22V2TenKvqboXZqN'
+set system login user vyos authentication public-keys aibix@admin2 type 'ssh-ed25519'
+set system login user vyos authentication public-keys aibix@doodlemox key 'AAAAC3NzaC1lZDI1NTE5AAAAIJhIGgYUf/Sl4xr4uv+nrMbpDhulZWQxynX5OBTvalsz'
+set system login user vyos authentication public-keys aibix@doodlemox type 'ssh-ed25519'
+set system login user vyos authentication public-keys aibix@minismox key 'AAAAC3NzaC1lZDI1NTE5AAAAIJPRSV+ocoYTP26UwMYUXsd0gVKSmrFC3WaOVJwEY0L1'
+set system login user vyos authentication public-keys aibix@minismox type 'ssh-ed25519'

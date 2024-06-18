@@ -1,0 +1,34 @@
+---
+
+- name: Fill template
+  hosts: router
+  connection: network_cli
+  gather_facts: false
+
+  tasks:
+#  - name: Delete config
+#    vyos.vyos.vyos_config:
+#      lines:
+#        - delete protocols bgp
+#        - delete protocols mpls
+#        - delete protocols ospf
+#        - delete protocols static
+#        - delete interface wireguard wg0
+#        - delete interface br100
+#      save: true
+
+  - name: Generate config using jinja2
+    ansible.builtin.template:
+      src: setup.j2
+      dest: out/{{ ansible_hostname }}-setup.cfg
+    delegate_to: localhost
+
+  - name: Remove Whitespaces
+    ansible.builtin.command:
+      cmd: sed -i 's/^\s*//' out/{{ ansible_hostname }}-setup.cfg
+    delegate_to: localhost
+
+  - name: Deploy config
+    vyos.vyos.vyos_config:
+      src: out/{{ ansible_hostname }}-setup.cfg
+      backup: true
