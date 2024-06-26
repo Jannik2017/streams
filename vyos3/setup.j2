@@ -1,28 +1,30 @@
 {# interfaces #}
 {% for item in interfaces %}
-    {% if item.interface != "eth0" %}
+    {#{% if item.interface != "eth0" %}
         delete interfaces {{ item.interface_type }} {{ item.interface }}
-    {% endif %}
-    set interfaces {{ item.interface_type }} {{ item.interface }} address '{{ item.ipv4_address }}'
+    {% endif %}#}
     {% if item.interface_type == "bridge" %}
         {% for m in item.members %}
             set interfaces {{ item.interface_type }} {{ item.interface }} member interface {{ m }}
         {% endfor %}
     {% endif %}
     {% if item.interface_type == "wireguard" %}
+        set interfaces wireguard wg0 private-key '{{ item.private_key }}'
+        set interfaces wireguard wg0 port '{{ item.port }}'
         {% for p in item.peers %}
             set interfaces wireguard wg0 description '{{ p.peer }}'
             set interfaces wireguard wg0 peer {{ p.peer }} address '{{ p.address }}'
             set interfaces wireguard wg0 peer {{ p.peer }} allowed-ips '{{ p.allowed_ips }}'
             set interfaces wireguard wg0 peer {{ p.peer }} port '{{ p.port }}'
-            set interfaces wireguard wg0 peer {{ p.peer }} public-key '{{ p.public_key }}='
+            set interfaces wireguard wg0 peer {{ p.peer }} public-key '{{ p.public_key }}'
         {% endfor %}
-        set interfaces wireguard wg0 port '{{ item.port }}'
-        set interfaces wireguard wg0 private-key '{{ item.private_key }}'
     {% endif %}
     {% if item.mtu is defined %}
         set interfaces {{ item.interface_type }} {{ item.interface }} mtu '{{ item.mtu }}'
+        set interfaces {{ item.interface_type }} {{ item.interface }} ip adjust-mss '{{ item.mtu - 40 }}'
+        set interfaces {{ item.interface_type }} {{ item.interface }} ipv6 adjust-mss '{{ item.mtu - 60 }}'
     {% endif %}
+    set interfaces {{ item.interface_type }} {{ item.interface }} address '{{ item.ipv4_address }}'
 {% endfor %}
 
 {# policy #}

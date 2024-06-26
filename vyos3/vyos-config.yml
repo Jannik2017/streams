@@ -6,16 +6,22 @@
   gather_facts: false
 
   tasks:
-#  - name: Delete config
-#    vyos.vyos.vyos_config:
-#      lines:
-#        - delete protocols bgp
-#        - delete protocols mpls
-#        - delete protocols ospf
-#        - delete protocols static
-#        - delete interface wireguard wg0
-#        - delete interface br100
-#      save: true
+  - debug: msg='{{ ansible_run_tags }}'
+    tags: ['debug']
+    when: "'debug' in ansible_run_tags"
+
+  - name: Delete config
+    vyos.vyos.vyos_config:
+      lines:
+        - delete protocols bgp
+        - delete protocols mpls
+        - delete protocols ospf
+        - delete protocols static
+        - delete interfaces wireguard wg0
+        - delete interfaces br100
+      save: true
+    tags: ['delete']
+    when: "'delete' in ansible_run_tags"
 
   - name: Generate config using jinja2
     ansible.builtin.template:
