@@ -12,11 +12,11 @@
     - name: configure mgmt vrf
       vyos_config:
         lines:
-          - set vrf name 'MGMT' table 2030
+          - set vrf name mgmt table 222
           - set vrf bind-to-all
-          - set interfaces ethernet eth0 vrf 'MGMT'
-          - set service ssh vrf 'MGMT'
-          - set service ssh port '22'
+          - set interfaces ethernet eth0 vrf mgmt
+          - set service ssh vrf mgmt
+          - set service ssh port 22
       tags: vyos,first
       when: os == "vyos"
       
