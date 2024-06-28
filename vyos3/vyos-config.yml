@@ -19,22 +19,45 @@
         - delete protocols static
         - delete interfaces wireguard wg0
         - delete interfaces br100
+        - delete interfaces loopback lo
+        - delete interfaces ethernet eth1
+        - delete interfaces ethernet eth2
+        - delete interfaces ethernet eth3
+        - delete interfaces ethernet eth4
       save: true
     tags: ['delete']
     when: "'delete' in ansible_run_tags"
 
   - name: Generate config using jinja2
     ansible.builtin.template:
-      src: setup.j2
+      src: setup-mit-set.j2
       dest: out/{{ ansible_hostname }}-setup.cfg
     delegate_to: localhost
-
+    tags: ['generate']
+    when: "'generate' in ansible_run_tags"
+    
   - name: Remove Whitespaces
     ansible.builtin.command:
       cmd: sed -i 's/^\s*//' out/{{ ansible_hostname }}-setup.cfg
     delegate_to: localhost
+    tags: ['generate']
+    when: "'generate' in ansible_run_tags"
+
+  - name: Remove empty lines
+    ansible.builtin.command:
+      cmd: sed -i '/^$/d' out/{{ ansible_hostname }}-setup.cfg
+    delegate_to: localhost
+    tags: ['generate']
+    when: "'generate' in ansible_run_tags"
 
   - name: Deploy config
-    vyos.vyos.vyos_config:
-      src: out/{{ ansible_hostname }}-setup.cfg
-      backup: true
+    copy: src=out/{{ ansible_hostname }}-setup.cfg dest=out/{{ ansible_hostname }}-setup.cfg
+    tags: ['deploy']
+    when: "'deploy' in ansible_run_tags"
+
+  - name: Activate config
+    vyos.vyos.vyos_command:
+      commands:
+        - sg vyattacfg -c vbash {{ ansible_hostname }}-setup.cfg
+    tags: ['activate']
+    when: "'activate' in ansible_run_tags"

@@ -5,6 +5,7 @@ set interfaces ethernet eth0 offload gro
 set interfaces ethernet eth0 offload gso
 set interfaces ethernet eth0 offload sg
 set interfaces ethernet eth0 offload tso
+set interfaces ethernet eth0 vrf 'mgmt'
 set interfaces ethernet eth1 address '10.2.12.2/24'
 set interfaces ethernet eth1 hw-id '00:24:18:f2:02:01'
 set interfaces ethernet eth1 mtu '1400'
@@ -57,10 +58,12 @@ set protocols ospf interface eth3
 set protocols ospf interface eth4
 set protocols ospf interface lo
 set protocols ospf parameters router-id '10.2.255.22'
+set service lldp interface all
 set service ntp server 1.pool.ntp.org
 set service ntp server 2.pool.ntp.org
 set service ssh client-keepalive-interval '180'
 set service ssh port '22'
+set service ssh vrf 'mgmt'
 set system config-management commit-revisions '100'
 set system conntrack modules ftp
 set system conntrack modules h323
@@ -73,6 +76,8 @@ set system host-name 'p2r2v'
 set system login user vyos authentication encrypted-password '$6$rounds=656000$qIXwQybgVMqbmyLH$ludPitKnBDNOltO2Q9ny.DkLzQczLwyYxpfWwX3ZHNFCLndRXDqkvVUXvGYz4/NXImIlwNb20YZ7rJtt/dUAr/'
 set system login user vyos authentication public-keys aibix@admin2 key 'AAAAC3NzaC1lZDI1NTE5AAAAIE5m1XvL7TLfEQyZs6IaySJxAoIS22V2TenKvqboXZqN'
 set system login user vyos authentication public-keys aibix@admin2 type 'ssh-ed25519'
+set system login user vyos authentication public-keys aibix@doodlemox key 'AAAAC3NzaC1lZDI1NTE5AAAAIJhIGgYUf/Sl4xr4uv+nrMbpDhulZWQxynX5OBTvalsz'
+set system login user vyos authentication public-keys aibix@doodlemox type 'ssh-ed25519'
 set system login user vyos authentication public-keys aibix@minismox key 'AAAAC3NzaC1lZDI1NTE5AAAAIJPRSV+ocoYTP26UwMYUXsd0gVKSmrFC3WaOVJwEY0L1'
 set system login user vyos authentication public-keys aibix@minismox type 'ssh-ed25519'
-set system name-server '1.1.1.1'
+set vrf name mgmt table '222'
