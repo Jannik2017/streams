@@ -478,49 +478,49 @@ router:
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
-              - rr: route-reflector-client
+                rr: route-reflector-client
           - ipv4_address: 10.2.255.22
             description: p2r2v
             remote_as: 65002
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
-              - rr: route-reflector-client
+                rr: route-reflector-client
           - ipv4_address: 10.2.255.23
             description: p2r3v
             remote_as: 65002
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
-              - rr: route-reflector-client
+                rr: route-reflector-client
           - ipv4_address: 10.2.255.24
             description: p2r4v
             remote_as: 65002
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
-              - rr: route-reflector-client
+                rr: route-reflector-client
           - ipv4_address: 10.2.255.25
             description: p2r5v
             remote_as: 65002
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
-              - rr: route-reflector-client
+                rr: route-reflector-client
           - ipv4_address: 10.2.255.27
             description: p2r7v
             remote_as: 65002
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
-              - rr: route-reflector-client
+                rr: route-reflector-client
           - ipv4_address: 10.2.255.28
             description: p2r8v
             remote_as: 65002
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
-              - rr: route-reflector-client
+                rr: route-reflector-client
       mpls:
         interfaces:
           - interface: eth1
