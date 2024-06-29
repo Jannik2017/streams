@@ -94,6 +94,9 @@ set protocols bgp neighbor {{ n.ipv4_address }} address-family {{ af.afi }}
 {% if af.next_hop is defined %}
 set protocols bgp neighbor {{ n.ipv4_address }} address-family {{ af.afi }} {{ af.next_hop }}
 {% endif %}
+{% if af.rr is defined %}
+set protocols bgp neighbor {{ n.ipv4_address }} address-family {{ af.afi }} {{ af.rr }}
+{% endif %}
 {% if af.route_maps.route_map_export is defined %}
 set protocols bgp neighbor {{ n.ipv4_address }} address-family {{ af.afi }} route-map export '{{ af.route_maps.route_map_export }}'
 {% endif %}
