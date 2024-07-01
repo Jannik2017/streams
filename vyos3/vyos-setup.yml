@@ -30,7 +30,7 @@
 
   - name: Render jinja2 config
     vyos.vyos.vyos_config:
-      src: setup-mit-set-ohne-leading-spaces.j2
+      src: vyos-setup.j2
       save: true
     tags: ['generate']
     when: "'generate' in ansible_run_tags"

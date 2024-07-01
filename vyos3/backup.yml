@@ -15,4 +15,4 @@
       backup: true
       backup_options:
         filename: "{{ inventory_hostname }}.config"
-        dir_path: "/home/aibix/isp-cfgs"
+        dir_path: "backup/"
