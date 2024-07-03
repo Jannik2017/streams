@@ -34,3 +34,11 @@
       save: true
     tags: ['generate']
     when: "'generate' in ansible_run_tags"
+
+  - name: Write config using jinja2
+    ansible.builtin.template:
+      src: vyos-setup.j2
+      dest: out/{{ ansible_hostname }}.txt
+    delegate_to: localhost
+    tags: ['test']
+    when: "'test' in ansible_run_tags"

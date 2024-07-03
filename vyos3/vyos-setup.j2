@@ -140,8 +140,12 @@ set protocols ospf interface {{ i.interface }}
 {% endif %}
 {# static #}
 {% if static is defined %}
-{% for route in static.routes %}
-set protocols static route {{ route.route }} next-hop {{ route.next_hop }}
+{% for s in static %}
+{% if s.routes is defined %}
+{% for r in s.routes %}
+set protocols static route {{ r.destination }} next-hop {{ r.next_hop }}
+{% endfor %}
+{% endif %}
 {% endfor %}
 {% endif %}
 {# common stuff #}

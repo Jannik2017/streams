@@ -41,9 +41,9 @@ router:
           private_key: 'QHMqK4UK7pMiV/iWTDb5G39axuYpnjxLJ/0Mnw/RbX4='
           mtu: 1400
       static:
-        routes:
+        - routes:
           - destination: 78.47.154.241/32
-            gateway: 192.168.111.1
+            next_hop: 192.168.111.1
       policy:
         - route_maps:
           - route_map: NACH_EXTERN
