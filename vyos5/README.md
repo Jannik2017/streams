@@ -1,1 +1,2 @@
-python nornir netbox playground
+python nornir nautobot playground
+replace netbox with nautobot
