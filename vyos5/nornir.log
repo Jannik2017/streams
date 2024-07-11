@@ -647,3 +647,62 @@ NameError: name 'nautobot_create_device' is not defined
 2024-07-11 21:43:22,945 -  nornir.core -     INFO -        run() - Running task 'fetch_vyos_config' with args {} on 1 hosts
 2024-07-11 21:48:50,914 -  nornir.core -     INFO -        run() - Running task 'fetch_vyos_config' with args {} on 1 hosts
 2024-07-11 21:50:00,503 -  nornir.core -     INFO -        run() - Running task 'fetch_vyos_config' with args {} on 1 hosts
+2024-07-11 22:05:19,552 -  nornir.core -     INFO -        run() - Running task 'fetch_vyos_config' with args {} on 1 hosts
+2024-07-11 22:05:29,565 - nornir.core.task -    ERROR -      start() - Host 'p2r1v': task 'netmiko_send_command' failed with traceback:
+Traceback (most recent call last):
+  File "/home/aibix/streams/vyos5/.abx-vyos5/lib/python3.11/site-packages/netmiko/base_connection.py", line 1139, in establish_connection
+    self.remote_conn_pre.connect(**ssh_connect_params)
+  File "/home/aibix/streams/vyos5/.abx-vyos5/lib/python3.11/site-packages/paramiko/client.py", line 386, in connect
+    sock.connect(addr)
+TimeoutError: timed out
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/aibix/streams/vyos5/.abx-vyos5/lib/python3.11/site-packages/nornir/core/task.py", line 99, in start
+    r = self.task(self, **self.params)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aibix/streams/vyos5/.abx-vyos5/lib/python3.11/site-packages/nornir_netmiko/tasks/netmiko_send_command.py", line 26, in netmiko_send_command
+    net_connect = task.host.get_connection(CONNECTION_NAME, task.nornir.config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aibix/streams/vyos5/.abx-vyos5/lib/python3.11/site-packages/nornir/core/inventory.py", line 494, in get_connection
+    self.open_connection(
+  File "/home/aibix/streams/vyos5/.abx-vyos5/lib/python3.11/site-packages/nornir/core/inventory.py", line 546, in open_connection
+    conn_obj.open(
+  File "/home/aibix/streams/vyos5/.abx-vyos5/lib/python3.11/site-packages/nornir_netmiko/connections/netmiko.py", line 59, in open
+    connection = ConnectHandler(**parameters)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aibix/streams/vyos5/.abx-vyos5/lib/python3.11/site-packages/netmiko/ssh_dispatcher.py", line 401, in ConnectHandler
+    return ConnectionClass(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aibix/streams/vyos5/.abx-vyos5/lib/python3.11/site-packages/netmiko/base_connection.py", line 490, in __init__
+    self._open()
+  File "/home/aibix/streams/vyos5/.abx-vyos5/lib/python3.11/site-packages/netmiko/base_connection.py", line 495, in _open
+    self.establish_connection()
+  File "/home/aibix/streams/vyos5/.abx-vyos5/lib/python3.11/site-packages/netmiko/base_connection.py", line 1161, in establish_connection
+    raise NetmikoTimeoutException(msg)
+netmiko.exceptions.NetmikoTimeoutException: TCP connection to device failed.
+
+Common causes of this problem are:
+1. Incorrect hostname or IP address.
+2. Wrong TCP port.
+3. Intermediate firewall blocking access.
+
+Device settings: vyos 10.20.30.21:22
+
+
+
+2024-07-11 22:05:29,565 - nornir.core.task -    ERROR -      start() - Host 'p2r1v': task 'fetch_vyos_config' failed with traceback:
+Traceback (most recent call last):
+  File "/home/aibix/streams/vyos5/.abx-vyos5/lib/python3.11/site-packages/nornir/core/task.py", line 99, in start
+    r = self.task(self, **self.params)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/aibix/streams/vyos5/fetch_config.py", line 7, in fetch_vyos_config
+    config_result = task.run(
+                    ^^^^^^^^^
+  File "/home/aibix/streams/vyos5/.abx-vyos5/lib/python3.11/site-packages/nornir/core/task.py", line 174, in run
+    raise NornirSubTaskError(task=run_task, result=r)
+nornir.core.exceptions.NornirSubTaskError: Subtask: netmiko_send_command (failed)
+
+
+2024-07-11 22:06:58,647 -  nornir.core -     INFO -        run() - Running task 'fetch_vyos_config' with args {} on 1 hosts
