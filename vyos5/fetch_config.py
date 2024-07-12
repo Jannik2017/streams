@@ -33,7 +33,7 @@ def main():
         print(task_results)
         print("0: ", task_results[1])
         for task_result in task_results[1]:
-            print(task_name, task_result)
+            print(task_result)
             print(f"{host}: {task_result.result}")
 
 if __name__ == "__main__":

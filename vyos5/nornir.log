@@ -706,3 +706,4 @@ nornir.core.exceptions.NornirSubTaskError: Subtask: netmiko_send_command (failed
 
 
 2024-07-11 22:06:58,647 -  nornir.core -     INFO -        run() - Running task 'fetch_vyos_config' with args {} on 1 hosts
+2024-07-11 22:14:49,551 -  nornir.core -     INFO -        run() - Running task 'fetch_vyos_config' with args {} on 1 hosts
