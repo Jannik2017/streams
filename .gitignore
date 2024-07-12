@@ -68,4 +68,6 @@ tags
 ansible-venv/
 .*-venv/
 hetzner-api.txt
-#nornir.log
+nornir.log
+*-config.txt
+
