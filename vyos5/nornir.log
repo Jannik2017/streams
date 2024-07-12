@@ -707,3 +707,13 @@ nornir.core.exceptions.NornirSubTaskError: Subtask: netmiko_send_command (failed
 
 2024-07-11 22:06:58,647 -  nornir.core -     INFO -        run() - Running task 'fetch_vyos_config' with args {} on 1 hosts
 2024-07-11 22:14:49,551 -  nornir.core -     INFO -        run() - Running task 'fetch_vyos_config' with args {} on 1 hosts
+2024-07-12 10:03:36,849 -  nornir.core -     INFO -        run() - Running task 'fetch_vyos_config' with args {} on 1 hosts
+2024-07-12 10:07:37,407 -  nornir.core -     INFO -        run() - Running task 'fetch_vyos_config' with args {} on 1 hosts
+2024-07-12 10:10:42,517 -  nornir.core -     INFO -        run() - Running task 'fetch_vyos_config' with args {} on 1 hosts
+2024-07-12 10:11:08,715 -  nornir.core -     INFO -        run() - Running task 'fetch_vyos_config' with args {} on 1 hosts
+2024-07-12 10:26:44,234 -  nornir.core -     INFO -        run() - Running task 'fetch_vyos_config' with args {} on 1 hosts
+2024-07-12 10:29:25,374 -  nornir.core -     INFO -        run() - Running task 'fetch_vyos_config' with args {} on 1 hosts
+2024-07-12 10:31:21,032 -  nornir.core -     INFO -        run() - Running task 'fetch_vyos_config' with args {} on 1 hosts
+2024-07-12 10:32:29,506 -  nornir.core -     INFO -        run() - Running task 'fetch_vyos_config' with args {} on 1 hosts
+2024-07-12 10:33:39,386 -  nornir.core -     INFO -        run() - Running task 'fetch_vyos_config' with args {} on 1 hosts
+2024-07-12 10:34:41,143 -  nornir.core -     INFO -        run() - Running task 'fetch_vyos_config' with args {} on 1 hosts

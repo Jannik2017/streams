@@ -31,10 +31,10 @@ def main():
     for host, task_results in result.items():
         print(host)
         print(task_results)
-        print("0: ", task_results[1])
-        for task_result in task_results[1]:
+        print("1: ", task_results[1])
+        for task_result in task_results[1].result.split('\n'):
             print(task_result)
-            print(f"{host}: {task_result.result}")
+            print(f"{host}: {task_result}")
 
 if __name__ == "__main__":
     main()
