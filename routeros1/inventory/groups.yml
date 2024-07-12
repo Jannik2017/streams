@@ -1,0 +1,5 @@
+---
+routeros:
+  platform: routeros
+  data:
+    napalm_driver: ros
