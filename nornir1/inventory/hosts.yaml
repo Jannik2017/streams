@@ -1,0 +1,9 @@
+---
+p2r1v:
+    hostname: 10.20.30.21
+    group: 
+      - vyos
+p2r2v:
+    hostname: 10.20.30.22
+    group: 
+      - vyos
