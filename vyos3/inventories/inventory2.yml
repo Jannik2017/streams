@@ -620,6 +620,13 @@ router:
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
+      vrfs:
+      - vrf: mgmt
+        table: 222
+      services:
+      - service: ssh
+        vrf: mgmt
+        port: 22
 
 
     p2r8v:
@@ -653,8 +660,7 @@ router:
           - afi: 'ipv4-unicast'
             #aggregate:
             networks:
-              ipv4_unicast:
-                - 198.51.0.0/24
+              - 198.51.0.0/24
         neighbors:
           - ipv4_address: 10.2.255.26
             description: p2r6v
@@ -683,4 +689,11 @@ router:
           - interface: eth1
           - interface: eth2
           - interface: lo
+      vrfs:
+      - vrf: mgmt
+        table: 222
+      services:
+      - service: ssh
+        vrf: mgmt
+        port: 22
 
