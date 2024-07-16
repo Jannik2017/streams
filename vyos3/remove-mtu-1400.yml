@@ -1,0 +1,24 @@
+---
+- name: vrf config
+  hosts: router
+  vars:
+    ansible_user: vyos
+    ansible_network_os: vyos.vyos.vyos
+  gather_facts: no
+
+  connection: network_cli
+  
+  tasks:
+    - name: remove mtu 1500
+      vyos_config:
+        lines:
+          - set interface ethernet eth0 mtu 1500
+          - set interface ethernet eth1 mtu 1500
+          - set interface ethernet eth2 mtu 1500
+          - set interface ethernet eth3 mtu 1500
+          - set interface ethernet eth4 mtu 1500
+
+    - name: save
+      vyos.vyos.vyos_config:
+        save: true
+
