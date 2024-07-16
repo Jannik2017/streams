@@ -15,19 +15,20 @@ router:
         - interface: eth0
           interface_type: ethernet
           ipv4_address: dhcp
-          mtu: 1400
+          mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
           ipv4_address: 192.168.111.109/24
+          mtu: 1500
         - interface: eth3
           interface_type: ethernet
           ipv4_address: 10.2.12.1/24
-          mtu: 1400
+          mtu: 1528
         - interface: eth4
           interface_type: ethernet
           ipv4_address: 10.2.15.1/24
-          mtu: 1400
+          mtu: 1528
         - interface: wg0
           interface_type: wireguard
           ipv4_address: 172.17.21.2/30
@@ -40,10 +41,6 @@ router:
           port: 50021
           private_key: 'QHMqK4UK7pMiV/iWTDb5G39axuYpnjxLJ/0Mnw/RbX4='
           mtu: 1400
-      static:
-        - routes:
-          - destination: 78.47.154.241/32
-            next_hop: 192.168.111.1
       policy:
         - route_maps:
           - route_map: NACH_EXTERN
@@ -73,6 +70,7 @@ router:
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
+                next_hop: 'nexthop-self'
           - ipv4_address: 172.17.21.1
             description: streampf
             remote_as: 65009
@@ -106,6 +104,10 @@ router:
           - interface: eth3
           - interface: eth4
           - interface: lo
+      static:
+        - routes:
+          - destination: 78.47.154.241/32
+            next_hop: 192.168.111.1
       vrfs:
       - vrf: mgmt
         table: 222
@@ -126,20 +128,25 @@ router:
         - interface: eth0
           interface_type: ethernet
           ipv4_address: dhcp
-          mtu: 1400
+          mtu: 1500
+          vrf: mgmt
+        - interface: eth0
+          interface_type: ethernet
+          ipv4_address: dhcp
+          mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
           ipv4_address: 10.2.12.2/24
-          mtu: 1400
+          mtu: 1528
         - interface: eth3
           interface_type: ethernet
           ipv4_address: 10.2.23.2/24
-          mtu: 1400
+          mtu: 1528
         - interface: eth4
           interface_type: ethernet
           ipv4_address: 10.2.26.2/24
-          mtu: 1400
+          mtu: 1528
       bgp:
         router_id: 10.2.255.22
         as: 65002
@@ -150,6 +157,7 @@ router:
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
+                next_hop: 'nexthop-self'
       mpls:
         interfaces:
           - interface: eth1
@@ -194,23 +202,24 @@ router:
         - interface: eth0
           interface_type: ethernet
           ipv4_address: dhcp
-          mtu: 1400
+          mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
           ipv4_address: 10.2.23.3/24
-          mtu: 1400
+          mtu: 1528
         - interface: eth2
           interface_type: ethernet
           ipv4_address: 10.123.2.1/24
+          mtu: 1500
         - interface: eth3
           interface_type: ethernet
           ipv4_address: 10.2.34.3/24
-          mtu: 1400
+          mtu: 1528
         - interface: eth4
           interface_type: ethernet
           ipv4_address: 10.2.37.2/24
-          mtu: 1400
+          mtu: 1528
       bgp:
         router_id: 10.2.255.23
         as: 65002
@@ -226,6 +235,7 @@ router:
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
+                next_hop: 'nexthop-self'
       mpls:
         interfaces:
           - interface: eth1
@@ -270,22 +280,24 @@ router:
         - interface: eth0
           interface_type: ethernet
           ipv4_address: dhcp
-          mtu: 1400
+          mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
           ipv4_address: 10.2.34.4/24
-          mtu: 1400
+          mtu: 1528
         - interface: eth2
           interface_type: ethernet
           ipv4_address: 10.124.2.1/24
+          mtu: 1500
         - interface: eth3
           interface_type: ethernet
           ipv4_address: 10.124.3.1/24
+          mtu: 1500
         - interface: eth4
           interface_type: ethernet
           ipv4_address: 10.2.48.2/24
-          mtu: 1400
+          mtu: 1528
       bgp:
         router_id: 10.2.255.24
         as: 65002
@@ -293,9 +305,8 @@ router:
           - afi: 'ipv4-unicast'
             #aggregate:
             networks:
-              ipv4_unicast:
-                - 10.124.2.0/24
-                - 10.124.3.0/24
+              - 10.124.2.0/24
+              - 10.124.3.0/24
         neighbors:
           - ipv4_address: 10.2.255.26
             description: p2r6v
@@ -303,6 +314,7 @@ router:
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
+                next_hop: 'nexthop-self'
       mpls:
         interfaces:
           - interface: eth1
@@ -344,23 +356,24 @@ router:
         - interface: eth0
           interface_type: ethernet
           ipv4_address: dhcp
-          mtu: 1400
+          mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
           ipv4_address: 192.168.111.110/24
+          mtu: 1500
         - interface: eth2
           interface_type: ethernet
           ipv4_address: 10.2.15.5/24
-          mtu: 1400
+          mtu: 1528
         - interface: eth3
           interface_type: ethernet
           ipv4_address: 10.2.56.5/24
-          mtu: 1400
+          mtu: 1528
         - interface: eth4
           interface_type: ethernet
           ipv4_address: 10.125.4.1/24
-          mtu: 1400
+          mtu: 1500
         - interface: wg0
           interface_type: wireguard
           ipv4_address: 172.17.25.2/30
@@ -373,10 +386,6 @@ router:
           port: 50025
           private_key: 'WKVjCPf/8gPrQHdimzC5D0A9ZjJ6x2GBLp5gUAQjXHU='
           mtu: 1400
-      static:
-        routes:
-          - destination: 78.47.154.241/32
-            gateway: 192.168.111.1
       policy:
         - route_maps:
           - route_map: NACH_EXTERN
@@ -398,15 +407,21 @@ router:
           - afi: 'ipv4-unicast'
             #aggregate:
             networks:
-              ipv4_unicast:
-                - 10.125.4.0/24
+              - 10.125.4.0/24
         neighbors:
+          - ipv4_address: 192.168.111.15
+            description: p3r5v
+            remote_as: 65003
+            update_source: eth1
+            afis:
+              - afi: 'ipv4-unicast'
           - ipv4_address: 10.2.255.26
             description: p2r6v
             remote_as: 65002
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
+                next_hop: 'nexthop-self'
           - ipv4_address: 172.17.25.1
             description: streampf
             remote_as: 65009
@@ -434,6 +449,10 @@ router:
           - interface: eth2
           - interface: eth3
           - interface: lo
+      static:
+        routes:
+          - destination: 78.47.154.241/32
+            gateway: 192.168.111.1
       vrfs:
       - vrf: mgmt
         table: 222
@@ -454,20 +473,20 @@ router:
         - interface: eth0
           interface_type: ethernet
           ipv4_address: dhcp
-          mtu: 1400
+          mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
           ipv4_address: 10.2.56.6/24
-          mtu: 1400
+          mtu: 1528
         - interface: eth2
           interface_type: ethernet
           ipv4_address: 10.2.26.6/24
-          mtu: 1400
+          mtu: 1528
         - interface: eth3
           interface_type: ethernet
           ipv4_address: 10.2.67.6/24
-          mtu: 1400
+          mtu: 1528
       bgp:
         router_id: 10.2.255.26
         as: 65002
@@ -565,24 +584,20 @@ router:
         - interface: eth0
           interface_type: ethernet
           ipv4_address: dhcp
-          mtu: 1400
+          mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
           ipv4_address: 10.2.67.7/24
-          mtu: 1400
+          mtu: 1528
         - interface: eth2
           interface_type: ethernet
           ipv4_address: 10.2.37.7/24
-          mtu: 1400
+          mtu: 1528
         - interface: eth3
           interface_type: ethernet
           ipv4_address: 10.2.78.7/24
-          mtu: 1400
-        - interface: eth4
-          interface_type: ethernet
-          ipv4_address: 10.2.79.7/24
-          mtu: 1400
+          mtu: 1500
       ospf:
         router_id: 10.2.255.27
         areas:
@@ -594,14 +609,12 @@ router:
           - interface: eth1
           - interface: eth2
           - interface: eth3
-          - interface: eth4
           - interface: lo
       mpls:
         interfaces:
           - interface: eth1
           - interface: eth2
           - interface: eth3
-          - interface: eth4
         ldp:
           router_id: 10.2.255.27
           interfaces:
@@ -609,7 +622,6 @@ router:
             - interface: eth1
             - interface: eth2
             - interface: eth3
-            - interface: eth4
       bgp:
         router_id: 10.2.255.27
         as: 65002
@@ -620,6 +632,7 @@ router:
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
+                next_hop: 'nexthop-self'
       vrfs:
       - vrf: mgmt
         table: 222
@@ -640,19 +653,20 @@ router:
         - interface: eth0
           interface_type: ethernet
           ipv4_address: dhcp
-          mtu: 1400
+          mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
           ipv4_address: 10.2.78.8/24
-          mtu: 1400
+          mtu: 1528
         - interface: eth2
           interface_type: ethernet
           ipv4_address: 10.2.48.8/24
-          mtu: 1400
+          mtu: 1528
         - interface: eth3
           interface_type: ethernet
           ipv4_address: 198.51.0.1/24
+          mtu: 1500
       bgp:
         router_id: 10.2.255.28
         as: 65002
@@ -668,6 +682,7 @@ router:
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
+                next_hop: 'nexthop-self'
       mpls:
         interfaces:
           - interface: eth1

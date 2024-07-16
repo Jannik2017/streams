@@ -1,6 +1,6 @@
 ---
 
-- name: Fill template
+- name: setup vyos config
   hosts: router
   connection: network_cli
   gather_facts: false
@@ -10,35 +10,16 @@
     tags: ['debug']
     when: "'debug' in ansible_run_tags"
 
-  - name: Delete config
-    vyos.vyos.vyos_config:
-      lines:
-        - delete protocols bgp
-        - delete protocols mpls
-        - delete protocols ospf
-        - delete protocols static
-        - delete interfaces wireguard wg0
-        - delete interfaces br100
-        - delete interfaces loopback lo
-        - delete interfaces ethernet eth1
-        - delete interfaces ethernet eth2
-        - delete interfaces ethernet eth3
-        - delete interfaces ethernet eth4
-      save: true
-    tags: ['delete']
-    when: "'delete' in ansible_run_tags"
-
-  - name: Render jinja2 config
+  - name: Write config to device using jinja2
     vyos.vyos.vyos_config:
       src: vyos-setup.j2
       save: true
-    tags: ['generate']
-    when: "'generate' in ansible_run_tags"
 
   - name: Write config using jinja2
     ansible.builtin.template:
       src: vyos-setup.j2
-      dest: out/{{ ansible_hostname }}.txt
+      dest: out/{{ ansible_hostname }}-ansible.txt
     delegate_to: localhost
     tags: ['test']
     when: "'test' in ansible_run_tags"
+    

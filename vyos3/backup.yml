@@ -14,5 +14,5 @@
     vyos_config:
       backup: true
       backup_options:
-        filename: "{{ inventory_hostname }}.config"
+        filename: "{{ inventory_hostname }}-backup.txt"
         dir_path: "backup/"

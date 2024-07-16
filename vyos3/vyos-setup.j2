@@ -1,22 +1,5 @@
-{# vrf #}
-{% if vrfs is defined -%}
-{% for vrf in vrfs -%}
-set vrf name {{ vrf.vrf }} table '{{ vrf.table }}'
-{% endfor -%}
-{% endif -%}
-{# services #}
-{% if services is defined -%}
-{# ssh #}
-{% if ssh is defined -%}
-set service ssh port '{{ ssh.port }}'
-set service ssh vrf '{{ ssh.vrf }}'
-{% endif -%}
-{% endif -%}
 {# interfaces #}
 {% for item in interfaces -%}
-{#{% if item.interface != "eth0" -%}
-delete interfaces {{ item.interface_type }} {{ item.interface }}
-{% endif -%}#}
 {% if item.interface_type == "bridge" -%}
 {% for m in item.members -%}
 set interfaces {{ item.interface_type }} {{ item.interface }} member interface {{ m }}
@@ -35,8 +18,8 @@ set interfaces wireguard wg0 peer {{ p.peer }} public-key '{{ p.public_key }}'
 {% endif -%}
 {% if item.mtu is defined -%}
 set interfaces {{ item.interface_type }} {{ item.interface }} mtu '{{ item.mtu }}'
-set interfaces {{ item.interface_type }} {{ item.interface }} ip adjust-mss '{{ item.mtu - 40 }}'
-set interfaces {{ item.interface_type }} {{ item.interface }} ipv6 adjust-mss '{{ item.mtu - 60 }}'
+{#set interfaces {{ item.interface_type }} {{ item.interface }} ip adjust-mss '{{ item.mtu - 40 }}'#}
+{#set interfaces {{ item.interface_type }} {{ item.interface }} ipv6 adjust-mss '{{ item.mtu - 60 }}'#}
 {% endif %}
 {% if item.vrf is defined %}
 set interfaces {{ item.interface_type }} {{ item.interface }} vrf '{{ item.vrf }}'
@@ -90,7 +73,7 @@ set protocols bgp neighbor {{ n.ipv4_address }} remote-as '{{ n.remote_as }}'
 set protocols bgp neighbor {{ n.ipv4_address }} update-source '{{ n.update_source }}'
 {% if n.afis is defined %}
 {% for af in n.afis %}
-set protocols bgp neighbor {{ n.ipv4_address }} address-family {{ af.afi }}
+{#set protocols bgp neighbor {{ n.ipv4_address }} address-family {{ af.afi }}#}
 {% if af.next_hop is defined %}
 set protocols bgp neighbor {{ n.ipv4_address }} address-family {{ af.afi }} {{ af.next_hop }}
 {% endif %}
@@ -162,10 +145,19 @@ set system conntrack modules sip
 set system conntrack modules sqlnet
 set system conntrack modules tftp
 set system host-name '{{ ansible_hostname }}'
-set system login user vyos authentication encrypted-password '$6$rounds=656000$5/Y/ohzSSjTR9jNp$n7lIywCqAQgwRLULDtdIGBAG9V7mRbTV5ECWX1VbplUn1AJVOskc5cEZZk4YquB.9HBB25aYh6pstcjsYCHQD0'
-set system login user vyos authentication public-keys aibix@admin2 key 'AAAAC3NzaC1lZDI1NTE5AAAAIE5m1XvL7TLfEQyZs6IaySJxAoIS22V2TenKvqboXZqN'
-set system login user vyos authentication public-keys aibix@admin2 type 'ssh-ed25519'
-set system login user vyos authentication public-keys aibix@doodlemox key 'AAAAC3NzaC1lZDI1NTE5AAAAIJhIGgYUf/Sl4xr4uv+nrMbpDhulZWQxynX5OBTvalsz'
-set system login user vyos authentication public-keys aibix@doodlemox type 'ssh-ed25519'
-set system login user vyos authentication public-keys aibix@minismox key 'AAAAC3NzaC1lZDI1NTE5AAAAIJPRSV+ocoYTP26UwMYUXsd0gVKSmrFC3WaOVJwEY0L1'
-set system login user vyos authentication public-keys aibix@minismox type 'ssh-ed25519'
+{# vrf #}
+{% if vrfs is defined -%}
+{% for vrf in vrfs -%}
+set vrf name {{ vrf.vrf }} table '{{ vrf.table }}'
+{% endfor -%}
+{% endif -%}
+{# services #}
+{% if services is defined -%}
+{% for s in services %}
+{# ssh #}
+{% if s.service == "ssh" %}
+set service ssh port '{{ s.port }}'
+set service ssh vrf '{{ s.vrf }}'
+{% endif %}
+{% endfor %}
+{% endif -%}
