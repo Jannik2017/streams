@@ -447,6 +447,24 @@ router:
             afis:
               - afi: 'ipv4-unicast'
                 next_hop: 'nexthop-self'
+          - ipv4_address: 192.168.111.68
+            description: p1r5v
+            remote_as: 65001
+            update_source: eth1
+            afis:
+              - afi: 'ipv4-unicast'
+                route_maps:
+                  route_map_import: 'VON_EXTERN'
+                  route_map_export: 'NACH_EXTERN'
+          - ipv4_address: 192.168.111.110
+            description: p2r5v
+            remote_as: 65002
+            update_source: eth1
+            afis:
+              - afi: 'ipv4-unicast'
+                route_maps:
+                  route_map_import: 'VON_EXTERN'
+                  route_map_export: 'NACH_EXTERN'
           - ipv4_address: 192.168.111.44
             description: OPNsense
             remote_as: 65005

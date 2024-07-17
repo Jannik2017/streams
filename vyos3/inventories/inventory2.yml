@@ -422,12 +422,33 @@ router:
             afis:
               - afi: 'ipv4-unicast'
                 next_hop: 'nexthop-self'
+          - ipv4_address: 192.168.111.68
+            description: p1r5v
+            remote_as: 65001
+            update_source: eth1
+            afis:
+              - afi: 'ipv4-unicast'
+                route_maps:
+                  route_map_import: 'VON_EXTERN'
+                  route_map_export: 'NACH_EXTERN'
+          - ipv4_address: 192.168.111.15
+            description: p3r5v
+            remote_as: 65003
+            update_source: eth1
+            afis:
+              - afi: 'ipv4-unicast'
+                route_maps:
+                  route_map_import: 'VON_EXTERN'
+                  route_map_export: 'NACH_EXTERN'
           - ipv4_address: 172.17.25.1
             description: streampf
             remote_as: 65009
             update_source: wg0
             afis:
               - afi: 'ipv4-unicast'
+                route_maps:
+                  route_map_import: 'VON_EXTERN'
+                  route_map_export: 'NACH_EXTERN'
       mpls:
         interfaces:
           - interface: eth2
@@ -597,7 +618,7 @@ router:
         - interface: eth3
           interface_type: ethernet
           ipv4_address: 10.2.78.7/24
-          mtu: 1500
+          mtu: 1528
       ospf:
         router_id: 10.2.255.27
         areas:

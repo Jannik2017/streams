@@ -50,7 +50,6 @@ router:
       bgp:
         router_id: 10.1.255.11
         as: 65001
-        #networks:
         neighbors:
           - ipv4_address: 10.1.255.16
             description: p1r6v
@@ -127,7 +126,6 @@ router:
       bgp:
         router_id: 10.1.255.12
         as: 65001
-        #networks:
         neighbors:
           - ipv4_address: 10.1.255.16
             description: p1r6v
@@ -185,7 +183,6 @@ router:
       bgp:
         router_id: 10.1.255.13
         as: 65001
-        #networks:
         neighbors:
           - ipv4_address: 10.1.255.16
             description: p1r6v
@@ -243,8 +240,10 @@ router:
       bgp:
         router_id: 10.1.255.14
         as: 65001
-        networks:
-          ipv4_unicast:
+        afis:
+          - afi: 'ipv4-unicast'
+            #aggregate:
+            networks:
             - 10.114.3.0/24
         neighbors:
           - ipv4_address: 10.1.255.16
@@ -289,7 +288,7 @@ router:
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
-          ipv4_address: 10.115.1.1/24
+          ipv4_address: 192.168.111.68/24
           mtu: 1500
         - interface: eth2
           interface_type: ethernet
@@ -316,9 +315,6 @@ router:
       bgp:
         router_id: 10.1.255.15
         as: 65001
-        networks:
-          ipv4_unicast:
-            - 10.115.1.0/24
         neighbors:
           - ipv4_address: 10.1.255.16
             description: p1r6v
@@ -327,6 +323,24 @@ router:
             afis:
               - afi: 'ipv4-unicast'
                 next_hop: 'nexthop-self'
+          - ipv4_address: 192.168.111.110
+            description: p2r5v
+            remote_as: 65002
+            update_source: eth1
+            afis:
+              - afi: 'ipv4-unicast'
+                route_maps:
+                  route_map_import: 'VON_EXTERN'
+                  route_map_export: 'NACH_EXTERN'
+          - ipv4_address: 192.168.111.15
+            description: p3r5v
+            remote_as: 65003
+            update_source: eth1
+            afis:
+              - afi: 'ipv4-unicast'
+                route_maps:
+                  route_map_import: 'VON_EXTERN'
+                  route_map_export: 'NACH_EXTERN'
       ospf:
         router_id: 10.1.255.15
         areas:
@@ -379,7 +393,6 @@ router:
       bgp:
         router_id: 10.1.255.16
         as: 65001
-        #networks:
         neighbors:
           - ipv4_address: 10.1.255.11
             description: p1r1v
@@ -479,7 +492,6 @@ router:
       bgp:
         router_id: 10.1.255.17
         as: 65001
-        #networks:
         neighbors:
           - ipv4_address: 10.1.255.16
             description: p1r6v
@@ -533,13 +545,14 @@ router:
         - interface: eth3
           interface_type: ethernet
           ipv4_address: 192.0.2.1/24
-          mtu: 1528
+          mtu: 1500
       bgp:
         router_id: 10.1.255.18
         as: 65001
-        networks:
-          ipv4_unicast:
-            - 192.0.2.0/24
+        afis:
+          - afi: 'ipv4-unicast'
+            networks:
+              - 192.0.2.0/24
         neighbors:
           - ipv4_address: 10.1.255.16
             description: p1r6v
