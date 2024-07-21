@@ -1,0 +1,109 @@
+set interfaces loopback lo address '10.1.255.16/32'
+set interfaces loopback lo address '2001:0470:731b:4000:10:1:255:16/128'
+set interfaces ethernet eth0 mtu '1500'
+set interfaces ethernet eth0 vrf 'mgmt'
+set interfaces ethernet eth0 address 'dhcp'
+set interfaces ethernet eth1 mtu '1528'
+set interfaces ethernet eth1 address '10.1.56.6/24'
+set interfaces ethernet eth2 mtu '1528'
+set interfaces ethernet eth2 address '10.1.26.6/24'
+set interfaces ethernet eth3 mtu '1528'
+set interfaces ethernet eth3 address '10.1.67.6/24'
+set protocols bgp parameters router-id '10.1.255.16'
+set protocols bgp system-as '65001'
+set protocols bgp neighbor 10.1.255.11 description 'p1r1v'
+set protocols bgp neighbor 10.1.255.11 remote-as '65001'
+set protocols bgp neighbor 10.1.255.11 update-source 'lo'
+set protocols bgp neighbor 10.1.255.11 address-family ipv4-unicast
+set protocols bgp neighbor 10.1.255.11 address-family ipv4-unicast route-reflector-client
+set protocols bgp neighbor 10.1.255.12 description 'p1r2v'
+set protocols bgp neighbor 10.1.255.12 remote-as '65001'
+set protocols bgp neighbor 10.1.255.12 update-source 'lo'
+set protocols bgp neighbor 10.1.255.12 address-family ipv4-unicast
+set protocols bgp neighbor 10.1.255.12 address-family ipv4-unicast route-reflector-client
+set protocols bgp neighbor 10.1.255.13 description 'p1r3v'
+set protocols bgp neighbor 10.1.255.13 remote-as '65001'
+set protocols bgp neighbor 10.1.255.13 update-source 'lo'
+set protocols bgp neighbor 10.1.255.13 address-family ipv4-unicast
+set protocols bgp neighbor 10.1.255.13 address-family ipv4-unicast route-reflector-client
+set protocols bgp neighbor 10.1.255.14 description 'p1r4v'
+set protocols bgp neighbor 10.1.255.14 remote-as '65001'
+set protocols bgp neighbor 10.1.255.14 update-source 'lo'
+set protocols bgp neighbor 10.1.255.14 address-family ipv4-unicast
+set protocols bgp neighbor 10.1.255.14 address-family ipv4-unicast route-reflector-client
+set protocols bgp neighbor 10.1.255.15 description 'p1r5v'
+set protocols bgp neighbor 10.1.255.15 remote-as '65001'
+set protocols bgp neighbor 10.1.255.15 update-source 'lo'
+set protocols bgp neighbor 10.1.255.15 address-family ipv4-unicast
+set protocols bgp neighbor 10.1.255.15 address-family ipv4-unicast route-reflector-client
+set protocols bgp neighbor 10.1.255.17 description 'p1r7v'
+set protocols bgp neighbor 10.1.255.17 remote-as '65001'
+set protocols bgp neighbor 10.1.255.17 update-source 'lo'
+set protocols bgp neighbor 10.1.255.17 address-family ipv4-unicast
+set protocols bgp neighbor 10.1.255.17 address-family ipv4-unicast route-reflector-client
+set protocols bgp neighbor 10.1.255.18 description 'p1r8v'
+set protocols bgp neighbor 10.1.255.18 remote-as '65001'
+set protocols bgp neighbor 10.1.255.18 update-source 'lo'
+set protocols bgp neighbor 10.1.255.18 address-family ipv4-unicast
+set protocols bgp neighbor 10.1.255.18 address-family ipv4-unicast route-reflector-client
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:1 description 'p1r1v'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:1 remote-as '65001'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:1 update-source 'lo'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:1 address-family ipv6-unicast
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:1 address-family ipv6-unicast nexthop-self
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:2 description 'p1r2v'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:2 remote-as '65001'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:2 update-source 'lo'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:2 address-family ipv6-unicast
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:2 address-family ipv6-unicast nexthop-self
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:3 description 'p1r3v'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:3 remote-as '65001'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:3 update-source 'lo'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:3 address-family ipv6-unicast
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:3 address-family ipv6-unicast nexthop-self
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:4 description 'p1r4v'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:4 remote-as '65001'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:4 update-source 'lo'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:4 address-family ipv6-unicast
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:4 address-family ipv6-unicast nexthop-self
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:5 description 'p1r5v'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:5 remote-as '65001'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:5 update-source 'lo'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:5 address-family ipv6-unicast
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:5 address-family ipv6-unicast nexthop-self
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:7 description 'p1r7v'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:7 remote-as '65001'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:7 update-source 'lo'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:7 address-family ipv6-unicast
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:7 address-family ipv6-unicast nexthop-self
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:8 description 'p1r8v'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:8 remote-as '65001'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:8 update-source 'lo'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:8 address-family ipv6-unicast
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:8 address-family ipv6-unicast nexthop-self
+set protocols ospf parameters router-id '10.1.255.16'
+set protocols ospf area 0 network '10.1.0.0/16'
+set protocols ospf interface eth1
+set protocols ospf interface eth2
+set protocols ospf interface eth3
+set protocols ospf interface lo
+set protocols ospfv3 parameters router-id '10.1.255.16'
+set protocols ospfv3 interface eth1
+set protocols ospfv3 interface eth2
+set protocols ospfv3 interface eth3
+set protocols ospfv3 interface lo
+set vrf name mgmt table '222'
+set service ssh port '22'
+set service ssh vrf 'mgmt'
+set service ntp server 1.pool.ntp.org
+set service ntp server 2.pool.ntp.org
+set service ssh client-keepalive-interval '180'
+set service ssh port '22'
+set system config-management commit-revisions '100'
+set system conntrack modules ftp
+set system conntrack modules h323
+set system conntrack modules nfs
+set system conntrack modules pptp
+set system conntrack modules sip
+set system conntrack modules sqlnet
+set system conntrack modules tftp

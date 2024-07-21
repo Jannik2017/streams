@@ -141,7 +141,7 @@ router:
             passive: true
       static:
         routes:
-          - route: 78.47.154.241/32
+          - destination: 78.47.154.241/32
             next_hop: 192.168.111.1
       vrfs:
       - vrf: mgmt
@@ -383,7 +383,7 @@ router:
             - eth5
         - interface: wg0
           interface_type: wireguard
-          ipv4_address: 172.17.31.2/30
+          ipv4_address: 172.17.35.2/30
           peers:
             - peer: streampf
               address: 78.47.154.241
@@ -497,7 +497,7 @@ router:
           - interface: lo
       static:
         routes:
-          - route: 78.47.154.241/32
+          - destination: 78.47.154.241/32
             next_hop: 192.168.111.1
       vrfs:
       - vrf: mgmt

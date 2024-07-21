@@ -473,7 +473,7 @@ router:
       static:
         routes:
           - destination: 78.47.154.241/32
-            gateway: 192.168.111.1
+            next_hop: 192.168.111.1
       vrfs:
       - vrf: mgmt
         table: 222

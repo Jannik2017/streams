@@ -22,11 +22,15 @@
         - delete protocols bgp
         - delete protocols mpls
         - delete protocols ospf
+        - delete protocols ospfv3
         - delete protocols isis
         - delete protocols static
+        - delete policy
         - delete interfaces wireguard wg0
         - delete interfaces br100
         - delete interfaces loopback lo
+        - delete interfaces loopback lo ip
+        - delete interfaces loopback lo ipv6
         - delete interfaces ethernet eth0 ip
         - delete interfaces ethernet eth0 ipv6
         - delete interfaces ethernet eth1

@@ -12,6 +12,7 @@ router:
         - interface: lo
           interface_type: loopback
           ipv4_address: 10.1.255.11/32
+          ipv6_address: 2001:0470:731b:4000:10:1:255:11/128
         - interface: eth0
           interface_type: ethernet
           ipv4_address: dhcp
@@ -33,6 +34,18 @@ router:
           interface_type: ethernet
           ipv4_address: 10.1.15.1/24
           mtu: 1528
+        - interface: wg0
+          interface_type: wireguard
+          ipv4_address: 172.17.11.2/30
+          peers:
+            - peer: streampf
+              address: 78.47.154.241
+              port: 50011
+              allowed_ips: 0.0.0.0/0
+              public_key: 'xTLgLyv2Tuavto8fa9UhMR+komJD0UZclb3T9yFAejw='
+          port: 50011
+          private_key: 'aO0PCJUIQohTnfYfJXZ8gZzJHK5Ec+5O3ATCKq4TPl4='
+          mtu: 1400
       policy:
         - route_maps:
           - route_map: NACH_EXTERN
@@ -70,6 +83,20 @@ router:
             update_source: eth1
             afis:
               - afi: 'ipv4-unicast'
+          - ipv4_address: 172.17.11.1
+            description: streampf
+            remote_as: 65009
+            update_source: wg0
+            afis:
+              - afi: 'ipv4-unicast'
+        neighbors6:
+          - ipv6_address: 2001:0470:731b:4000:10:1:255:16
+            description: p1r6v
+            remote_as: 65001
+            update_source: lo
+            afis:
+              - afi: 'ipv6-unicast'
+                next_hop: 'nexthop-self'
       ospf:
         router_id: 10.1.255.11
         areas:
@@ -81,9 +108,18 @@ router:
           - interface: eth3
           - interface: eth4
           - interface: lo
+      ospfv3:
+        router_id: 10.1.255.11
+        areas:
+        - area: 0
+          default_information: always
+        interfaces:
+          - interface: eth3
+          - interface: eth4
+          - interface: lo
       static:
         routes:
-          - route: 78.47.154.241/32
+          - destination: 78.47.154.241/32
             next_hop: 192.168.111.1
       vrfs:
       - vrf: mgmt
@@ -102,6 +138,7 @@ router:
         - interface: lo
           interface_type: loopback
           ipv4_address: 10.1.255.12/32
+          ipv6_address: 2001:0470:731b:4000:10:1:255:12/128
         - interface: eth0
           interface_type: ethernet
           ipv4_address: dhcp
@@ -113,7 +150,8 @@ router:
           mtu: 1528
         - interface: eth2
           interface_type: ethernet
-          ipv4_address: 10.2.12.2/24
+          ipv4_address: 10.122.2.1/24
+          ipv6_address: fe80::1/64
           mtu: 1500
         - interface: eth3
           interface_type: ethernet
@@ -126,6 +164,12 @@ router:
       bgp:
         router_id: 10.1.255.12
         as: 65001
+        afis:
+          - afi: 'ipv6-unicast'
+            #aggregate:
+            redistribute: 
+            - static
+            #networks:
         neighbors:
           - ipv4_address: 10.1.255.16
             description: p1r6v
@@ -133,6 +177,14 @@ router:
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
+                next_hop: 'nexthop-self'
+        neighbors6:
+          - ipv6_address: 2001:0470:731b:4000:10:1:255:16
+            description: p1r6v
+            remote_as: 65001
+            update_source: lo
+            afis:
+              - afi: 'ipv6-unicast'
                 next_hop: 'nexthop-self'
       ospf:
         router_id: 10.1.255.12
@@ -146,6 +198,22 @@ router:
           - interface: eth3
           - interface: eth4
           - interface: lo
+      ospfv3:
+        router_id: 10.1.255.12
+        areas:
+        - area: 0
+          #networks:
+          #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
+        interfaces:
+          - interface: eth1
+          - interface: eth3
+          - interface: eth4
+          - interface: lo
+      static:
+        routes6:
+          - destination: 2001:0470:731b:4100::/64
+            next_hop: fe80::be24:11ff:fea5:b3d
+            interface: eth2
       vrfs:
       - vrf: mgmt
         table: 222
@@ -163,6 +231,7 @@ router:
         - interface: lo
           interface_type: loopback
           ipv4_address: 10.1.255.13/32
+          ipv6_address: 2001:0470:731b:4000:10:1:255:13/128
         - interface: eth0
           interface_type: ethernet
           ipv4_address: dhcp
@@ -191,12 +260,31 @@ router:
             afis:
               - afi: 'ipv4-unicast'
                 next_hop: 'nexthop-self'
+        neighbors6:
+          - ipv6_address: 2001:0470:731b:4000:10:1:255:16
+            description: p1r6v
+            remote_as: 65001
+            update_source: lo
+            afis:
+              - afi: 'ipv6-unicast'
+                next_hop: 'nexthop-self'
       ospf:
         router_id: 10.1.255.13
         areas:
         - area: 0
           networks:
             - 10.1.0.0/16
+          #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
+        interfaces:
+          - interface: eth1
+          - interface: eth3
+          - interface: eth4
+          - interface: lo
+      ospfv3:
+        router_id: 10.1.255.13
+        areas:
+        - area: 0
+          #networks:
           #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
         interfaces:
           - interface: eth1
@@ -220,6 +308,7 @@ router:
         - interface: lo
           interface_type: loopback
           ipv4_address: 10.1.255.14/32
+          ipv6_address: 2001:0470:731b:4000:10:1:255:14/128
         - interface: eth0
           interface_type: ethernet
           ipv4_address: dhcp
@@ -232,6 +321,7 @@ router:
         - interface: eth3
           interface_type: ethernet
           ipv4_address: 10.114.3.1/24
+          ipv6_address: fe80::1/64
           mtu: 1500
         - interface: eth4
           interface_type: ethernet
@@ -245,6 +335,11 @@ router:
             #aggregate:
             networks:
             - 10.114.3.0/24
+          - afi: 'ipv6-unicast'
+            #aggregate:
+            redistribute: 
+            - static
+            #networks:
         neighbors:
           - ipv4_address: 10.1.255.16
             description: p1r6v
@@ -252,6 +347,14 @@ router:
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
+                next_hop: 'nexthop-self'
+        neighbors6:
+          - ipv6_address: 2001:0470:731b:4000:10:1:255:16
+            description: p1r6v
+            remote_as: 65001
+            update_source: lo
+            afis:
+              - afi: 'ipv6-unicast'
                 next_hop: 'nexthop-self'
       ospf:
         router_id: 10.1.255.14
@@ -264,6 +367,21 @@ router:
           - interface: eth1
           - interface: eth4
           - interface: lo
+      ospfv3:
+        router_id: 10.1.255.14
+        areas:
+        - area: 0
+          #networks:
+          #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
+        interfaces:
+          - interface: eth1
+          - interface: eth4
+          - interface: lo
+      static:
+        routes6:
+          - destination: 2001:0470:731b:7f00::/56
+            next_hop: fe80::be24:11ff:feea:964c
+            interface: eth3
       vrfs:
       - vrf: mgmt
         table: 222
@@ -281,6 +399,7 @@ router:
         - interface: lo
           interface_type: loopback
           ipv4_address: 10.1.255.15/32
+          ipv6_address: 2001:0470:731b:4000:10:1:255:15/128
         - interface: eth0
           interface_type: ethernet
           ipv4_address: dhcp
@@ -298,6 +417,18 @@ router:
           interface_type: ethernet
           ipv4_address: 10.1.56.5/24
           mtu: 1528
+        - interface: wg0
+          interface_type: wireguard
+          ipv4_address: 172.17.15.2/30
+          peers:
+            - peer: streampf
+              address: 78.47.154.241
+              port: 50015
+              allowed_ips: 0.0.0.0/0
+              public_key: 'JYK+D5swtG08CJqx3OXeUt7HxJaH6EL1ARi6ZzJsc1M='
+          port: 50015
+          private_key: 'mIoaQlRKHJlsX+jklR3mM9xED97lrlw+LYzen1mS72o='
+          mtu: 1400
       policy:
         - route_maps:
           - route_map: NACH_EXTERN
@@ -341,6 +472,20 @@ router:
                 route_maps:
                   route_map_import: 'VON_EXTERN'
                   route_map_export: 'NACH_EXTERN'
+          - ipv4_address: 172.17.15.1
+            description: streampf
+            remote_as: 65009
+            update_source: wg0
+            afis:
+              - afi: 'ipv4-unicast'
+        neighbors6:
+          - ipv6_address: 2001:0470:731b:4000:10:1:255:16
+            description: p1r6v
+            remote_as: 65001
+            update_source: lo
+            afis:
+              - afi: 'ipv6-unicast'
+                next_hop: 'nexthop-self'
       ospf:
         router_id: 10.1.255.15
         areas:
@@ -352,8 +497,18 @@ router:
           - interface: eth2
           - interface: eth3
           - interface: lo
+      ospfv3:
+        router_id: 10.1.255.15
+        areas:
+        - area: 0
+          #networks:
+          #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
+        interfaces:
+          - interface: eth2
+          - interface: eth3
+          - interface: lo
       static:
-        - routes:
+        routes:
           - destination: 78.47.154.241/32
             next_hop: 192.168.111.1
       vrfs:
@@ -373,6 +528,7 @@ router:
         - interface: lo
           interface_type: loopback
           ipv4_address: 10.1.255.16/32
+          ipv6_address: 2001:0470:731b:4000:10:1:255:16/128
         - interface: eth0
           interface_type: ethernet
           ipv4_address: dhcp
@@ -443,12 +599,73 @@ router:
             afis:
               - afi: 'ipv4-unicast'
                 rr: route-reflector-client
+        neighbors6:
+          - ipv6_address: 2001:0470:731b:4000:10:1:255:11
+            description: p1r1v
+            remote_as: 65001
+            update_source: lo
+            afis:
+              - afi: 'ipv6-unicast'
+                rr: route-reflector-client
+          - ipv6_address: 2001:0470:731b:4000:10:1:255:12
+            description: p1r2v
+            remote_as: 65001
+            update_source: lo
+            afis:
+              - afi: 'ipv6-unicast'
+                rr: route-reflector-client
+          - ipv6_address: 2001:0470:731b:4000:10:1:255:13
+            description: p1r3v
+            remote_as: 65001
+            update_source: lo
+            afis:
+              - afi: 'ipv6-unicast'
+                rr: route-reflector-client
+          - ipv6_address: 2001:0470:731b:4000:10:1:255:14
+            description: p1r4v
+            remote_as: 65001
+            update_source: lo
+            afis:
+              - afi: 'ipv6-unicast'
+                rr: route-reflector-client
+          - ipv6_address: 2001:0470:731b:4000:10:1:255:15
+            description: p1r5v
+            remote_as: 65001
+            update_source: lo
+            afis:
+              - afi: 'ipv6-unicast'
+                rr: route-reflector-client
+          - ipv6_address: 2001:0470:731b:4000:10:1:255:17
+            description: p1r7v
+            remote_as: 65001
+            update_source: lo
+            afis:
+              - afi: 'ipv6-unicast'
+                rr: route-reflector-client
+          - ipv6_address: 2001:0470:731b:4000:10:1:255:18
+            description: p1r8v
+            remote_as: 65001
+            update_source: lo
+            afis:
+              - afi: 'ipv6-unicast'
+                rr: route-reflector-client
       ospf:
         router_id: 10.1.255.16
         areas:
         - area: 0
           networks:
             - 10.1.0.0/16
+          #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
+        interfaces:
+          - interface: eth1
+          - interface: eth2
+          - interface: eth3
+          - interface: lo
+      ospfv3:
+        router_id: 10.1.255.16
+        areas:
+        - area: 0
+          #networks:
           #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
         interfaces:
           - interface: eth1
@@ -472,6 +689,7 @@ router:
         - interface: lo
           interface_type: loopback
           ipv4_address: 10.1.255.17/32
+          ipv6_address: 2001:0470:731b:4000:10:1:255:17/128
         - interface: eth0
           interface_type: ethernet
           ipv4_address: dhcp
@@ -500,12 +718,31 @@ router:
             afis:
               - afi: 'ipv4-unicast'
                 next_hop: 'nexthop-self'
+        neighbors6:
+          - ipv6_address: 2001:0470:731b:4000:10:1:255:16
+            description: p1r6v
+            remote_as: 65001
+            update_source: lo
+            afis:
+              - afi: 'ipv6-unicast'
+                next_hop: 'nexthop-self'
       ospf:
         router_id: 10.1.255.17
         areas:
         - area: 0
           networks:
             - 10.1.0.0/16
+          #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
+        interfaces:
+          - interface: eth1
+          - interface: eth2
+          - interface: eth3
+          - interface: lo
+      ospfv3:
+        router_id: 10.1.255.17
+        areas:
+        - area: 0
+          #networks:
           #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
         interfaces:
           - interface: eth1
@@ -529,6 +766,7 @@ router:
         - interface: lo
           interface_type: loopback
           ipv4_address: 10.1.255.18/32
+          ipv6_address: 2001:0470:731b:4000:10:1:255:18/128
         - interface: eth0
           interface_type: ethernet
           ipv4_address: dhcp
@@ -561,12 +799,30 @@ router:
             afis:
               - afi: 'ipv4-unicast'
                 next_hop: 'nexthop-self'
+        neighbors6:
+          - ipv6_address: 2001:0470:731b:4000:10:1:255:16
+            description: p1r6v
+            remote_as: 65001
+            update_source: lo
+            afis:
+              - afi: 'ipv6-unicast'
+                next_hop: 'nexthop-self'
       ospf:
         router_id: 10.1.255.18
         areas:
         - area: 0
           networks:
             - 10.1.0.0/16
+          #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
+        interfaces:
+          - interface: eth1
+          - interface: eth4
+          - interface: lo
+      ospfv3:
+        router_id: 10.1.255.18
+        areas:
+        - area: 0
+          #networks:
           #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
         interfaces:
           - interface: eth1
