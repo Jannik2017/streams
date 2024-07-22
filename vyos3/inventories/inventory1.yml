@@ -150,7 +150,7 @@ router:
           mtu: 1528
         - interface: eth2
           interface_type: ethernet
-          ipv4_address: 10.122.2.1/24
+          ipv4_address: 10.112.2.1/24
           ipv6_address: fe80::1/64
           mtu: 1500
         - interface: eth3
