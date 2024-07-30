@@ -130,11 +130,6 @@ router:
           ipv4_address: dhcp
           mtu: 1500
           vrf: mgmt
-        - interface: eth0
-          interface_type: ethernet
-          ipv4_address: dhcp
-          mtu: 1500
-          vrf: mgmt
         - interface: eth1
           interface_type: ethernet
           ipv4_address: 10.2.12.2/24
@@ -336,6 +331,10 @@ router:
           - interface: eth1
           - interface: eth4
           - interface: lo
+      static:
+        routes:
+          - destination: 10.200.0.0/24
+            next_hop: 10.124.2.22
       vrfs:
       - vrf: mgmt
         table: 1020
