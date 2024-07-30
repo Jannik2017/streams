@@ -72,3 +72,6 @@ nornir.log
 *-config.txt
 
 .venv
+.vscode
+callbacks/
+
