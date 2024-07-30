@@ -299,6 +299,8 @@ router:
         afis:
           - afi: 'ipv4-unicast'
             #aggregate:
+            redistribute:
+              - static
             networks:
               - 10.124.2.0/24
               - 10.124.3.0/24
@@ -333,6 +335,7 @@ router:
           - interface: lo
       static:
         routes:
+          # für anycast Demo
           - destination: 10.200.0.0/24
             next_hop: 10.124.2.22
       vrfs:

@@ -21,6 +21,10 @@ router:
           interface_type: ethernet
           ipv4_address: 192.168.111.14/24
           mtu: 1500
+        - interface: eth2
+          interface_type: ethernet
+          ipv4_address: 10.131.2.1/24
+          mtu: 1500
         - interface: eth3
           interface_type: ethernet
           ipv4_address: 10.3.12.1/24
@@ -31,7 +35,7 @@ router:
           mtu: 1528
         - interface: br100
           interface_type: bridge
-          ipv4_address: 10.131.0.1/24
+          ipv4_address: 10.131.100.1/24
           members:
             - eth2
         - interface: wg0
@@ -68,9 +72,8 @@ router:
             aggregate:
               - 10.3.0.0/16
             networks:
-              - 10.131.0.0/24
               - 10.131.2.0/24
-              - 10.131.5.0/24
+              - 10.131.100.0/24
         neighbors:
           - ipv4_address: 10.3.255.34
             description: p3r4v
@@ -127,7 +130,7 @@ router:
           - area: 0
             networks:
               - 10.3.0.0/16
-              - 10.131.0.0/24
+              - 10.131.100.0/24
             #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
         interfaces:
           - interface: br100
@@ -285,6 +288,7 @@ router:
         - interface: eth2
           interface_type: ethernet
           ipv4_address: 10.134.2.1/24
+          mtu: 1500
         - interface: eth3
           interface_type: ethernet
           ipv4_address: 10.134.3.1/24
@@ -301,6 +305,8 @@ router:
             networks:
               - 10.134.2.0/24
               - 10.134.3.0/24
+            redistribute:
+              - static
         neighbors:
           - ipv4_address: 10.3.255.31
             description: p3r1v
@@ -345,6 +351,7 @@ router:
           - interface: lo
       static:
         routes:
+          # für anycast Demo
           - destination: 10.200.0.0/24
             next_hop: 10.134.2.22
       vrfs:
@@ -383,10 +390,9 @@ router:
           mtu: 1528
         - interface: br100
           interface_type: bridge
-          ipv4_address: 10.135.0.1/24
+          ipv4_address: 10.135.100.1/24
           members:
             - eth4
-            - eth5
         - interface: wg0
           interface_type: wireguard
           ipv4_address: 172.17.35.2/30
@@ -421,9 +427,8 @@ router:
             aggregate:
               - 10.3.0.0/16
             networks:
-              - 10.131.0.0/24
               - 10.131.2.0/24
-              - 10.131.5.0/24
+              - 10.131.100.0/24
         neighbors:
           - ipv4_address: 10.3.255.31
             description: p3r1v
