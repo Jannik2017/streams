@@ -123,7 +123,7 @@ router:
             next_hop: 192.168.111.1
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -216,7 +216,7 @@ router:
             interface: eth2
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -293,7 +293,7 @@ router:
           - interface: lo
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -384,7 +384,7 @@ router:
             interface: eth3
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -513,7 +513,7 @@ router:
             next_hop: 192.168.111.1
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -674,7 +674,7 @@ router:
           - interface: lo
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -751,7 +751,7 @@ router:
           - interface: lo
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -830,7 +830,7 @@ router:
           - interface: lo
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt

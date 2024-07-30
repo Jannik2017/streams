@@ -34,7 +34,6 @@ router:
           ipv4_address: 10.131.0.1/24
           members:
             - eth2
-            - eth5
         - interface: wg0
           interface_type: wireguard
           ipv4_address: 172.17.31.2/30
@@ -145,7 +144,7 @@ router:
             next_hop: 192.168.111.1
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -202,7 +201,7 @@ router:
           - interface: lo
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -259,7 +258,7 @@ router:
           - interface: lo
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -343,7 +342,7 @@ router:
           - interface: lo
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -501,7 +500,7 @@ router:
             next_hop: 192.168.111.1
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -558,7 +557,7 @@ router:
           - interface: lo
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -616,7 +615,7 @@ router:
           - interface: lo
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -703,7 +702,7 @@ router:
           - interface: lo
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
