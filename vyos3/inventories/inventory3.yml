@@ -145,7 +145,7 @@ router:
             next_hop: 192.168.111.1
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -202,7 +202,7 @@ router:
           - interface: lo
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -259,7 +259,7 @@ router:
           - interface: lo
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -283,6 +283,9 @@ router:
           interface_type: ethernet
           ipv4_address: 10.3.34.4/24
           mtu: 1528
+        - interface: eth2
+          interface_type: ethernet
+          ipv4_address: 10.134.2.1/24
         - interface: eth3
           interface_type: ethernet
           ipv4_address: 10.134.3.1/24
@@ -294,7 +297,7 @@ router:
       bgp:
         router_id: 10.3.255.34
         as: 65003
-        afis::
+        afis:
           - afi: 'ipv4-unicast'
             networks:
               - 10.134.2.0/24
@@ -341,9 +344,13 @@ router:
           - interface: eth1
           - interface: eth4
           - interface: lo
+      static:
+        routes:
+          - destination: 10.200.0.0/24
+            next_hop: 10.134.2.22
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -501,7 +508,7 @@ router:
             next_hop: 192.168.111.1
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -558,7 +565,7 @@ router:
           - interface: lo
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -616,7 +623,7 @@ router:
           - interface: lo
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -703,7 +710,7 @@ router:
           - interface: lo
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt

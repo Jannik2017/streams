@@ -110,7 +110,7 @@ router:
             next_hop: 192.168.111.1
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -125,11 +125,6 @@ router:
         - interface: lo
           interface_type: loopback
           ipv4_address: 10.2.255.22/32
-        - interface: eth0
-          interface_type: ethernet
-          ipv4_address: dhcp
-          mtu: 1500
-          vrf: mgmt
         - interface: eth0
           interface_type: ethernet
           ipv4_address: dhcp
@@ -184,7 +179,7 @@ router:
           - interface: lo
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -262,7 +257,7 @@ router:
           - interface: lo
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -336,9 +331,13 @@ router:
           - interface: eth1
           - interface: eth4
           - interface: lo
+      static:
+        routes:
+          - destination: 10.200.0.0/24
+            next_hop: 10.124.2.22
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -476,7 +475,7 @@ router:
             next_hop: 192.168.111.1
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -587,7 +586,7 @@ router:
           - interface: lo
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -656,7 +655,7 @@ router:
                 next_hop: 'nexthop-self'
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt
@@ -727,7 +726,7 @@ router:
           - interface: lo
       vrfs:
       - vrf: mgmt
-        table: 222
+        table: 1020
       services:
       - service: ssh
         vrf: mgmt

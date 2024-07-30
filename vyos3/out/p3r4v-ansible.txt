@@ -1,0 +1,56 @@
+set interfaces loopback lo address '10.3.255.34/32'
+set interfaces ethernet eth0 mtu '1500'
+set interfaces ethernet eth0 vrf 'mgmt'
+set interfaces ethernet eth0 address 'dhcp'
+set interfaces ethernet eth1 mtu '1528'
+set interfaces ethernet eth1 address '10.3.34.4/24'
+set interfaces ethernet eth2 address '10.134.2.1/24'
+set interfaces ethernet eth3 mtu '1500'
+set interfaces ethernet eth3 address '10.134.3.1/24'
+set interfaces ethernet eth4 mtu '1528'
+set interfaces ethernet eth4 address '10.3.48.2/24'
+set protocols bgp parameters router-id '10.3.255.34'
+set protocols bgp system-as '65003'
+set protocols bgp neighbor 10.3.255.31 description 'p3r1v'
+set protocols bgp neighbor 10.3.255.31 remote-as '65003'
+set protocols bgp neighbor 10.3.255.31 update-source 'lo'
+set protocols bgp neighbor 10.3.255.31 address-family ipv4-unicast
+set protocols bgp neighbor 10.3.255.31 address-family ipv4-unicast nexthop-self
+set protocols bgp neighbor 10.3.255.35 description 'p3r5v'
+set protocols bgp neighbor 10.3.255.35 remote-as '65003'
+set protocols bgp neighbor 10.3.255.35 update-source 'lo'
+set protocols bgp neighbor 10.3.255.35 address-family ipv4-unicast
+set protocols bgp neighbor 10.3.255.35 address-family ipv4-unicast nexthop-self
+set protocols bgp neighbor 10.3.255.38 description 'p3r8v'
+set protocols bgp neighbor 10.3.255.38 remote-as '65003'
+set protocols bgp neighbor 10.3.255.38 update-source 'lo'
+set protocols bgp neighbor 10.3.255.38 address-family ipv4-unicast
+set protocols bgp neighbor 10.3.255.38 address-family ipv4-unicast nexthop-self
+set protocols mpls interface 'eth1'
+set protocols mpls interface 'eth4'
+set protocols mpls ldp router-id '10.3.255.34'
+set protocols mpls ldp discovery transport-ipv4-address '10.3.255.34'
+set protocols mpls ldp interface 'lo'
+set protocols mpls ldp interface 'eth1'
+set protocols mpls ldp interface 'eth4'
+set protocols ospf parameters router-id '10.3.255.34'
+set protocols ospf area 0 network '10.3.0.0/16'
+set protocols ospf interface eth1
+set protocols ospf interface eth4
+set protocols ospf interface lo
+set protocols static route 10.200.0.0/24 next-hop 10.134.2.22
+set vrf name mgmt table '1020'
+set service ssh port '22'
+set service ssh vrf 'mgmt'
+set service ntp server 1.pool.ntp.org
+set service ntp server 2.pool.ntp.org
+set service ssh client-keepalive-interval '180'
+set service ssh port '22'
+set system config-management commit-revisions '100'
+set system conntrack modules ftp
+set system conntrack modules h323
+set system conntrack modules nfs
+set system conntrack modules pptp
+set system conntrack modules sip
+set system conntrack modules sqlnet
+set system conntrack modules tftp
