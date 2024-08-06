@@ -312,6 +312,22 @@ router:
             afis:
               - afi: 'ipv4-unicast'
                 next_hop: 'nexthop-self'
+          - ipv4_address: 10.124.2.22
+            description: p2anycast
+            remote_as: 65421
+            update_source: eth2
+            bfd: true
+            afis:
+              - afi: 'ipv4-unicast'
+                next_hop: 'nexthop-self'
+          - ipv4_address: 10.124.3.33
+            description: bloodeagle
+            remote_as: 65255
+            update_source: eth3
+            bfd: true
+            afis:
+              - afi: 'ipv4-unicast'
+                next_hop: 'nexthop-self'
       mpls:
         interfaces:
           - interface: eth1
@@ -333,11 +349,6 @@ router:
           - interface: eth1
           - interface: eth4
           - interface: lo
-      static:
-        routes:
-          # für anycast Demo
-          - destination: 10.200.0.0/24
-            next_hop: 10.124.2.22
       vrfs:
       - vrf: mgmt
         table: 1020

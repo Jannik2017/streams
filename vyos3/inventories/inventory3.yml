@@ -329,6 +329,14 @@ router:
             afis:
               - afi: 'ipv4-unicast'
                 next_hop: 'nexthop-self'
+          - ipv4_address: 10.134.2.22
+            description: p3anycast
+            remote_as: 65421
+            update_source: eth2
+            bfd: true
+            afis:
+              - afi: 'ipv4-unicast'
+                next_hop: 'nexthop-self'
       mpls:
         interfaces:
           - interface: eth1
@@ -349,11 +357,6 @@ router:
           - interface: eth1
           - interface: eth4
           - interface: lo
-      static:
-        routes:
-          # für anycast Demo
-          - destination: 10.200.0.0/24
-            next_hop: 10.134.2.22
       vrfs:
       - vrf: mgmt
         table: 1020
@@ -661,7 +664,7 @@ router:
           mtu: 1500
         - interface: eth4
           interface_type: ethernet
-          ipv4_address: 10.138.4.1/24
+          ipv4_address: 10.10.30.30/24
           mtu: 1500
       bgp:
         router_id: 10.3.255.38
