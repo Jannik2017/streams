@@ -20,7 +20,13 @@ sed -i -e 's/#ParallelDownloads/ParallelDownloads/' -e 's/#ILoveCandy/ILoveCandy
 
 sleep 1
 
-for user in /home/* ; do useradd -m ${user} ; chown -R $(basename user) ${user} ; done
+for user in /home/*
+do 
+    useradd -m ${user}
+    chown -R $(basename user) ${user}
+    sudo -iu $(basename ${user}) zsh ${user}/setup-user.zsh
+done
+
 chmod -R g-rwx o-rwx /home/*
 usermod -aG wheel aibix
 
