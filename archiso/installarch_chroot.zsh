@@ -24,7 +24,7 @@ for user in /home/*
 do 
     useradd -m ${user}
     chown -R $(basename user) ${user}
-    sudo -iu $(basename ${user}) zsh ${user}/setup-user.zsh
+    sudo -iu $(basename ${user}) zsh /home/setup-user.zsh
 done
 
 chmod -R g-rwx o-rwx /home/*
