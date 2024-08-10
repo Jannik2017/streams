@@ -1,0 +1,155 @@
+router:
+  vars:
+    ansible_user: "admin"
+    ansible_network_os: community.network.routeros
+
+  hosts:
+    pmr1m:
+      os: "routeros"
+      ansible_host: 10.20.30.101
+      ansible_hostname: "pmr1m"
+      interfaces:
+        - interface: lo
+          interface_type: loopback
+          ipv4_address: 10.3.255.31/32
+        - interface: eth0
+          interface_type: ethernet
+          ipv4_address: dhcp
+          mtu: 1500
+          vrf: mgmt
+        - interface: eth1
+          interface_type: ethernet
+          ipv4_address: 192.168.111.14/24
+          mtu: 1500
+        - interface: eth2
+          interface_type: ethernet
+          ipv4_address: 10.131.2.1/24
+          mtu: 1500
+        - interface: eth3
+          interface_type: ethernet
+          ipv4_address: 10.3.12.1/24
+          mtu: 1528
+        - interface: eth4
+          interface_type: ethernet
+          ipv4_address: 10.3.15.1/24
+          mtu: 1528
+        - interface: br100
+          interface_type: bridge
+          ipv4_address: 10.131.100.1/24
+          members:
+            - eth2
+        - interface: wg0
+          interface_type: wireguard
+          ipv4_address: 172.17.31.2/30
+          peers:
+            - peer: streampf
+              address: 78.47.154.241
+              port: 50031
+              allowed_ips: 0.0.0.0/0
+              public_key: '4pw8bb58iSAbBXrpbqJQQlJI92E0WuSYIYkZF34VpSE='
+          port: 50031
+          private_key: '8GniHeGIPEakapxfZfw5RXE+NFyreUcN6C1lmy7qAUw='
+          mtu: 1400
+      policy:
+        - route_maps:
+          - route_map: NACH_EXTERN
+            description: 'nach_extern_beigebracht'
+            rules:
+              - rule: 100
+                action: permit
+                match: 'local-preference 100'
+          - route_map: VON_EXTERN
+            description: 'von_extern_gelernt'
+            rules:
+              - rule: 100
+                action: permit
+                set: 'local-preference 50'
+      bgp:
+        router_id: 10.3.255.31
+        as: 65003
+        afis:
+          - afi: 'ipv4-unicast'
+            aggregate:
+              - 10.3.0.0/16
+            networks:
+              - 10.131.2.0/24
+              - 10.131.100.0/24
+        neighbors:
+          - ipv4_address: 10.3.255.34
+            description: p3r4v
+            remote_as: 65003
+            update_source: lo
+            afis:
+              - afi: 'ipv4-unicast'
+                next_hop: 'nexthop-self'
+          - ipv4_address: 10.3.255.35
+            description: p3r5v
+            remote_as: 65003
+            update_source: lo
+            afis:
+              - afi: 'ipv4-unicast'
+                next_hop: 'nexthop-self'
+          - ipv4_address: 10.3.255.38
+            description: p3r8v
+            remote_as: 65003
+            update_source: lo
+            afis:
+              - afi: 'ipv4-unicast'
+                next_hop: 'nexthop-self'
+          - ipv4_address: 172.17.31.1
+            description: streampf
+            remote_as: 65009
+            update_source: wg0
+            afis:
+              - afi: 'ipv4-unicast'
+                route_maps:
+                  route_map_import: 'VON_EXTERN'
+                  route_map_export: 'NACH_EXTERN'
+          - ipv4_address: 192.168.111.44
+            description: OPNsense
+            remote_as: 65005
+            update_source: eth1
+            afis:
+              - afi: 'ipv4-unicast'
+                route_maps:
+                  route_map_import: 'VON_EXTERN'
+                  route_map_export: 'NACH_EXTERN'
+      mpls:
+        interfaces:
+          - interface: eth3
+          - interface: eth4
+        ldp:
+          router_id: 10.3.255.31
+          interfaces:
+            - interface: lo
+            - interface: eth3
+            - interface: eth4
+      ospf:
+        router_id: 10.3.255.31
+        areas:
+          - area: 0
+            networks:
+              - 10.3.0.0/16
+              - 10.131.100.0/24
+            #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
+        interfaces:
+          - interface: br100
+            passive: true
+          - interface: eth2
+            passive: true
+          - interface: eth3
+          - interface: eth4
+          - interface: eth5
+            passive: true
+      static:
+        routes:
+          - destination: 78.47.154.241/32
+            next_hop: 192.168.111.1
+      vrfs:
+      - vrf: mgmt
+        table: 1020
+      services:
+      - service: ssh
+        vrf: mgmt
+        port: 22
+
