@@ -22,8 +22,8 @@ sleep 1
 
 for user in /home/*
 do 
-    useradd -m ${user}
-    chown -R $(basename user) ${user}
+    useradd -m $(basename ${user})
+    chown -R $(basename ${user}) ${user}
     sudo -iu $(basename ${user}) zsh /home/setup-user.zsh
 done
 
