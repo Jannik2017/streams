@@ -74,10 +74,14 @@ sed -i -e 's/#ParallelDownloads/ParallelDownloads/' -e 's/#ILoveCandy/ILoveCandy
 # install base system
 pacstrap -K /mnt base linux-lts linux-lts-headers base-devel curl wget cmake tmux zsh mc zfs-dkms zfs-utils dhclient openssh man-db man-pages texinfo nano qemu-guest-agent git
 
-rsync -a /root/overlay/ /mnt/
+cp -r /root/overlay/* /mnt/
+chown -R root:root /mnt/etc
+chown -R root:root /mnt/boot
+
+chmod 750 /mnt/etc/sudoers.d
 
 cp installarch_chroot.zsh /mnt/root/
-arch-chroot /mnt /root/installarch_chroot.zsh
+arch-chroot /mnt zsh /root/installarch_chroot.zsh
 
 sleep 1
 umount -R /mnt

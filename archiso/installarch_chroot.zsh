@@ -13,10 +13,11 @@ echo "KEYMAP=de-latin1" > /etc/vconsole.conf
 
 echo "total-recall" > /etc/hostname
 
-sed -i 's/^MODULES=()/MODULES=(zfs)/' /etc/mkinitcipo.conf
+sed -i 's/^MODULES=()/MODULES=(zfs)/' /etc/mkinitcpio.conf
 sed -i 's/filesystems fsck/zfs filesystems/' /etc/mkinitcpio.conf
 
-sed -i -e 's/#ParallelDownloads/ParallelDownloads/' -e 's/#ILoveCandy/ILoveCandy/' /etc/pacman.conf
+sed -i -e 's/#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
+echo "ILoveCandy" >> /etc/pacman.conf
 
 sleep 1
 
@@ -24,7 +25,8 @@ for user in /home/*
 do 
     useradd -m $(basename ${user})
     chown -R $(basename ${user}) ${user}
-    sudo -iu $(basename ${user}) zsh /home/setup-user.zsh
+    # soll der user selber ausführen bis sudo passt
+    #sudo -iu $(basename ${user}) zsh /home/setup-user.zsh
 done
 
 chmod -R g-rwx o-rwx /home/*
