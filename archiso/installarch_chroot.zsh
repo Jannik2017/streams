@@ -16,9 +16,6 @@ echo "total-recall" > /etc/hostname
 sed -i 's/^MODULES=()/MODULES=(zfs)/' /etc/mkinitcpio.conf
 sed -i 's/filesystems fsck/zfs filesystems/' /etc/mkinitcpio.conf
 
-sed -i -e 's/#ParallelDownloads/ParallelDownloads/' /etc/pacman.conf
-echo "ILoveCandy" >> /etc/pacman.conf
-
 sleep 1
 
 for user in /home/*
