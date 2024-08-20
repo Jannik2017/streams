@@ -29,7 +29,7 @@ done
 chmod -R g-rwx o-rwx /home/*
 usermod -aG wheel aibix
 
-systemctl enable dhclient@enp6s18
+systemctl enable dhclient@eno1
 systemctl enable sshd
 systemctl enable zfs.target
 systemctl enable zfs-import-cache
@@ -44,4 +44,3 @@ bootctl install
 mkinitcpio -P
 
 zpool set cachefile=/etc/zfs/zpool.cache zroot
-

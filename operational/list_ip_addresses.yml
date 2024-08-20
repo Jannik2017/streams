@@ -1,0 +1,26 @@
+---
+- hosts: router
+  connection: ansible.netcommon.network_cli
+  gather_facts: false
+  vars:
+    ansible_user: "vyos"
+    ansible_password: "vyos"
+    ansible_network_os: vyos.vyos.vyos
+
+  tasks:
+  - name: "Get interface IP addresses on VyOS"
+    vyos.vyos.vyos_command:
+      commands:
+        - show interfaces
+    register: vyos_show_interface
+
+  - name: "Fetch interface state and parse with pyats"
+    ansible.utils.cli_parse:
+      parser:
+        name: ansible.netcommon.pyats
+      text: "{{ vyos_show_interface }}"
+    register: vyos_pyats_show_interface
+
+  - name: print structured interface state data
+    ansible.builtin.debug:
+      msg: "{{ vyos_pyats_show_interface['parsed'] }}"

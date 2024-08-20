@@ -12,13 +12,13 @@ ZPOOL=$(zpool list | awk '/ONLINE/ {print $1}')
 if [[ $ZPOOL ]] ; then ; zfs umount -a ; zpool destroy $ZPOOL ; fi
 
 # make partitions /dev/sd{a..c}
-for p in {a..c} ; do sfdisk --force /dev/sd${p} < installarch_partitions.sfdisk ; sleep 1 ; done
+for p in {a..b} ; do sfdisk --force /dev/sd${p} < installarch_partitions.sfdisk ; sleep 1 ; done
 
 # make zfs pool command
 MKZFS="zpool create -f -o ashift=12 -O acltype=posixacl -O relatime=on -O xattr=sa -O dnodesize=legacy -O normalization=formD -O mountpoint=none -O canmount=off -O devices=off -R /mnt zroot raidz1 "
 
 # generate command wirh partuuids
-for id in $(ls -l /dev/disk/by-partuuid | awk '/2$/ {print $9}') ; do MKZFS="$MKZFS /dev/disk/by-partuuid/$id" ; done
+for id in $(ls -l /dev/disk/by-partuuid | grep -v sdc | awk '/2$/ {print $9}') ; do MKZFS="$MKZFS /dev/disk/by-partuuid/$id" ; done
 
 echo $MKZFS
 ls -l /dev/disk/by-partuuid | grep 2$
@@ -60,6 +60,8 @@ cp /etc/zfs/zpool.cache /mnt/etc/zfs/zpool.cache
 sleep -1
 
 # mount boot
+mkfs.fat -F32 /dev/sda1
+mkfs.fat -F32 /dev/sdb1
 mkdir /mnt/boot
 mount /dev/sda1 /mnt/boot
 sleep 1
