@@ -16,9 +16,11 @@
 
   - name: "Fetch interface state and parse with pyats"
     ansible.utils.cli_parse:
+      command: show interfaces
       parser:
         name: ansible.netcommon.pyats
-      text: "{{ vyos_show_interface }}"
+        command: show interfaces
+        os: vyos
     register: vyos_pyats_show_interface
 
   - name: print structured interface state data
