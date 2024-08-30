@@ -14,6 +14,10 @@
         - show interfaces
     register: vyos_show_interface
 
+  - name: "Print Interfaces from show command"
+    ansible.builtin.debug:
+      msg: "{{ vyos_show_interface }}"
+
   - name: "Fetch interface state and parse with pyats"
     ansible.utils.cli_parse:
       command: show interfaces

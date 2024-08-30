@@ -1,0 +1,36 @@
+---
+- hosts: router
+  connection: ansible.netcommon.network_cli
+  gather_facts: false
+  vars:
+    ansible_user: "vyos"
+    ansible_password: "vyos"
+    ansible_network_os: vyos.vyos.vyos
+
+  tasks:
+    - name: Clear L3-config other than mgmt!!
+      vyos.vyos.vyos_config:
+        lines:
+          - delete interface {{ item.interface_type }} {{ item.interface }} address
+      with_items: "{{ interfaces }}"
+      when: item.interface != "eth0"
+
+    - name: Replace device configuration with provided configuration IPv4
+      vyos.vyos.vyos_l3_interfaces:
+        config:
+        - name: "{{ item.interface }}"
+          ipv4:
+          - address: "{{ item.ipv4_address }}"
+        state: merged
+      with_items: "{{ interfaces }}"
+      when: item.ipv4_address is defined and item.interface != "eth0"
+
+    - name: Replace device configuration with provided configuration IPv6
+      vyos.vyos.vyos_l3_interfaces:
+        config:
+        - name: "{{ item.interface }}"
+          ipv6:
+          - address: "{{ item.ipv6_address }}"
+        state: merged
+      with_items: "{{ interfaces }}"
+      when: item.ipv6_address is defined and item.interface != "eth0"

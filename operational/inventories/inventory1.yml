@@ -706,6 +706,7 @@ router:
         - interface: eth2
           interface_type: ethernet
           ipv4_address: 10.1.37.7/24
+          ipv6_address: 2001:0470:731b:4000:10:1:37:7/64
           mtu: 1528
         - interface: eth3
           interface_type: ethernet
