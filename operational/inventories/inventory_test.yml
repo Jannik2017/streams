@@ -13,8 +13,6 @@ router:
           interface_type: loopback
           ipv4_address:
             - 10.1.255.17/32
-            - 10.1.255.18/32
-            - 10.1.255.19/32
         - interface: eth1
           interface_type: ethernet
           ipv4_address:
