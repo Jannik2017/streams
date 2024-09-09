@@ -1,0 +1,15 @@
+---
+- hosts: router
+  connection: ansible.netcommon.network_cli
+  gather_facts: false
+  vars:
+    ansible_user: "vyos"
+    ansible_password: "vyos"
+    ansible_network_os: vyos.vyos.vyos
+
+  tasks:
+    - name: Configure interfaces
+      include_tasks: block.yml
+      loop: "{{ interfaces }}"
+      loop_control:
+        loop_var: 'iface'

@@ -9,11 +9,9 @@ router:
       ansible_host: 10.20.30.17
       ansible_hostname: "p1r7v"
       interfaces:
-          lo:
-            interface_type: loopback
-            ipv4_address:
-              - 10.1.255.17/32
-              - 10.1.255.18/32
-              - 10.1.255.19/32
-            ipv6_address: 
-              - 2001:0470:731b:4000:10:1:255:17/128
+        - interface: lo
+          interface_type: loopback
+          ipv4_address:
+            - 10.1.255.17/32
+            - 10.1.255.18/32
+            - 10.1.255.19/32

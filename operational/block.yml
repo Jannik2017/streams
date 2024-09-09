@@ -1,0 +1,40 @@
+- name: Get current IP addresses on current interfaces
+  vyos.vyos.vyos_command:
+    commands:
+      - show configuration commands | match "interfaces {{ iface.interface_type }} {{ iface.interface }}.*address"
+  register: iface_config
+
+- name: Extract current IP addresses for all interfaces
+  set_fact:
+    current_iface_ips: "{{ iface_config.stdout_lines | regex_findall(' address \\S([\\d.]+/\\d+)') }}"
+
+- name: Debug current IP addresses
+  debug:
+    var: current_iface_ips
+
+- name: Debug iface_stdout.lines
+  debug:
+    var: iface_config.stdout_lines
+
+- name: Debug inventory IPv4 addresses for current iface.interface
+  debug:
+    var: iface.ipv4_address
+
+- name: Find surplus IPv4 addresses on iface.interface
+  set_fact:
+    surplus_iface_ips: "{{ current_iface_ips | difference(iface.ipv4_address) }}"
+
+- name: Debug surplus_iface_ips
+  debug:
+    var: surplus_iface_ips
+
+- name: Set interface IP address(es) from inventory
+  vyos.vyos.vyos_l3_interfaces:
+    config:
+      - name: "{{ item.0.interface }}"
+        ipv4:
+          - address: "{{ item.1 }}"
+  loop: "{{ hostvars[inventory_hostname]['interfaces'] | subelements('ipv4_address') }}"
+  loop_control:
+    loop_var: 'item'
+  when: item.0.interface == 'lo0'
