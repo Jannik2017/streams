@@ -15,3 +15,20 @@ router:
             - 10.1.255.17/32
             - 10.1.255.18/32
             - 10.1.255.19/32
+        - interface: eth1
+          interface_type: ethernet
+          ipv4_address:
+            - 10.1.67.7/24
+        - interface: eth2
+          interface_type: ethernet
+          ipv4_address:
+            - 10.1.37.7/24
+        - interface: eth3
+          interface_type: ethernet
+          ipv4_address:
+            - 10.1.78.7/24
+        - interface: eth4
+          interface_type: ethernet
+          ipv4_address:
+            - 10.4.4.4/32
+

@@ -20,7 +20,6 @@
   loop: "{{ surplus_iface_ips }}"
   loop_control:
     loop_var: 'current_surplus_ip'
-  when: iface.interface == 'lo'
 
 - name: Set interface IP address(es) from inventory
   vyos.vyos.vyos_l3_interfaces:
@@ -31,4 +30,4 @@
   loop: "{{ hostvars[inventory_hostname]['interfaces'] | subelements('ipv4_address') }}"
   loop_control:
     loop_var: 'item'
-  when: item.0.interface == 'lo'
+
