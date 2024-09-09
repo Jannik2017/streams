@@ -22,14 +22,6 @@
     loop_var: 'current_surplus_ip'
   when: iface.interface == 'lo'
 
-- name: Debug config commands
-  debug:
-    msg: "delete interface {{ iface.interface_type }} {{ iface.interface }} address '{{ current_surplus_ip }}'"
-  loop: "{{ surplus_iface_ips }}"
-  loop_control:
-    loop_var: 'current_surplus_ip'
-  when: iface.interface == 'lo'
-
 - name: Set interface IP address(es) from inventory
   vyos.vyos.vyos_l3_interfaces:
     config:
