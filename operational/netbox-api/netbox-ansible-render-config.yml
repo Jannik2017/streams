@@ -1,0 +1,74 @@
+- name: Render Jinja template within NetBox and return the result
+  gather_facts: false
+  hosts: all
+
+  vars:
+    netbox_endpoint: "{{ lookup('env', 'NETBOX_ENDPOINT') }}"
+    netbox_token: "{{ lookup('env', 'NETBOX_TOKEN') }}"
+    output_dir: "output"
+
+  pre_tasks:
+    - name: Set local connection for all hosts
+      ansible.builtin.set_fact:
+        ansible_connection: local
+      tags:
+        - always
+
+  tasks:
+    - name: Get device ID
+      ansible.builtin.uri:
+        url: "{{ netbox_endpoint }}/graphql/"
+        method: POST
+        validate_certs: false
+        headers:
+          Authorization: "Token {{ netbox_token }}"
+          Content-Type: "application/json"
+          Accept: "application/json"
+        body:
+          query: |
+            {
+              device_list(filters: {name: {exact: "{{ inventory_hostname }}"}}) {
+                name
+                id
+              }
+            }
+        body_format: json
+        return_content: true
+        status_code: 200
+      delegate_to: localhost
+      register: response
+
+    - name: Set fact
+      ansible.builtin.set_fact:
+        device_id: "{{ response.json.data.device_list[0].id }}"
+      delegate_to: localhost
+
+    - name: Trigger NetBox to return rendered configuration
+      ansible.builtin.uri:
+        url: "{{ netbox_endpoint }}/api/dcim/devices/{{ device_id }}/render-config/"
+        method: POST
+        validate_certs: false
+        headers:
+          Authorization: "Token {{ netbox_token }}"
+          Content-Type: "application/json"
+          Accept: "text/plain"
+        body:
+          {
+            "format": "txt"
+          }
+        body_format: json
+        return_content: true
+        status_code: 200
+      delegate_to: localhost
+      register: response
+      tags:
+        - build
+
+    - name: Save rendered config to file
+      ansible.builtin.copy:
+        content: "{{ response.content }}"
+        dest: "{{ output_dir }}/{{ inventory_hostname }}.txt"
+        mode: '0640'
+      delegate_to: localhost
+      tags:
+        - build

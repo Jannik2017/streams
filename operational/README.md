@@ -1,6 +1,4 @@
 # operational
 
-Der Titel macht keinen Sinn, was besseres ist mir aber nicht eingefallen.
-Hier Probiere ich ein wenig mit der vyos.vyos.vyos ansible-collection herum.
-
-Nicht jeder Schritt ist einzeln committed.
+Hier sind Basteleien mit der NetBox-API zu finden.
+Ich versuche nur funktionierende Stati zu committen.

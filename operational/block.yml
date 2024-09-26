@@ -4,9 +4,21 @@
       - show configuration commands | match "interfaces {{ iface.interface_type }} {{ iface.interface }}.*address"
   register: iface_config
 
+- name: Debug iface
+  debug:
+    var: iface
+
+- name: Debug iface_config
+  debug:
+    var: iface_config
+
 - name: Extract current IP addresses for interface
   set_fact:
     current_iface_ips: "{{ iface_config.stdout_lines | regex_findall(' address \\S([\\d.]+/\\d+)') }}"
+
+- name: Debug iface_config.stdout_lines
+  debug:
+    var: iface_config.stdout_lines
 
 - name: Find surplus IPv4 addresses on iface.interface
   set_fact:
@@ -30,4 +42,5 @@
   loop: "{{ hostvars[inventory_hostname]['interfaces'] | subelements('ipv4_address') }}"
   loop_control:
     loop_var: 'item'
+  when: item.0.interface == iface.interface
 
