@@ -67,7 +67,7 @@
     - name: Save rendered config to file
       ansible.builtin.copy:
         content: "{{ response.content }}"
-        dest: "{{ output_dir }}/{{ inventory_hostname }}.txt"
+        dest: "{{ output_dir }}/{{ inventory_hostname }}.cfg.backup"
         mode: '0640'
       delegate_to: localhost
       tags:

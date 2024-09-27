@@ -10,7 +10,6 @@ isp_names = ["isp1", "isp2", "isp3"]
 
 for tag_name in tag_names:
     for isp_name in isp_names:
-        ip_addresses = []
         response = requests.get(f"{netbox_url}/api/ipam/ip-addresses/?tag={tag_name}&tag={isp_name}", headers={
             "Authorization": f"Token {auth_token}",
             "Content-Type": "application/json"},
