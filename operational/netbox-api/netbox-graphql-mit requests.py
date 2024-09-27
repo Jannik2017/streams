@@ -13,7 +13,7 @@ headers = {
     'Accept': f'application/json'
 }
 
-url = 'https://192.168.111.205/graphql/' 
+url = f"{netbox_url}/graphql/"
 query_device_interfaces = '''
 query {
     device_list(filters: {name: {exact: "p1r7v"}}) {
