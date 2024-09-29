@@ -91,6 +91,7 @@ for route_reflector in route_reflectors:
         config_lines = generate_config_lines(client[1], client[0], bgp_config[client[0]]['asn'])
         print(config_lines)
 
+# This loop iterates through the clients and their route reflectors, printing each route reflector for each client.
 for client in route_reflector_clients:
     print(f"Client {client[0]} has the following route-reflectors:")
     for route_reflector in route_reflectors:
