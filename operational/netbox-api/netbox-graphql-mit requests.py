@@ -14,6 +14,15 @@ headers = {
 
 url = f"{netbox_url}/graphql/"
 
+def generate_config_lines(neighbor, device, asn):
+    config_lines = f"""
+    set protocols bgp neighbor { neighbor } address-family ipv4-unicast nexthop-self
+    set protocols bgp neighbor { neighbor } description '{ device }'
+    set protocols bgp neighbor { neighbor } remote-as '{ asn }'
+    set protocols bgp neighbor { neighbor } update-source 'lo'
+    """
+    return config_lines
+
 def query_device_interfaces(device):
     query_device_interfaces = '''
     query {
@@ -36,7 +45,6 @@ def query_device_interfaces(device):
     }
     '''
     return query_device_interfaces
-
 
 query_devices_p1 = '''
 query {
@@ -80,21 +88,12 @@ for router, config in bgp_config.items():
 for route_reflector in route_reflectors:
     print(f"Route Reflector {route_reflector[0]} has the following clients:")
     for client in route_reflector_clients:
-        config_lines = f"""
-        set protocols bgp neighbor { client[1] } address-family ipv4-unicast nexthop-self
-        set protocols bgp neighbor { client[1] } description '{ client[0]}'
-        set protocols bgp neighbor { client[1] } remote-as '{ bgp_config[client[0]]['asn'] }'
-        set protocols bgp neighbor { client[1] } update-source 'lo'"""
-
+        config_lines = generate_config_lines(client[1], client[0], bgp_config[client[0]]['asn'])
         print(config_lines)
 
 for client in route_reflector_clients:
+    print(f"Client {client[0]} has the following route-reflectors:")
     for route_reflector in route_reflectors:
-        config_lines = f"""
-        set protocols bgp neighbor { route_reflector[1] } address-family ipv4-unicast nexthop-self
-        set protocols bgp neighbor { route_reflector[1] } description '{ route_reflector[0]}'
-        set protocols bgp neighbor { route_reflector[1] } remote-as '{ bgp_config[route_reflector[0]]['asn'] }'
-        set protocols bgp neighbor { route_reflector[1] } update-source 'lo'"""
-
-        print(client[0], config_lines)
+        config_lines = generate_config_lines(route_reflector[1], route_reflector[0], bgp_config[route_reflector[0]]['asn'])
+        print(config_lines)
 
