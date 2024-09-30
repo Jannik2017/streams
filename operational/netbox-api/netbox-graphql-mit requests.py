@@ -54,7 +54,7 @@ query {
 }
 '''
 
-# get data from netbox
+# get data for p1 from netbox
 response_devices_p1 = requests.post(url, json={"query": query_devices_p1}, headers=headers, verify=False)
 
 # print result
@@ -74,10 +74,12 @@ for device in response_devices_p1.json()['data']['device_list']:
                         bgp_config[device['name']]['ipv4-address'] = ip['address']
                         bgp_config[device['name']]['asn'] = device_interfaces.json()['data']['device_list'][0]['custom_fields']['BGP_ASN']
 
+# The following loop iterates through the routers and their configurations.
+# It the saves route-flector routers to a list of lists with the router name and ip address
+# It also saves the routers that are clients of a route reflector to a list of lists with the router name and ip address
 route_reflectors = []
 route_reflector_clients = []
 
-# This loop iterates through the routers and their configurations.
 for router, config in bgp_config.items():
     if 'rr-type' in config and config['rr-type'] == 'route-reflector':
         route_reflectors.append([router, config['ipv4-address']])
