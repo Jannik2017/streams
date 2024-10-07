@@ -80,6 +80,7 @@ for device in response_devices_p1.json()['data']['device_list']:
 route_reflectors = []
 route_reflector_clients = []
 
+# Iterate through the routers and their configurations
 for router, config in bgp_config.items():
     if 'rr-type' in config and config['rr-type'] == 'route-reflector':
         route_reflectors.append([router, config['ipv4-address']])

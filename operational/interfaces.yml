@@ -20,17 +20,17 @@
         config:
         - name: "{{ item.interface }}"
           ipv4:
-          - address: "{{ item.ipv4_address }}"
+          - address: "{{ item.ipv4_address[0] }}"
         state: merged
       with_items: "{{ interfaces }}"
-      when: item.ipv4_address is defined and item.interface != "eth0"
+      when: item.ipv4_address is defined and item.interface != "eth0" and item.interface != "lo"
 
     - name: Replace device configuration with provided configuration IPv6
       vyos.vyos.vyos_l3_interfaces:
         config:
         - name: "{{ item.interface }}"
           ipv6:
-          - address: "{{ item.ipv6_address }}"
+          - address: "{{ item.ipv6_address[0] }}"
         state: merged
       with_items: "{{ interfaces }}"
-      when: item.ipv6_address is defined and item.interface != "eth0"
+      when: item.ipv6_address is defined and item.interface != "eth0" and item.interface != "lo"
