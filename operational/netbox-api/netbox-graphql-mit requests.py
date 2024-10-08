@@ -62,7 +62,7 @@ bgp_config = {}
 for device in response_devices_p1.json()['data']['device_list']:
     device_interfaces = requests.post(url, json={"query": query_device_interfaces(device['name'])}, headers=headers, verify=False)
     
-    print("Device: " + device['name'])
+    print(f"Device: { device['name'] }")
     bgp_config[device['name']] = {}
     for interface in device_interfaces.json()['data']['device_list'][0]['interfaces']:
         if len(interface['ip_addresses']) > 0:
