@@ -67,6 +67,7 @@ for device in response_devices_p1.json()['data']['device_list']:
 
     # Extract the interfaces for this device from the response
     interfaces =  device_interfaces.json()['data']['device_list'][0]['interfaces']
+    custom_fields = device_interfaces.json()['data']['device_list'][0]['custom_fields']
 
     # Iterate over each interface and its associated IP addresses with route-reflector tags
     for interface in interfaces:
@@ -77,16 +78,20 @@ for device in response_devices_p1.json()['data']['device_list']:
                 if tag['name']=='route-reflector':
 
                     # Add the device and interface to the rr_ips list
-                    rr_ips.append({"device": device['name'], interface['name']: address['address']})
+                    rr_ips.append({"device": device['name'], "interface": interface['name'], "ip_address": address['address'], "asn": custom_fields['BGP_ASN']})
                 elif tag['name']=='route-reflector-client':
 
                     # Add the device and interface to the rrc_ips list
-                    rrc_ips.append({"device": device['name'], interface['name']: address['address']})
+                    rrc_ips.append({"device": device['name'], "interface": interface['name'], "ip_address": address['address'], "asn": custom_fields['BGP_ASN']})
 
-# This code block is complete, but it can be improved by adding error handling and possibly using a more efficient data structure for rr_ips and rrc_ips.
-print("="*3+" route reflectors"+"="*3)
-pprint(rr_ips)
+for rr in rr_ips:
+    print(f"route-reflector { rr['device'] } has the following clients:")
+    for rrc in rrc_ips:
+        config_lines = generate_config_lines(rrc['ip_address'], rrc['device'], rrc['asn'])
+        print(config_lines)
 
-print("="*3+" route reflector clients"+"="*3)
-pprint(rrc_ips)
-
+for rrc in rrc_ips:
+    print(f"route-reflector-client { rrc['device'] } has the following route-reflectors:")
+    for rr in rr_ips:
+        config_lines = generate_config_lines(rr['ip_address'], rr['device'], rr['asn'])
+        print(config_lines)
