@@ -1,0 +1,18 @@
+{
+  device_list(filters: { name: { exact: "p1r1v" } }) {
+    name
+    interfaces {
+      name
+      ip_addresses {
+        address
+        tags(filters: { name: { exact: "route-reflector-client" } }) {
+          id
+          name
+        }
+      }
+      tags {
+        name
+      }
+    }
+  }
+}
