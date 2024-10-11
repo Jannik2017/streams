@@ -5,6 +5,10 @@
 
   tasks:
 
+    - name: Show id
+      debug:
+        var: inventory_hostname
+
     - name: Show context
       debug:
         var: config_context

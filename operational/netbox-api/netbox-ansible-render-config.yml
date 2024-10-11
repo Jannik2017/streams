@@ -30,19 +30,6 @@
               device_list(filters: {name: {exact: "{{ inventory_hostname }}"}}) {
                 name
                 id
-                interfaces {
-                    name
-                    ip_addresses {
-                        address
-                        tags {
-                            name
-                        }
-                    }
-                    tags {
-                        name
-                    }
-                }
-                custom_fields
               }
             }
         body_format: json
@@ -55,12 +42,6 @@
       ansible.builtin.set_fact:
         device_id: "{{ response.json.data.device_list[0].id }}"
       delegate_to: localhost
-
-    - name: Debug interface-list
-      ansible.builtin.debug:
-        var: response.json.data.device_list[0].interfaces
-      delegate_to: localhost
-      when: response.json.data.device_list[0].interfaces is defined
 
     - name: Trigger NetBox to return rendered configuration
       ansible.builtin.uri:
