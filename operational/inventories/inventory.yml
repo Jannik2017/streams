@@ -1,0 +1,11 @@
+---
+plugin: netbox.netbox.nb_inventory
+validate_certs: False
+config_context: True
+api_endpoint: https://192.168.111.8/
+token: 584149a859ea8e7a7f5e2d610c7235a3e2d2460c
+group_by:
+  - device_roles
+  - tags
+device_query_filters:
+  - has_primary_ip: true

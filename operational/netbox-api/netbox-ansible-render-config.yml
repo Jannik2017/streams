@@ -40,7 +40,7 @@
                     }
                     tags {
                         name
-                    }  
+                    }
                 }
                 custom_fields
               }

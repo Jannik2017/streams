@@ -1,0 +1,14 @@
+---
+- name: Access context data via Netbox inventory plugin
+  hosts: all
+  connection: local
+
+  tasks:
+
+    - name: Show context
+      debug:
+        var: config_context
+
+    - name: Loop over the dictionary
+      debug: msg="Key={{ item.key }} value={{ item.value }}"
+      with_dict: "{{ config_context[0].routing_information }}"
