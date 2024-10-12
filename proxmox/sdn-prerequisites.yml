@@ -61,12 +61,17 @@
 
         - name: Debug interfaces_content
           debug:
-            msg: "{{ interfaces_content }}"
+            msg: "{{ (interfaces_content.content | b64decode) }}"
 
         - name: Extract the bridge-port for vmbr0
           set_fact:
-            bridge_port: "{{ (interfaces_content.content | b64decode).splitlines() | select('search', '^\\s*bridge-ports\\s+.+$') | map('regex_replace', '^\\s*bridge-ports\\s+(.+)', '\\1') | first }}"
-        - name: Debug the detected bridge-port for vmbr0 (for verification)
+            #bridge_port: "{{ (interfaces_content.content | b64decode).splitlines() | select('search', '^\\s*iface vmbr0 inet static$') | map('regex_replace', '^.*bridge-ports\\s+(.+)$', '\\1') | select('search', '^.+$') | first | default('') }}"
+            # working:
+            #bridge_port: "{{ (interfaces_content.content | b64decode).splitlines() | select('search', '^\\s*bridge-ports\\s+.+$') | map('regex_replace', '^\\s*bridge-ports\\s+(.+)', '\\1') | first }}"
+            # testing:
+            bridge_port: "{{ (interfaces_content.content | b64decode).splitlines() | select('search', '^\\s*iface vmbr0 inet static\n\\s*bridge-ports\\s+.+$') | map('regex_replace', '^.*bridge-ports\\s+(.+)$', '\\1') | select('search', '^.+$') | first | default('') }}"
+
+        - name: Debug bridge_port
           debug:
             msg: "Detected bridge-port for vmbr0 is: {{ bridge_port }}"
 
@@ -97,6 +102,3 @@
         line: '        mtu 2000'
         state: present
         backup: yes
-
-    - name: Execute a bash command using the shell module
-      shell: "ifreload -a"
