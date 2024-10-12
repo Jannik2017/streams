@@ -1,0 +1,102 @@
+- name: Install SDN prerequisites on Proxmox Host
+  hosts: all
+  vars:
+    bridge_port: ""
+
+  tasks:
+    - name: Update the apt package index
+      apt:
+        update_cache: yes
+
+    - name: Upgrade all apt packages to the latest version
+      apt:
+        upgrade: dist
+        force_apt_get: yes
+
+    - name: Install packages
+      apt:
+        name:
+          - git
+          - curl
+          - tmux
+          - mc
+          - termshark
+          - lnav
+          - libpve-network-perl
+          - dnsmasq
+          - frr-pythontools
+        state: present
+
+    - name: Ensure dnsmasq is disabled
+      systemd:
+        name: dnsmasq
+        enabled: false
+        state: stopped
+
+    - name: Config für sdn in network/interfaces inkludieren, falls nicht vorhanden
+      lineinfile:
+        path: /etc/network/interfaces
+        line: "source /etc/network/interfaces.d/*"
+        state: present
+        create: no
+        insertafter: EOF
+
+    - name: Config für sdn in network/interfaces inkludieren, falls nicht vorhanden
+      lineinfile:
+        path: /etc/network/interfaces
+        line: "### EIGENE CHANGES AB HIER EINBAUEN ###"
+        state: present
+        create: no
+        insertafter: EOF
+
+    - name: Clean up apt cache (optional)
+      apt:
+        autoclean: yes
+
+    - block:
+        - name: Read the network interfaces file
+          slurp:
+            path: /etc/network/interfaces
+          register: interfaces_content
+
+        - name: Debug interfaces_content
+          debug:
+            msg: "{{ interfaces_content }}"
+
+        - name: Extract the bridge-port for vmbr0
+          set_fact:
+            bridge_port: "{{ (interfaces_content.content | b64decode).splitlines() | select('search', '^\\s*bridge-ports\\s+.+$') | map('regex_replace', '^\\s*bridge-ports\\s+(.+)', '\\1') | first }}"
+        - name: Debug the detected bridge-port for vmbr0 (for verification)
+          debug:
+            msg: "Detected bridge-port for vmbr0 is: {{ bridge_port }}"
+
+        - name: Fail if no bridge-port found for vmbr0
+          fail:
+            msg: "No bridge-port was found for vmbr0. Please check the network configuration."
+          when: bridge_port == ""
+
+        - name: Insert an indented comment after the bridge-port interface
+          lineinfile:
+            path: /etc/network/interfaces
+            insertafter: '^iface {{ bridge_port }} inet manual$'
+            line: '        mtu 2000'
+            state: present
+            backup: yes
+
+        - name: Insert "mtu 2000" directly into vmbr0 block using regex replace
+          replace:
+            path: /etc/network/interfaces
+            regexp: '^iface vmbr0 inet static$'
+            replace: 'iface vmbr0 inet static\n        mtu 2000'
+            backup: yes
+
+    - name: Ensure "mtu 2000" is present in the iface vmbr0 block
+      lineinfile:
+        path: /etc/network/interfaces
+        insertafter: '^iface vmbr0 inet static$'
+        line: '        mtu 2000'
+        state: present
+        backup: yes
+
+    - name: Execute a bash command using the shell module
+      shell: "ifreload -a"

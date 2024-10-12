@@ -1,0 +1,23 @@
+---
+- name: Remove MTU configurations and installed software
+  hosts: all
+  become: true  # This ensures the playbook runs with sudo privileges
+
+  tasks:
+    - name: Remove all "mtu 2000" lines from /etc/network/interfaces
+      lineinfile:
+        path: /etc/network/interfaces
+        regexp: 'mtu 2000'
+        state: absent
+        backup: yes
+
+    - name: Remove installed software packages
+      apt:
+        name:
+          - libpve-network-perl
+          - dnsmasq
+          - frr-pythontools
+        state: absent
+        purge: yes
+        autoremove: yes
+        force_apt_get: yes
