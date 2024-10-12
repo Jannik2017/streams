@@ -18,6 +18,7 @@
         name:
           - git
           - curl
+          - build-essential
           - tmux
           - mc
           - termshark
@@ -69,11 +70,11 @@
 
         - name: Debug bridge_port
           debug:
-            msg: "Detected bridge-port for vmbr0 is: {{ bridge_port }}"
+            msg: "Detected first bridge-port is: {{ bridge_port }}"
 
         - name: Fail if no bridge-port found for vmbr0
           fail:
-            msg: "No bridge-port was found for vmbr0. Please check the network configuration."
+            msg: "No bridge-port was found. Please check the network configuration."
           when: bridge_port == ""
 
         - name: Insert "mtu 2000" after the bridge-port interface
@@ -91,10 +92,10 @@
             replace: 'iface vmbr0 inet static\n        mtu 2000'
             backup: yes
 
-    - name: Ensure "mtu 2000" is present in the iface vmbr0 block
-      lineinfile:
-        path: /etc/network/interfaces
-        insertafter: '^iface vmbr0 inet static$'
-        line: '        mtu 2000'
-        state: present
-        backup: yes
+    # - name: Ensure "mtu 2000" is present in the iface vmbr0 block
+    #   lineinfile:
+    #     path: /etc/network/interfaces
+    #     insertafter: '^iface vmbr0 inet static$'
+    #     line: '        mtu 2000'
+    #     state: present
+    #     backup: yes
