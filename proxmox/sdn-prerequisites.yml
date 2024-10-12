@@ -65,11 +65,10 @@
 
         - name: Extract the bridge-port for vmbr0
           set_fact:
-            #bridge_port: "{{ (interfaces_content.content | b64decode).splitlines() | select('search', '^\\s*iface vmbr0 inet static$') | map('regex_replace', '^.*bridge-ports\\s+(.+)$', '\\1') | select('search', '^.+$') | first | default('') }}"
             # working:
             #bridge_port: "{{ (interfaces_content.content | b64decode).splitlines() | select('search', '^\\s*bridge-ports\\s+.+$') | map('regex_replace', '^\\s*bridge-ports\\s+(.+)', '\\1') | first }}"
             # testing:
-            bridge_port: "{{ (interfaces_content.content | b64decode).splitlines() | select('search', '^\\s*iface vmbr0 inet static\n\\s*bridge-ports\\s+.+$') | map('regex_replace', '^.*bridge-ports\\s+(.+)$', '\\1') | select('search', '^.+$') | first | default('') }}"
+            bridge_port: "{{ (interfaces_content.content | b64decode).splitlines() | select('search', '^\\s*bridge-ports\\s+.+$') | map('regex_replace', '^.*bridge-ports\\s+(.+)$', '\\1') | first }}"
 
         - name: Debug bridge_port
           debug:
@@ -80,7 +79,7 @@
             msg: "No bridge-port was found for vmbr0. Please check the network configuration."
           when: bridge_port == ""
 
-        - name: Insert an indented comment after the bridge-port interface
+        - name: Insert "mtu 2000" after the bridge-port interface
           lineinfile:
             path: /etc/network/interfaces
             insertafter: '^iface {{ bridge_port }} inet manual$'
