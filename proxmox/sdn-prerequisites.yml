@@ -65,9 +65,6 @@
 
         - name: Extract the bridge-port for vmbr0
           set_fact:
-            # working:
-            #bridge_port: "{{ (interfaces_content.content | b64decode).splitlines() | select('search', '^\\s*bridge-ports\\s+.+$') | map('regex_replace', '^\\s*bridge-ports\\s+(.+)', '\\1') | first }}"
-            # testing:
             bridge_port: "{{ (interfaces_content.content | b64decode).splitlines() | select('search', '^\\s*bridge-ports\\s+.+$') | map('regex_replace', '^.*bridge-ports\\s+(.+)$', '\\1') | first }}"
 
         - name: Debug bridge_port
