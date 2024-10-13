@@ -55,47 +55,29 @@
         autoclean: yes
 
     - block:
-        - name: Read the network interfaces file
-          slurp:
-            path: /etc/network/interfaces
-          register: interfaces_content
+      - name: Set vmbr0 and member interfaces mtu configuration value to 2000
+        community.general.interfaces_file:
+          dest: /etc/network/interfaces
+        register: interfaces_cfg
 
-        - name: Debug interfaces_content
-          debug:
-            msg: "{{ (interfaces_content.content | b64decode) }}"
+      - name: Access bridge-ports from interfaces_cfg
+        set_fact:
+          bridge_port: "{{ interfaces_cfg['ifaces']['vmbr0']['bridge-ports'] }}"
 
-        - name: Extract the bridge-port for vmbr0
-          set_fact:
-            bridge_port: "{{ (interfaces_content.content | b64decode).splitlines() | select('search', '^\\s*bridge-ports\\s+.+$') | map('regex_replace', '^.*bridge-ports\\s+(.+)$', '\\1') | first }}"
+      - name: Set bridge-port mtu configuration value to 2000
+        community.general.interfaces_file:
+          dest: /etc/network/interfaces
+          iface: "{{ bridge_port }}"
+          option: mtu
+          value: 2000
+          backup: true
+          state: present
 
-        - name: Debug bridge_port
-          debug:
-            msg: "Detected first bridge-port is: {{ bridge_port }}"
-
-        - name: Fail if no bridge-port found for vmbr0
-          fail:
-            msg: "No bridge-port was found. Please check the network configuration."
-          when: bridge_port == ""
-
-        - name: Insert "mtu 2000" after the bridge-port interface
-          lineinfile:
-            path: /etc/network/interfaces
-            insertafter: '^iface {{ bridge_port }} inet manual$'
-            line: '        mtu 2000'
-            state: present
-            backup: yes
-
-        - name: Insert "mtu 2000" directly into vmbr0 block using regex replace
-          replace:
-            path: /etc/network/interfaces
-            regexp: '^iface vmbr0 inet static$'
-            replace: 'iface vmbr0 inet static\n        mtu 2000'
-            backup: yes
-
-    # - name: Ensure "mtu 2000" is present in the iface vmbr0 block
-    #   lineinfile:
-    #     path: /etc/network/interfaces
-    #     insertafter: '^iface vmbr0 inet static$'
-    #     line: '        mtu 2000'
-    #     state: present
-    #     backup: yes
+      - name: Set vmbr0 mtu configuration value to 2000
+        community.general.interfaces_file:
+          dest: /etc/network/interfaces
+          iface: vmbr0
+          option: mtu
+          value: 2000
+          backup: true
+          state: present

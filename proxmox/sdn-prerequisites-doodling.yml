@@ -1,0 +1,32 @@
+- name: Install SDN prerequisites on Proxmox Host
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - block:
+      - name: Set eth1 mtu configuration value to 2000
+        community.general.interfaces_file:
+          dest: /etc/network/interfaces
+        register: interfaces_cfg
+
+      - name: Access bridge-ports from interfaces_cfg
+        set_fact:
+          bridge_port: "{{ interfaces_cfg['ifaces']['vmbr0']['bridge-ports'] }}"
+
+      - name: Set bridge-port mtu configuration value to 2000
+        community.general.interfaces_file:
+          dest: /etc/network/interfaces
+          iface: "{{ bridge_port }}"
+          option: mtu
+          value: 3000
+          backup: true
+          state: present
+
+      - name: Set vmbr0 mtu configuration value to 2000
+        community.general.interfaces_file:
+          dest: /etc/network/interfaces
+          iface: vmbr0
+          option: mtu
+          value: 2000
+          backup: true
+          state: present
