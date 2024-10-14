@@ -1,6 +1,7 @@
 # Group of Debian-based servers
 [proxmox]
 umox ansible_host=192.168.111.3 ansible_user=root
+minismox ansible_host=192.168.111.108 ansible_user=root
 picomox ansible_host=192.168.111.90 ansible_user=root
 dell ansible_host=192.168.111.130 ansible_user=root
 
