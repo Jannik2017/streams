@@ -47,16 +47,31 @@ router:
           private_key: 'aO0PCJUIQohTnfYfJXZ8gZzJHK5Ec+5O3ATCKq4TPl4='
           mtu: 1400
       policy:
+        - prefix_lists:
+          - prefix_list: INTERNAL_NETWORKS
+            description: AIBIXHQ
+            rules:
+              - rule: 100
+                action: permit
+                ge: 16
+                prefixes:
+                - 192.168.0.0/16
         - route_maps:
           - route_map: NACH_EXTERN
             description: 'nach_extern_beigebracht'
             rules:
+              - rule: 50
+                action: deny
+                match: 'ip address prefix-list INTERNAL_NETWORKS'
               - rule: 100
                 action: permit
                 match: 'local-preference 100'
           - route_map: VON_EXTERN
             description: 'von_extern_gelernt'
             rules:
+              - rule: 50
+                action: deny
+                match: 'ip address prefix-list INTERNAL_NETWORKS'
               - rule: 100
                 action: permit
                 set: 'local-preference 50'
@@ -65,38 +80,54 @@ router:
         as: 65001
         neighbors:
           - ipv4_address: 10.1.255.16
-            description: p1r6v
+            description: p1r6v_6
             remote_as: 65001
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
                 next_hop: 'nexthop-self'
           - ipv4_address: 192.168.111.109
-            description: p2r1v
+            description: p2r1v_4
             remote_as: 65002
             update_source: eth1
             afis:
               - afi: 'ipv4-unicast'
+                route_maps:
+                  - import: 'VON_EXTERN'
+                  - export: 'NACH_EXTERN'
           - ipv4_address: 192.168.111.14
-            description: p3r1v
+            description: p3r1v_4
             remote_as: 65003
             update_source: eth1
             afis:
               - afi: 'ipv4-unicast'
+                route_maps:
+                  - import: 'VON_EXTERN'
+                  - export: 'NACH_EXTERN'
           - ipv4_address: 172.17.11.1
-            description: streampf
+            description: streampf_4
             remote_as: 65009
             update_source: wg0
             afis:
               - afi: 'ipv4-unicast'
+                route_maps:
+                  - import: 'VON_EXTERN'
+                  - export: 'NACH_EXTERN'
         neighbors6:
           - ipv6_address: 2001:0470:731b:4000:10:1:255:16
-            description: p1r6v
+            description: p1r6v_6
             remote_as: 65001
             update_source: lo
             afis:
               - afi: 'ipv6-unicast'
                 next_hop: 'nexthop-self'
+          - ipv6_address: 2a09:04c0:03e0:03af::1:1:1
+            description: streampf_6
+            remote_as: 65009
+            update_source: wg0
+            afis:
+              - afi: 'ipv6-unicast'
+                next_hop: 'netxhop-self'
       ospf:
         router_id: 10.1.255.11
         areas:

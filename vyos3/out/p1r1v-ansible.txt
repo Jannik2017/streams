@@ -1,43 +1,83 @@
-        set interfaces loopback lo address '10.1.255.11/32'
-        set interfaces ethernet eth0 mtu '1500'
-        set interfaces ethernet eth0 vrf 'mgmt'
-        set interfaces ethernet eth0 address 'dhcp'
-        set interfaces ethernet eth1 mtu '1500'
-        set interfaces ethernet eth1 address '192.168.111.67/24'
-        set interfaces ethernet eth2 mtu '1500'
-        set interfaces ethernet eth2 address '10.1.11.1/24'
-        set interfaces ethernet eth3 mtu '1528'
-        set interfaces ethernet eth3 address '10.1.12.1/24'
-        set interfaces ethernet eth4 mtu '1528'
-        set interfaces ethernet eth4 address '10.1.15.1/24'
+set interfaces loopback lo address '10.1.255.11/32'
+set interfaces loopback lo address '2001:0470:731b:4000:10:1:255:11/128'
+set interfaces ethernet eth0 mtu '1500'
+set interfaces ethernet eth0 vrf 'mgmt'
+set interfaces ethernet eth0 address 'dhcp'
+set interfaces ethernet eth1 mtu '1500'
+set interfaces ethernet eth1 address '192.168.111.67/24'
+set interfaces ethernet eth2 mtu '1500'
+set interfaces ethernet eth2 address '10.1.11.1/24'
+set interfaces ethernet eth3 mtu '1528'
+set interfaces ethernet eth3 address '10.1.12.1/24'
+set interfaces ethernet eth4 mtu '1528'
+set interfaces ethernet eth4 address '10.1.15.1/24'
+set interfaces wireguard wg0 private-key 'aO0PCJUIQohTnfYfJXZ8gZzJHK5Ec+5O3ATCKq4TPl4='
+set interfaces wireguard wg0 port '50011'
+set interfaces wireguard wg0 peer streampf address '78.47.154.241'
+set interfaces wireguard wg0 peer streampf allowed-ips '0.0.0.0/0'
+set interfaces wireguard wg0 peer streampf port '50011'
+set interfaces wireguard wg0 peer streampf public-key 'xTLgLyv2Tuavto8fa9UhMR+komJD0UZclb3T9yFAejw='
+set interfaces wireguard wg0 mtu '1400'
+set interfaces wireguard wg0 address '172.17.11.2/30'
+      
+set policy prefix-list INTERNAL_NETWORKS description AIBIXHQ
+set policy prefix-list INTERNAL_NETWORKS rule 100 action permit
+set policy prefix-list INTERNAL_NETWORKS rule 100 ge 16                  
+set policy prefix-list INTERNAL_NETWORKS rule 100 prefix 192.168.0.0/16                    
+  
+
+
 set policy route-map NACH_EXTERN description nach_extern_beigebracht
+set policy route-map NACH_EXTERN rule 50 action deny
+set policy route-map NACH_EXTERN rule 50 match ip address prefix-list INTERNAL_NETWORKS
 set policy route-map NACH_EXTERN rule 100 action permit
 set policy route-map NACH_EXTERN rule 100 match local-preference 100
 set policy route-map VON_EXTERN description von_extern_gelernt
+set policy route-map VON_EXTERN rule 50 action deny
+set policy route-map VON_EXTERN rule 50 match ip address prefix-list INTERNAL_NETWORKS
 set policy route-map VON_EXTERN rule 100 action permit
 set policy route-map VON_EXTERN rule 100 set local-preference 50
 set protocols bgp parameters router-id '10.1.255.11'
 set protocols bgp system-as '65001'
-set protocols bgp neighbor 10.1.255.16 description 'p1r6v'
+set protocols bgp neighbor 10.1.255.16 description 'p1r6v_6'
 set protocols bgp neighbor 10.1.255.16 remote-as '65001'
 set protocols bgp neighbor 10.1.255.16 update-source 'lo'
+set protocols bgp neighbor 10.1.255.16 address-family ipv4-unicast
 set protocols bgp neighbor 10.1.255.16 address-family ipv4-unicast nexthop-self
-set protocols bgp neighbor 192.168.111.109 description 'p2r1v'
+set protocols bgp neighbor 192.168.111.109 description 'p2r1v_4'
 set protocols bgp neighbor 192.168.111.109 remote-as '65002'
 set protocols bgp neighbor 192.168.111.109 update-source 'eth1'
-set protocols bgp neighbor 192.168.111.14 description 'p3r1v'
+set protocols bgp neighbor 192.168.111.109 address-family ipv4-unicast
+set protocols bgp neighbor 192.168.111.14 description 'p3r1v_4'
 set protocols bgp neighbor 192.168.111.14 remote-as '65003'
 set protocols bgp neighbor 192.168.111.14 update-source 'eth1'
+set protocols bgp neighbor 192.168.111.14 address-family ipv4-unicast
+set protocols bgp neighbor 172.17.11.1 description 'streampf_4'
+set protocols bgp neighbor 172.17.11.1 remote-as '65009'
+set protocols bgp neighbor 172.17.11.1 update-source 'wg0'
+set protocols bgp neighbor 172.17.11.1 address-family ipv4-unicast
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:16 description 'p1r6v_6'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:16 remote-as '65001'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:16 update-source 'lo'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:16 address-family ipv6-unicast
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:16 address-family ipv6-unicast nexthop-self
+set protocols bgp neighbor 2a09:04c0:03e0:03af::1:1:1 description 'streampf_6'
+set protocols bgp neighbor 2a09:04c0:03e0:03af::1:1:1 remote-as '65009'
+set protocols bgp neighbor 2a09:04c0:03e0:03af::1:1:1 update-source 'wg0'
+set protocols bgp neighbor 2a09:04c0:03e0:03af::1:1:1 address-family ipv6-unicast
+set protocols bgp neighbor 2a09:04c0:03e0:03af::1:1:1 address-family ipv6-unicast netxhop-self
 set protocols ospf parameters router-id '10.1.255.11'
 set protocols ospf area 0 network '10.1.0.0/16'
 set protocols ospf interface eth3
 set protocols ospf interface eth4
 set protocols ospf interface lo
-set protocols ospf parameters router-id '10.1.255.11'
-set protocols ospfv3 interface eth3
-set protocols ospfv3 interface eth4
-set protocols ospfv3 interface lo
-set vrf name mgmt table '222'
+set protocols ospfv3 parameters router-id '10.1.255.11'
+set protocols ospfv3 area 0
+set protocols ospfv3 interface eth3 area 0
+set protocols ospfv3 interface eth4 area 0
+set protocols ospfv3 interface lo area 0
+set protocols static route 78.47.154.241/32 next-hop 192.168.111.1
+set vrf name mgmt table '1020'
 set service ssh port '22'
 set service ssh vrf 'mgmt'
 set service ntp server 1.pool.ntp.org
