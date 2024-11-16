@@ -42,16 +42,31 @@ router:
           private_key: 'QHMqK4UK7pMiV/iWTDb5G39axuYpnjxLJ/0Mnw/RbX4='
           mtu: 1400
       policy:
+        - prefix_lists:
+          - prefix_list: INTERNAL_NETWORKS
+            description: AIBIXHQ
+            rules:
+              - rule: 100
+                action: permit
+                ge: 16
+                prefixes:
+                - 192.168.0.0/16
         - route_maps:
           - route_map: NACH_EXTERN
             description: 'nach_extern_beigebracht'
             rules:
+              - rule: 50
+                action: deny
+                match: 'ip address prefix-list INTERNAL_NETWORKS'
               - rule: 100
                 action: permit
                 match: 'local-preference 100'
           - route_map: VON_EXTERN
             description: 'von_extern_gelernt'
             rules:
+              - rule: 50
+                action: deny
+                match: 'ip address prefix-list INTERNAL_NETWORKS'
               - rule: 100
                 action: permit
                 set: 'local-preference 50'

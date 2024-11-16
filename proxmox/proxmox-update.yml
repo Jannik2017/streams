@@ -1,0 +1,17 @@
+- name: Install SDN prerequisites on Proxmox Host
+  hosts: all
+  vars:
+    bridge_port: ""
+
+  tasks:
+    - name: Update the apt package index
+      apt:
+        update_cache: yes
+
+    - name: Upgrade all apt packages to the latest version
+      apt:
+        upgrade: dist
+        force_apt_get: yes
+
+    - name: Reboot the system
+      reboot:
