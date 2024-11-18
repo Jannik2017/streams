@@ -3,12 +3,9 @@
   gather_facts: false
   connection: ansible.netcommon.network_cli
   vars:
-    ansible_user: vyos
-    ansible_password: vyos
     ansible_network_os: vyos.vyos.vyos
 
   hosts: router
-
   tasks:
 
     - name: Get latest VyOS ISO URL
@@ -19,7 +16,6 @@
         status_code: 200
         body_format: json
       register: data
-      # failed_when: <optional condition based on JSON returned content>
 
     - name: Extract the ISO URL from content
       set_fact:
@@ -33,21 +29,25 @@
       set_fact:
         iso_name: "{{ iso_url.split('/')[-1] }}"
 
-    - name: Download from iso_url
+    - name: Check if the image already exists
+      stat:
+        path: "/tmp/{{ iso_name }}"
+      register: image_stat
+
+    - name: Download ISO if it does not exist
       get_url:
         url: "{{ iso_url }}"
         dest: "/tmp/{{ iso_name }}"
+      when: not image_stat.stat.exists
 
     - name: Upload vyos.iso to router
-      copy:
-        src: "/tmp/vyos.iso"
-        dest: "/config/images/{{ iso_name }}"
-
-# see after this task, we can use the same playbook to install latest vyos on system
+      net_put:
+        src: "/tmp/{{ iso_name }}"
+        dest: "{{ iso_name }}"
 
     - name: "Installing latest vyos on system"
       cli_command:
-        command: add system image "{{ iso_url }}"
+        command: add system image "{{ iso_name }}"
         newline: True
         check_all: True
         prompt:
