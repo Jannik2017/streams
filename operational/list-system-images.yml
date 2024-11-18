@@ -1,0 +1,41 @@
+---
+- name: Get latest VyOS ISO and deploy on routers for upgrading.
+  gather_facts: false
+  connection: ansible.netcommon.network_cli
+  vars:
+    ansible_user: vyos
+    ansible_password: vyos
+    ansible_network_os: vyos.vyos.vyos
+
+  hosts: router
+
+  tasks:
+
+    - name: Get a list of system images from router
+      vyos.vyos.vyos_command:
+        commands:
+          - show system image
+      register: images
+
+    - name: Ensure stdout_lines is not empty
+      fail:
+        msg: "stdout_lines is empty, no images found."
+      when: images.stdout_lines | length == 0
+
+    - name: Parse stdout_lines and add all images that are NOT in use to to_delete variable
+      set_fact:
+        to_delete: "{{ to_delete | default([]) + [item.split()[0]] }}"
+      loop: "{{ images.stdout_lines[0][2:] }}"  # Skip the header lines
+      when: "'Yes' not in item"
+
+    - name: Delete all unused system images from router
+      ansible.netcommon.cli_command:
+        command: delete system image {{ item }}
+        newline: true
+        check_all: true
+        prompt:
+          - 'Do you really want to delete the image'
+        answer:
+          - 'y'
+      loop: "{{ to_delete }}"
+      when: to_delete is defined and to_delete | length > 0

@@ -1,0 +1,16 @@
+---
+- name: vrf config
+  hosts: router
+  vars:
+    ansible_user: vyos
+    ansible_network_os: vyos.vyos.vyos
+  gather_facts: no
+
+  connection: network_cli
+  
+  tasks:
+    - name: Set name-server
+      vyos_config:
+        lines:
+          - set system name-server 1.1.1.1
+      

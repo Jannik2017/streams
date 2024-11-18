@@ -1,0 +1,67 @@
+---
+- name: Get latest VyOS ISO and deploy on routers for upgrading.
+  gather_facts: false
+  connection: ansible.netcommon.network_cli
+  vars:
+    ansible_user: vyos
+    ansible_password: vyos
+    ansible_network_os: vyos.vyos.vyos
+
+  hosts: router
+
+  tasks:
+
+    - name: Get latest VyOS ISO URL
+      uri: 
+        url: https://raw.githubusercontent.com/vyos/vyos-nightly-build/refs/heads/current/version.json
+        method: GET
+        return_content: yes
+        status_code: 200
+        body_format: json
+      register: data
+      # failed_when: <optional condition based on JSON returned content>
+
+    - name: Extract the ISO URL from content
+      set_fact:
+        iso_url: "{{ (data.content | from_json)[0].url }}"
+
+    - name: Debug iso_url
+      debug:
+        var: iso_url
+
+    - name: Set fact iso_name from url
+      set_fact:
+        iso_name: "{{ iso_url.split('/')[-1] }}"
+
+    - name: Download from iso_url
+      get_url:
+        url: "{{ iso_url }}"
+        dest: "/tmp/{{ iso_name }}"
+
+    - name: Upload vyos.iso to router
+      copy:
+        src: "/tmp/vyos.iso"
+        dest: "/config/images/{{ iso_name }}"
+
+# see after this task, we can use the same playbook to install latest vyos on system
+
+    - name: "Installing latest vyos on system"
+      cli_command:
+        command: add system image "{{ iso_url }}"
+        newline: True
+        check_all: True
+        prompt:
+        - 'What would you like to name this image'
+        - 'Would you like to set the new image as the default one for boot'
+        - 'An active configuration was found'
+        - 'Would you like to copy SSH host keys'
+        answer:
+        - ''
+        - 'y'
+        - 'y'
+        - 'y'
+
+    - name: reboot
+      cli_command:
+        command: "reboot now"
+      #when: reboot is defined
