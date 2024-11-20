@@ -64,7 +64,7 @@ router:
               rules:
                 - rule: 50
                   action: deny
-                  match: 'ip prefix-list PL_INTERNAL_NETWORKS'
+                  match: 'ip address prefix-list PL_INTERNAL_NETWORKS'
                 - rule: 100
                   action: permit
                   match: 'local-preference 100'
@@ -73,7 +73,7 @@ router:
               rules:
                 - rule: 50
                   action: deny
-                  match: 'ip prefix-list PL_INTERNAL_NETWORKS'
+                  match: 'ip address prefix-list PL_INTERNAL_NETWORKS'
                 - rule: 100
                   action: permit
                   set: 'local-preference 50'
@@ -571,7 +571,7 @@ router:
               rules:
                 - rule: 50
                   action: deny
-                  match: 'ip prefix-list PL_INTERNAL_NETWORKS'
+                  match: 'ip address prefix-list PL_INTERNAL_NETWORKS'
                 - rule: 100
                   action: permit
                   match: 'local-preference 100'
@@ -580,7 +580,7 @@ router:
               rules:
                 - rule: 50
                   action: deny
-                  match: 'ip prefix-list PL_INTERNAL_NETWORKS'
+                  match: 'ip address prefix-list PL_INTERNAL_NETWORKS'
                 - rule: 100
                   action: permit
                   set: 'local-preference 50'
