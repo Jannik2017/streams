@@ -143,7 +143,7 @@ router:
           - interface: eth3
           - interface: eth4
         ldp:
-          router_id: 10.2.255.11
+          router_id: 10.1.255.11
           interfaces:
             - interface: lo
             - interface: eth3
@@ -270,7 +270,7 @@ router:
           - interface: eth3
           - interface: eth4
         ldp:
-          router_id: 10.2.255.12
+          router_id: 10.1.255.12
           interfaces:
             - interface: lo
             - interface: eth1
@@ -390,7 +390,7 @@ router:
           - interface: eth3
           - interface: eth4
         ldp:
-          router_id: 10.2.255.13
+          router_id: 10.1.255.13
           interfaces:
             - interface: lo
             - interface: eth1
@@ -485,7 +485,7 @@ router:
           - interface: eth1
           - interface: eth4
         ldp:
-          router_id: 10.2.255.24
+          router_id: 10.1.255.24
           interfaces:
             - interface: lo
             - interface: eth1
@@ -648,7 +648,7 @@ router:
           - interface: eth2
           - interface: eth3
         ldp:
-          router_id: 10.2.255.15
+          router_id: 10.1.255.15
           interfaces:
             - interface: lo
             - interface: eth2
@@ -853,7 +853,7 @@ router:
           - interface: eth2
           - interface: eth3
         ldp:
-          router_id: 10.2.255.16
+          router_id: 10.1.255.16
           interfaces:
             - interface: lo
             - interface: eth1
@@ -979,7 +979,7 @@ router:
           - interface: eth2
           - interface: eth3
         ldp:
-          router_id: 10.2.255.17
+          router_id: 10.1.255.17
           interfaces:
             - interface: lo
             - interface: eth1
@@ -1096,7 +1096,7 @@ router:
           - interface: eth1
           - interface: eth2
         ldp:
-          router_id: 10.2.255.18
+          router_id: 10.1.255.18
           interfaces:
             - interface: lo
             - interface: eth1
