@@ -1,0 +1,25 @@
+---
+
+- name: finalize config
+  hosts: router
+  connection: network_cli
+  gather_facts: false
+
+  tasks:
+  - debug: msg='{{ ansible_run_tags }}'
+    tags: ['debug']
+    when: "'debug' in ansible_run_tags"
+
+  - name: unset vrf bind-to-all
+    vyos.vyos.vyos_config:
+      lines:
+        - delete vrf bind-to-all
+      save: true
+
+  - name: Write config using jinja2
+    ansible.builtin.template:
+      src: vyos-setup.j2
+      dest: out/{{ ansible_hostname }}-ansible.txt
+    delegate_to: localhost
+    tags: ['test']
+    when: "'test' in ansible_run_tags"

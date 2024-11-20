@@ -1,0 +1,286 @@
+#jinja2: lstrip_blocks: True
+{# interfaces #}
+{% for i in interfaces %}
+    {% if i.interface_type == "bridge" %}
+        {% for m in i.members %}
+set interfaces {{ i.interface_type }} {{ i.interface }} member interface {{ m }}
+        {% endfor %}
+    {% endif %}
+    {% if i.interface_type == "wireguard" %}
+set interfaces wireguard wg0 private-key '{{ i.private_key }}'
+set interfaces wireguard wg0 port '{{ i.port }}'
+        {% for p in i.peers %}
+set interfaces wireguard wg0 peer {{ p.peer }} address '{{ p.address }}'
+set interfaces wireguard wg0 peer {{ p.peer }} allowed-ips '{{ p.allowed_ips }}'
+set interfaces wireguard wg0 peer {{ p.peer }} port '{{ p.port }}'
+set interfaces wireguard wg0 peer {{ p.peer }} public-key '{{ p.public_key }}'
+        {% endfor %}
+    {% endif %}
+    {% if i.mtu is defined %}
+set interfaces {{ i.interface_type }} {{ i.interface }} mtu '{{ i.mtu }}'
+{#set interfaces {{ i.interface_type }} {{ i.interface }} ip adjust-mss '{{ i.mtu - 40 }}'#}
+{#set interfaces {{ i.interface_type }} {{ i.interface }} ipv6 adjust-mss '{{ i.mtu - 60 }}'#}
+    {% endif %}
+    {% if i.vrf is defined %}
+set interfaces {{ i.interface_type }} {{ i.interface }} vrf '{{ i.vrf }}'
+    {% endif %}
+set interfaces {{ i.interface_type }} {{ i.interface }} address '{{ i.ipv4_address }}'
+    {% if i.ipv6_address is defined %}
+set interfaces {{ i.interface_type }} {{ i.interface }} address '{{ i.ipv6_address }}'
+    {% endif %}
+{% endfor -%}
+
+{# policy #}
+{% if policy is defined %}
+    {% for p in policy %}
+    {# prefix-list #}
+        {% if p.prefix_lists is defined %}
+            {% for pl in p.prefix_lists %}      
+set policy prefix-list {{ pl.prefix_list }} description {{ pl.description }}
+                {% for r in pl.rules %}
+set policy prefix-list {{ pl.prefix_list }} rule {{ r.rule }} action {{ r.action }}
+                    {% if r.ge is defined %}
+set policy prefix-list {{ pl.prefix_list }} rule {{ r.rule }} ge {{ r.ge }}                  
+                    {% endif %}
+                    {% for pfx in r.prefixes %}
+set policy prefix-list {{ pl.prefix_list }} rule {{ r.rule }} prefix {{ pfx }}                    
+                    {% endfor %}
+                {% endfor %}
+            {% endfor %}  
+        {% endif %}
+
+    {# route-map #}
+        {% if p.route_maps is defined %}
+            {% for rm in p.route_maps %}
+set policy route-map {{ rm.route_map }} description {{ rm.description }}
+                {% for r in rm.rules %}
+set policy route-map {{ rm.route_map }} rule {{ r.rule }} action {{ r.action }}
+                    {% if r.match is defined %}
+set policy route-map {{ rm.route_map }} rule {{ r.rule }} match {{ r.match }}
+                    {% endif %}
+                    {% if r.set is defined %}
+set policy route-map {{ rm.route_map }} rule {{ r.rule }} set {{ r.set }}
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+{% endif -%}
+
+{# bgp #}
+{% if bgp is defined %}
+    {# parameters #}
+set protocols bgp parameters router-id '{{ bgp.router_id }}'
+set protocols bgp system-as '{{ bgp.as }}'
+    {# 'global' afis #}
+    {% if bgp.afis is defined %}
+        {% for af in bgp.afis %}
+            {% if af.aggregates is defined %}
+                {% for aggregate in af.aggregates %}
+set protocols bgp address-family {{ af.afi }} aggregate-address {{ aggregate }}
+                {% endfor %}
+            {% endif %}
+            {% if af.redistribute is defined %}
+                {% for rd in af.redistribute %}
+set protocols bgp address-family {{ af.afi }} redistribute {{ rd }}
+                {%endfor %}
+            {% endif %}
+            {% if af.networks is defined %}
+                {% for n in af.networks %}
+set protocols bgp address-family {{ af.afi }} network {{ n }}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    {# neighbors #}
+    {% for n in bgp.neighbors %}
+set protocols bgp neighbor {{ n.ipv4_address }} description '{{ n.description }}'
+set protocols bgp neighbor {{ n.ipv4_address }} remote-as '{{ n.remote_as }}'
+set protocols bgp neighbor {{ n.ipv4_address }} update-source '{{ n.update_source }}'
+        {% if n.afis is defined %}
+            {% for af in n.afis %}
+{#set protocols bgp neighbor {{ n.ipv4_address }} address-family {{ af.afi }}#}
+                {% if af.next_hop is defined %}
+set protocols bgp neighbor {{ n.ipv4_address }} address-family {{ af.afi }} {{ af.next_hop }}
+                {% endif %}
+                {% if af.rr is defined %}
+set protocols bgp neighbor {{ n.ipv4_address }} address-family {{ af.afi }} {{ af.rr }}
+                {% endif %}
+                {% if af.route_maps.route_map_export is defined %}
+set protocols bgp neighbor {{ n.ipv4_address }} address-family {{ af.afi }} route-map export '{{ af.route_maps.route_map_export }}'
+                {% endif %}
+                {% if af.route_maps.route_map_import is defined %}
+set protocols bgp neighbor {{ n.ipv4_address }} address-family {{ af.afi }} route-map import '{{ af.route_maps.route_map_import }}'
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+    {# neighbors6 #}
+    {% if bgp.neighbors6 is defined %}
+        {% for n in bgp.neighbors6 %}
+set protocols bgp neighbor {{ n.ipv6_address }} description '{{ n.description }}'
+set protocols bgp neighbor {{ n.ipv6_address }} remote-as '{{ n.remote_as }}'
+set protocols bgp neighbor {{ n.ipv6_address }} update-source '{{ n.update_source }}'
+            {% if n.afis is defined %}
+                {% for af in n.afis %}
+{#set protocols bgp neighbor {{ n.ipv6_address }} address-family {{ af.afi }}#}
+                    {% if af.next_hop is defined %}
+set protocols bgp neighbor {{ n.ipv6_address }} address-family {{ af.afi }} {{ af.next_hop }}
+                    {% endif %}
+                    {% if af.rr is defined %}
+set protocols bgp neighbor {{ n.ipv6_address }} address-family {{ af.afi }} {{ af.rr }}
+                    {% endif %}
+                    {% if af.route_maps.route_map_export is defined %}
+set protocols bgp neighbor {{ n.ipv6_address }} address-family {{ af.afi }} route-map export '{{ af.route_maps.route_map_export }}'
+                    {% endif %}
+                    {% if af.route_maps.route_map_import is defined %}
+set protocols bgp neighbor {{ n.ipv6_address }} address-family {{ af.afi }} route-map import '{{ af.route_maps.route_map_import }}'
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{% endif -%}
+
+{# mpls #}
+{% if mpls is defined %}
+    {% for i in mpls.interfaces %}
+set protocols mpls interface '{{ i.interface }}'
+    {% endfor %}
+    {% if mpls.ldp is defined %}
+set protocols mpls ldp router-id '{{ mpls.ldp.router_id }}'
+set protocols mpls ldp discovery transport-ipv4-address '{{ mpls.ldp.router_id }}'
+        {% if mpls.ldp.interfaces is defined %}
+            {% for i in mpls.ldp.interfaces %}
+set protocols mpls ldp interface '{{ i.interface }}'
+            {% endfor %}
+        {% endif %}
+    {% endif %}
+{% endif -%}
+
+{# ospf #}
+{% if ospf is defined %}
+set protocols ospf parameters router-id '{{ ospf.router_id }}'
+    {% for a in ospf.areas %}
+        {% for n in a.networks %}
+set protocols ospf area {{ a.area }} network '{{ n }}'
+        {% endfor %}
+    {% endfor %}
+    {% for i in ospf.interfaces %}
+        {% if i.passive is defined and i.passive == true %}
+set protocols ospf interface {{ i.interface }} passive
+        {% else %}
+set protocols ospf interface {{ i.interface }}
+        {% endif %}
+    {% endfor %}
+{% endif -%}
+
+{# ospfv3 #}
+{% if ospfv3 is defined %}
+set protocols ospfv3 parameters router-id '{{ ospfv3.router_id }}'
+    {% for a in ospfv3.areas %}
+set protocols ospfv3 area {{ a.area }}
+        {% if a.networks is defined %}
+            {% for n in a.networks %}
+set protocols ospfv3 area {{ a.area }} network '{{ n }}'
+            {% endfor %}
+        {% endif %}
+        {% for i in ospfv3.interfaces %}
+            {% if i.passive is defined and i.passive == true %}
+set protocols ospfv3 interface {{ i.interface }} passive
+            {% else %}
+set protocols ospfv3 interface {{ i.interface }} area {{ a.area }}
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+{% endif -%}
+
+{# static #}
+{% if static is defined %}
+    {% if static.routes is defined %}
+        {% for r in static.routes %}
+set protocols static route {{ r.destination }} next-hop {{ r.next_hop }}
+        {% endfor %}
+    {% endif %}
+    {% if static.routes6 is defined %}
+        {% for r6 in static.routes6 %}
+set protocols static route6 {{ r6.destination }} next-hop {{ r6.next_hop }} interface {{ r6.interface }}
+        {% endfor %}
+    {% endif -%}
+{% endif -%}
+
+{# vrf #}
+{%+ if vrfs is defined %}
+    {% for vrf in vrfs %}
+set vrf name {{ vrf.vrf }} table '{{ vrf.table }}'
+    {% endfor %}
+{% endif -%}
+
+{# services #}
+{% if services is defined %}
+    {% for s in services %}
+    {# ssh #}
+        {% if s.service == "ssh" %}
+set service ssh port '{{ s.port }}'
+set service ssh vrf '{{ s.vrf }}'
+        {% endif %}
+    {# dhcp-relay #}
+        {% if s.service == "dhcp-relay" %}
+            {% for li in s.listen_interfaces %}
+set service dhcp-relay listen-interface {{ li }}
+            {% endfor %}
+            {% if s.relay_options is defined %}
+                {% for ro in s.relay_options %}
+set service dhcp-relay relay-options {{ ro }}
+                {% endfor %}
+            {% endif %}
+set service dhcp-relay server {{ s.server }}
+            {% for ui in s.upstream_interfaces %}
+set service dhcp-relay upstream-interface {{ ui }}
+            {% endfor %}
+        {% endif %}
+    {# dhcpv6-relay #}
+        {% if s.service == "dhcpv6-relay" %}
+            {% for li in s.listen_interfaces %}
+set service dhcpv6-relay listen-interface {{ li }}
+            {% endfor %}
+            {% for ui in s.upstream_interfaces %}
+set service dhcpv6-relay upstream-interface {{ ui }} address {{ s.address }}
+            {% endfor %}
+            {% if s.options is defined %}
+                {% for ro in s.options %}
+set service dhcpv6-relay {{ ro }}
+                {% endfor %}
+            {% endif %}
+        {% endif %}
+    {# router-advert #}
+        {% if s.service == "router-advert" %}
+            {% for i in s.interfaces %}
+                {% if i.default_preference is defined %}
+set service router-advert interface {{ i.interface }} default-preference {{ i.default_preference }}
+                {% endif %}
+                {% if i.name_servers is defined %}
+                    {% for ns in i.name_servers %}
+set service router-advert interface {{ i.interface }} name-server {{ ns }}
+                    {% endfor %}
+                {% endif %}
+                {% if i.config_flags is defined %}
+                    {% for cf in i.config_flags %}
+set service router-advert interface {{ i.interface }} {{ cf }}
+                    {% endfor %}
+                {% endif %}
+set service router-advert interface {{ i.interface }} prefix {{ i.prefix }}
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+{% endif -%}
+
+{# common stuff #}
+set system config-management commit-revisions '100'
+set system conntrack modules ftp
+set system conntrack modules h323
+set system conntrack modules nfs
+set system conntrack modules pptp
+set system conntrack modules sip
+set system conntrack modules sqlnet
+set system conntrack modules tftp
