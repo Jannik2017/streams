@@ -18,7 +18,7 @@
   - name: Write config using jinja2
     ansible.builtin.template:
       src: vyos-setup.j2
-      dest: out/{{ ansible_hostname }}-ansible.txt
+      dest: ../out/{{ ansible_hostname }}-ansible.txt
     delegate_to: localhost
     tags: ['test']
     when: "'test' in ansible_run_tags"
