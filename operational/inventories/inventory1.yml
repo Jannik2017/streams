@@ -11,34 +11,57 @@ router:
       interfaces:
         - interface: lo
           interface_type: loopback
-          ipv4_address: 10.1.255.11/32
-          ipv6_address: 2001:0470:731b:4000:10:1:255:11/128
+          description: loopback
+          ipv4_addresses: 
+            - 10.1.255.11/32
+          ipv6_addresses: 
+            - 2001:0470:731b:4000:10:1:255:11/128
         - interface: eth0
           interface_type: ethernet
-          ipv4_address: dhcp
+          description: mgmt-vrf
+          ipv4_addresses: 
+            - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
-          ipv4_address: 192.168.111.67/24
+          description: uplink
+          ipv4_addresses: 
+            - 192.168.111.67/24
           mtu: 1500
         - interface: eth2
           interface_type: ethernet
-          ipv4_address: 10.1.11.1/24
-          ipv6_address: 2001:470:731b:4002::1/64
+          description: infra-dhcp
+          ipv4_addresses: 
+            - 10.1.11.1/24
+          ipv6_addresses: 
+            - 2001:470:731b:4002::1/64
           mtu: 1500
         - interface: eth3
           interface_type: ethernet
-          ipv4_address: 10.1.12.1/24
+          description: core::p1r1v-p1r2v
+          ipv4_addresses: 
+            - 10.1.12.1/24
           mtu: 1528
         - interface: eth4
           interface_type: ethernet
-          ipv4_address: 10.1.15.1/24
+          description: core::p1r1v-p1r5v
+          ipv4_addresses: 
+            - 10.1.15.1/24
+          mtu: 1528
+        - interface: eth5
+          interface_type: ethernet
+          description: core::p1r1v-p2r1v (b-plane)
+          ipv4_addresses: 
+            - 10.12.11.1/24
           mtu: 1528
         - interface: wg0
           interface_type: wireguard
-          ipv4_address: 172.17.11.2/30
-          ipv6_address: 2a09:4c0:3e0:3af:0:1:1:2/126
+          description: transit (hetzner-streampf)
+          ipv4_addresses: 
+            - 172.17.11.2/30
+          ipv6_addresses: 
+            - 2a09:4c0:3e0:3af:0:1:1:2/126
           peers:
             - peer: streampf
               address: 78.47.154.241
@@ -97,7 +120,7 @@ router:
               - connected
         neighbors:
           - ipv4_address: 10.1.255.16
-            description: p1r6v
+            description: core::p1r6v
             remote_as: 65001
             update_source: lo
             afis:
@@ -132,7 +155,7 @@ router:
                   route_map_export: 'RM_NACH_EXTERN'
         neighbors6:
           - ipv6_address: 2001:0470:731b:4000:10:1:255:16
-            description: p1r6v
+            description: core::p1r6v
             remote_as: 65001
             update_source: lo
             afis:
@@ -191,34 +214,55 @@ router:
       interfaces:
         - interface: lo
           interface_type: loopback
-          ipv4_address: 10.1.255.12/32
-          ipv6_address: 2001:0470:731b:4000:10:1:255:12/128
+          description: loopback
+          ipv4_addresses: 
+            - 10.1.255.12/32
+          ipv6_addresses: 
+            - 2001:0470:731b:4000:10:1:255:12/128
         - interface: eth0
           interface_type: ethernet
-          ipv4_address: dhcp
+          description: mgmt-vrf
+          ipv4_addresses: 
+            - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
-          ipv4_address: 10.1.12.2/24
+          description: core::p1r2v-p1r1v
+          ipv4_addresses: 
+            - 10.1.12.2/24
           mtu: 1528
         - interface: eth2
           interface_type: ethernet
-          ipv4_address: 198.51.0.1/26
-          ipv6_address: 2001:470:731b:4802::1/64
+          description: customer::opnsense1
+          ipv4_addresses: 
+            - 198.51.0.1/26
+          ipv6_addresses: 
+            - 2001:470:731b:4802::1/64
           mtu: 1500
         - interface: eth3
           interface_type: ethernet
-          ipv4_address: 10.1.23.2/24
+          description: core::p1r2v-p1r3v
+          ipv4_addresses: 
+            - 10.1.23.2/24
           mtu: 1528
         - interface: eth4
           interface_type: ethernet
-          ipv4_address: 10.1.26.2/24
+          description: core::p1r2v-p1r6v
+          ipv4_addresses: 
+            - 10.1.26.2/24
           mtu: 1528
         - interface: eth5
           interface_type: ethernet
-          description: MS-01
-          ipv4_address: 198.51.100.1/28
+          description: core::p1r2v-p2r2v (b-plane)
+          ipv4_addresses: 
+            - 10.12.22.1/24
+          mtu: 1528
+        - interface: eth6
+          interface_type: ethernet
+          description: cusctomer::MS-01
+          ipv4_addresses: 
+            - 198.51.100.1/28
           mtu: 1500
       policy:
         - prefix_lists:
@@ -250,7 +294,7 @@ router:
               - connected
         neighbors:
           - ipv4_address: 10.1.255.16
-            description: p1r6v
+            description: core::p1r6v
             remote_as: 65001
             update_source: lo
             afis:
@@ -258,7 +302,7 @@ router:
                 next_hop: 'nexthop-self'
         neighbors6:
           - ipv6_address: 2001:0470:731b:4000:10:1:255:16
-            description: p1r6v
+            description: core::p1r6v
             remote_as: 65001
             update_source: lo
             afis:
@@ -346,31 +390,48 @@ router:
       interfaces:
         - interface: lo
           interface_type: loopback
-          ipv4_address: 10.1.255.13/32
-          ipv6_address: 2001:0470:731b:4000:10:1:255:13/128
+          description: loopback
+          ipv4_addresses: 
+            - 10.1.255.13/32
+          ipv6_addresses: 
+            - 2001:0470:731b:4000:10:1:255:13/128
         - interface: eth0
           interface_type: ethernet
-          ipv4_address: dhcp
+          description: mgmt-vrf
+          ipv4_addresses: 
+            - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
-          ipv4_address: 10.1.23.3/24
+          description: core::p1r3v-p1r2v
+          ipv4_addresses: 
+            - 10.1.23.3/24
           mtu: 1528
         - interface: eth3
           interface_type: ethernet
-          ipv4_address: 10.1.34.3/24
+          description: core::p1r3v-p1r4v
+          ipv4_addresses: 
+            - 10.1.34.3/24
           mtu: 1528
         - interface: eth4
           interface_type: ethernet
-          ipv4_address: 10.1.37.3/24
+          description: core::p1r3v-p1r7v
+          ipv4_addresses: 
+            - 10.1.37.3/24
+          mtu: 1528
+        - interface: eth5
+          interface_type: ethernet
+          description: core::p1r3v-p2r3v (b-plane)
+          ipv4_addresses: 
+            - 10.12.33.1/24
           mtu: 1528
       bgp:
         router_id: 10.1.255.13
         as: 65001
         neighbors:
           - ipv4_address: 10.1.255.16
-            description: p1r6v
+            description: core::p1r6v
             remote_as: 65001
             update_source: lo
             afis:
@@ -378,7 +439,7 @@ router:
                 next_hop: 'nexthop-self'
         neighbors6:
           - ipv6_address: 2001:0470:731b:4000:10:1:255:16
-            description: p1r6v
+            description: core::p1r6v
             remote_as: 65001
             update_source: lo
             afis:
@@ -432,27 +493,45 @@ router:
       interfaces:
         - interface: lo
           interface_type: loopback
-          ipv4_address: 10.1.255.14/32
-          ipv6_address: 2001:0470:731b:4000:10:1:255:14/128
+          description: loopback
+          ipv4_addresses: 
+            - 10.1.255.14/32
+          ipv6_addresses: 
+            - 2001:0470:731b:4000:10:1:255:14/128
         - interface: eth0
           interface_type: ethernet
-          ipv4_address: dhcp
+          description: mgmt-vrf
+          ipv4_addresses: 
+            - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
-          ipv4_address: 10.1.34.4/24
+          description: core::p1r4v-p1r3v
+          ipv4_addresses: 
+            - 10.1.34.4/24
           mtu: 1528
         - interface: eth3
           interface_type: ethernet
-          ipv4_address: 10.114.3.1/24
+          description: customer (obsolete?)
+          ipv4_addresses: 
+            - 10.114.3.1/24
           # fe80::1/64 muss konfiguriert werden, wenn Clients diese als GW nutzen können sollen
           # für Hoster /56 Demo
-          ipv6_address: fe80::1/64
+          ipv6_addresses: 
+            - fe80::1/64
           mtu: 1500
         - interface: eth4
           interface_type: ethernet
-          ipv4_address: 10.1.48.4/24
+          description: core::p1r4v-p1r8v
+          ipv4_addresses: 
+            - 10.1.48.4/24
+          mtu: 1528
+        - interface: eth5
+          interface_type: ethernet
+          description: core::p1r4v-p2r4v (b-plane)
+          ipv4_addresses: 
+            - 10.12.44.1/24
           mtu: 1528
       bgp:
         router_id: 10.1.255.14
@@ -466,7 +545,7 @@ router:
               - static
         neighbors:
           - ipv4_address: 10.1.255.16
-            description: p1r6v
+            description: core::p1r6v
             remote_as: 65001
             update_source: lo
             afis:
@@ -474,7 +553,7 @@ router:
                 next_hop: 'nexthop-self'
         neighbors6:
           - ipv6_address: 2001:0470:731b:4000:10:1:255:16
-            description: p1r6v
+            description: core::p1r6v
             remote_as: 65001
             update_source: lo
             afis:
@@ -524,28 +603,47 @@ router:
       interfaces:
         - interface: lo
           interface_type: loopback
-          ipv4_address: 10.1.255.15/32
-          ipv6_address: 2001:0470:731b:4000:10:1:255:15/128
+          description: loopback
+          ipv4_addresses: 
+            - 10.1.255.15/32
+          ipv6_addresses: 
+            - 2001:0470:731b:4000:10:1:255:15/128
         - interface: eth0
           interface_type: ethernet
-          ipv4_address: dhcp
+          description: mgmt-vrf
+          ipv4_addresses: 
+            - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
-          ipv4_address: 192.168.111.68/24
+          description: uplink
+          ipv4_addresses: 
+            - 192.168.111.68/24
           mtu: 1500
         - interface: eth2
           interface_type: ethernet
-          ipv4_address: 10.1.15.5/24
+          description: core::p1r5v-p1r1v
+          ipv4_addresses: 
+            - 10.1.15.5/24
           mtu: 1528
         - interface: eth3
           interface_type: ethernet
-          ipv4_address: 10.1.56.5/24
+          description: core::p1r5v-p1r6v
+          ipv4_addresses: 
+            - 10.1.56.5/24
+          mtu: 1528
+        - interface: eth5
+          interface_type: ethernet
+          description: core::p1r5v-p2r5v (b-plane)
+          ipv4_addresses: 
+            - 10.12.55.1/24
           mtu: 1528
         - interface: wg0
           interface_type: wireguard
-          ipv4_address: 172.17.15.2/30
+          description: transit (hetzner-streampf)
+          ipv4_addresses: 
+            - 172.17.15.2/30
           peers:
             - peer: streampf
               address: 78.47.154.241
@@ -602,7 +700,7 @@ router:
               - connected
         neighbors:
           - ipv4_address: 10.1.255.16
-            description: p1r6v
+            description: core::p1r6v
             remote_as: 65001
             update_source: lo
             afis:
@@ -637,7 +735,7 @@ router:
                   route_map_export: 'RM_NACH_EXTERN'
         neighbors6:
           - ipv6_address: 2001:0470:731b:4000:10:1:255:16
-            description: p1r6v
+            description: core::p1r6v
             remote_as: 65001
             update_source: lo
             afis:
@@ -695,30 +793,50 @@ router:
       interfaces:
         - interface: lo
           interface_type: loopback
-          ipv4_address: 10.1.255.16/32
-          ipv6_address: 2001:0470:731b:4000:10:1:255:16/128
+          description: loopback
+          ipv4_addresses: 
+            - 10.1.255.16/32
+          ipv6_addresses: 
+            - 2001:0470:731b:4000:10:1:255:16/128
         - interface: eth0
           interface_type: ethernet
-          ipv4_address: dhcp
+          description: mgmt-vrf
+          ipv4_addresses: 
+            - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
-          ipv4_address: 10.1.56.6/24
+          description: core::p1r6v-p1r5v
+          ipv4_addresses: 
+            - 10.1.56.6/24
           mtu: 1528
         - interface: eth2
           interface_type: ethernet
-          ipv4_address: 10.1.26.6/24
+          description: core::p1r6v-p1r2v
+          ipv4_addresses: 
+            - 10.1.26.6/24
           mtu: 1528
         - interface: eth3
           interface_type: ethernet
-          ipv4_address: 10.1.67.6/24
+          description: core::p1r6v-p1r7v
+          ipv4_addresses: 
+            - 10.1.67.6/24
           mtu: 1528
         - interface: eth4
           interface_type: ethernet
-          ipv4_address: 198.51.100.33/28
-          ipv6_address: 2001:470:731b:6804::1/64
+          description: opnsense2
+          ipv4_addresses: 
+            - 198.51.100.33/28
+          ipv6_addresses: 
+            - 2001:470:731b:6804::1/64
           mtu: 1500
+        - interface: eth5
+          interface_type: ethernet
+          description: core::p1r6v-p2r6v (b-plane)
+          ipv4_addresses: 
+            - 10.12.66.1/24
+          mtu: 1528
       policy:
         - prefix_lists:
             - prefix_list: PL_BGP_redistribute_v4
@@ -749,49 +867,49 @@ router:
               - connected
         neighbors:
           - ipv4_address: 10.1.255.11
-            description: p1r1v
+            description: core::p1r1v
             remote_as: 65001
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
                 rr: route-reflector-client
           - ipv4_address: 10.1.255.12
-            description: p1r2v
+            description: core::p1r2v
             remote_as: 65001
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
                 rr: route-reflector-client
           - ipv4_address: 10.1.255.13
-            description: p1r3v
+            description: core::p1r3v
             remote_as: 65001
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
                 rr: route-reflector-client
           - ipv4_address: 10.1.255.14
-            description: p1r4v
+            description: core::p1r4v
             remote_as: 65001
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
                 rr: route-reflector-client
           - ipv4_address: 10.1.255.15
-            description: p1r5v
+            description: core::p1r5v
             remote_as: 65001
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
                 rr: route-reflector-client
           - ipv4_address: 10.1.255.17
-            description: p1r7v
+            description: core::p1r7v
             remote_as: 65001
             update_source: lo
             afis:
               - afi: 'ipv4-unicast'
                 rr: route-reflector-client
           - ipv4_address: 10.1.255.18
-            description: p1r8v
+            description: core::p1r8v
             remote_as: 65001
             update_source: lo
             afis:
@@ -799,49 +917,49 @@ router:
                 rr: route-reflector-client
         neighbors6:
           - ipv6_address: 2001:0470:731b:4000:10:1:255:11
-            description: p1r1v
+            description: core::p1r1v
             remote_as: 65001
             update_source: lo
             afis:
               - afi: 'ipv6-unicast'
                 rr: route-reflector-client
           - ipv6_address: 2001:0470:731b:4000:10:1:255:12
-            description: p1r2v
+            description: core::p1r2v
             remote_as: 65001
             update_source: lo
             afis:
               - afi: 'ipv6-unicast'
                 rr: route-reflector-client
           - ipv6_address: 2001:0470:731b:4000:10:1:255:13
-            description: p1r3v
+            description: core::p1r3v
             remote_as: 65001
             update_source: lo
             afis:
               - afi: 'ipv6-unicast'
                 rr: route-reflector-client
           - ipv6_address: 2001:0470:731b:4000:10:1:255:14
-            description: p1r4v
+            description: core::p1r4v
             remote_as: 65001
             update_source: lo
             afis:
               - afi: 'ipv6-unicast'
                 rr: route-reflector-client
           - ipv6_address: 2001:0470:731b:4000:10:1:255:15
-            description: p1r5v
+            description: core::p1r5v
             remote_as: 65001
             update_source: lo
             afis:
               - afi: 'ipv6-unicast'
                 rr: route-reflector-client
           - ipv6_address: 2001:0470:731b:4000:10:1:255:17
-            description: p1r7v
+            description: core::p1r7v
             remote_as: 65001
             update_source: lo
             afis:
               - afi: 'ipv6-unicast'
                 rr: route-reflector-client
           - ipv6_address: 2001:0470:731b:4000:10:1:255:18
-            description: p1r8v
+            description: core::p1r8v
             remote_as: 65001
             update_source: lo
             afis:
@@ -923,30 +1041,50 @@ router:
       interfaces:
         - interface: lo
           interface_type: loopback
-          ipv4_address: 10.1.255.17/32
-          ipv6_address: 2001:0470:731b:4000:10:1:255:17/128
+          description: loopback
+          ipv4_addresses: 
+            - 10.1.255.17/32
+          ipv6_addresses: 
+            - 2001:0470:731b:4000:10:1:255:17/128
         - interface: eth0
           interface_type: ethernet
-          ipv4_address: dhcp
+          description: mgmt-vrf
+          ipv4_addresses: 
+            - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
-          ipv4_address: 10.1.67.7/24
+          description: core::p1r7v-p1r6v
+          ipv4_addresses: 
+            - 10.1.67.7/24
           mtu: 1528
         - interface: eth2
           interface_type: ethernet
-          ipv4_address: 10.1.37.7/24
+          description: core::p1r7v-p1r3v
+          ipv4_addresses: 
+            - 10.1.37.7/24
           mtu: 1528
         - interface: eth3
           interface_type: ethernet
-          ipv4_address: 10.1.78.7/24
+          description: core::p1r7v-p1r8v
+          ipv4_addresses: 
+            - 10.1.78.7/24
           mtu: 1528
         - interface: eth4
           interface_type: ethernet
-          ipv4_address: 203.0.113.1/28
-          ipv6_address: 2001:470:731b:7004::1/64
+          description: pfsense2
+          ipv4_addresses: 
+            - 203.0.113.1/28
+          ipv6_addresses: 
+            - 2001:470:731b:7004::1/64
           mtu: 1500
+        - interface: eth5
+          interface_type: ethernet
+          description: core::p1r7v-p2r7v (b-plane)
+          ipv4_addresses: 
+            - 10.12.77.1/24
+          mtu: 1528
       bgp:
         router_id: 10.1.255.17
         as: 65001
@@ -959,7 +1097,7 @@ router:
               - 2001:470:731b:7004::/64
         neighbors:
           - ipv4_address: 10.1.255.16
-            description: p1r6v
+            description: core::p1r6v
             remote_as: 65001
             update_source: lo
             afis:
@@ -967,7 +1105,7 @@ router:
                 next_hop: 'nexthop-self'
         neighbors6:
           - ipv6_address: 2001:0470:731b:4000:10:1:255:16
-            description: p1r6v
+            description: core::p1r6v
             remote_as: 65001
             update_source: lo
             afis:
@@ -1049,25 +1187,42 @@ router:
       interfaces:
         - interface: lo
           interface_type: loopback
-          ipv4_address: 10.1.255.18/32
-          ipv6_address: 2001:0470:731b:4000:10:1:255:18/128
+          description: loopback
+          ipv4_addresses: 
+            - 10.1.255.18/32
+          ipv6_addresses: 
+            - 2001:0470:731b:4000:10:1:255:18/128
         - interface: eth0
           interface_type: ethernet
-          ipv4_address: dhcp
+          description: mgmt-vrf
+          ipv4_addresses: 
+            - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
-          ipv4_address: 10.1.78.8/24
+          description: core::p1r8v-p1r7v
+          ipv4_addresses: 
+            - 10.1.78.8/24
           mtu: 1528
         - interface: eth2
           interface_type: ethernet
-          ipv4_address: 10.1.48.8/24
+          description: core::p1r8v-p1r4v
+          ipv4_addresses: 
+            - 10.1.48.8/24
           mtu: 1528
         - interface: eth3
           interface_type: ethernet
-          ipv4_address: 192.0.2.1/24
+          description: customer (obsolete?)
+          ipv4_addresses: 
+            - 192.0.2.1/24
           mtu: 1500
+        - interface: eth5
+          interface_type: ethernet
+          description: core::p1r8v-p2r8v (b-plane)
+          ipv4_addresses: 
+            - 10.12.88.1/24
+          mtu: 1528
       bgp:
         router_id: 10.1.255.18
         as: 65001
@@ -1077,7 +1232,7 @@ router:
               - 192.0.2.0/24
         neighbors:
           - ipv4_address: 10.1.255.16
-            description: p1r6v
+            description: core::p1r6v
             remote_as: 65001
             update_source: lo
             afis:
@@ -1085,7 +1240,7 @@ router:
                 next_hop: 'nexthop-self'
         neighbors6:
           - ipv6_address: 2001:0470:731b:4000:10:1:255:16
-            description: p1r6v
+            description: core::p1r6v
             remote_as: 65001
             update_source: lo
             afis:

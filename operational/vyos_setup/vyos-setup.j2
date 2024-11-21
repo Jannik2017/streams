@@ -18,15 +18,28 @@ set interfaces wireguard wg0 peer {{ p.peer }} public-key '{{ p.public_key }}'
     {% endif %}
     {% if i.mtu is defined %}
 set interfaces {{ i.interface_type }} {{ i.interface }} mtu '{{ i.mtu }}'
-{#set interfaces {{ i.interface_type }} {{ i.interface }} ip adjust-mss '{{ i.mtu - 40 }}'#}
-{#set interfaces {{ i.interface_type }} {{ i.interface }} ipv6 adjust-mss '{{ i.mtu - 60 }}'#}
+        {% if i.mtu < 1500 %} {# e.g. wireguard-interfaces and other vpn-type #}
+set interfaces {{ i.interface_type }} {{ i.interface }} ip adjust-mss '{{ i.mtu - 40 }}'
+set interfaces {{ i.interface_type }} {{ i.interface }} ipv6 adjust-mss '{{ i.mtu - 60 }}'
+        {% endif %}
     {% endif %}
     {% if i.vrf is defined %}
 set interfaces {{ i.interface_type }} {{ i.interface }} vrf '{{ i.vrf }}'
     {% endif %}
-set interfaces {{ i.interface_type }} {{ i.interface }} address '{{ i.ipv4_address }}'
-    {% if i.ipv6_address is defined %}
-set interfaces {{ i.interface_type }} {{ i.interface }} address '{{ i.ipv6_address }}'
+    {% if i.ipv4_addresses is defined %}
+        {% for a4 in i.ipv4_addresses  %}
+set interfaces {{ i.interface_type }} {{ i.interface }} address '{{ a4 }}'
+        {% endfor %}
+    {% endif %}
+    {% if i.ipv6_addresses is defined %}
+        {% for a6 in i.ipv6_addresses %}
+set interfaces {{ i.interface_type }} {{ i.interface }} address '{{ a6 }}'
+        {% endfor %}
+    {% endif %}
+    {% if i.description is defined %}
+set interfaces {{ i.interface_type }} {{ i.interface }} description '{{ i.description }}'
+    {% else %}
+delete interfaces {{ i.interface_type }} {{ i.interface }} description
     {% endif %}
 {% endfor -%}
 
