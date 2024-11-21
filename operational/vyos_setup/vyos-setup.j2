@@ -210,7 +210,7 @@ set protocols static route6 {{ r6.destination }} next-hop {{ r6.next_hop }} inte
 {% endif -%}
 
 {# vrf #}
-{%+ if vrfs is defined %}
+{% if vrfs is defined %}
     {% for vrf in vrfs %}
 set vrf name {{ vrf.vrf }} table '{{ vrf.table }}'
     {% endfor %}
