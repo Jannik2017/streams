@@ -15,12 +15,12 @@
       register: images
 
     - name: Ensure stdout_lines is not empty
-      fail:
+      ansible.builtin.fail:
         msg: "stdout_lines is empty, no images found."
       when: images.stdout_lines | length == 0
 
     - name: Parse stdout_lines and add all images that are NOT in use to to_delete variable
-      set_fact:
+      ansible.builtin.set_fact:
         to_delete: "{{ to_delete | default([]) + [item.split()[0]] }}"
       loop: "{{ images.stdout_lines[0][2:] }}"  # Skip the header lines
       when: "'Yes' not in item"

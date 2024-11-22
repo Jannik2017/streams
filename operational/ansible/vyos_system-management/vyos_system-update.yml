@@ -9,59 +9,59 @@
   tasks:
 
     - name: Get latest VyOS ISO URL
-      uri: 
+      ansible.builtin.uri:
         url: https://raw.githubusercontent.com/vyos/vyos-nightly-build/refs/heads/current/version.json
         method: GET
-        return_content: yes
+        return_content: true
         status_code: 200
         body_format: json
       register: data
 
     - name: Extract the ISO URL from content
-      set_fact:
+      ansible.builtin.set_fact:
         iso_url: "{{ (data.content | from_json)[0].url }}"
 
     - name: Debug iso_url
-      debug:
+      ansible.builtin.debug:
         var: iso_url
 
     - name: Set fact iso_name from url
-      set_fact:
+      ansible.builtin.set_fact:
         iso_name: "{{ iso_url.split('/')[-1] }}"
 
     - name: Check if the image already exists
-      stat:
-        path: "../vyos-images/{{ iso_name }}"
+      ansible.builtin.stat:
+        path: "vyos-images/{{ iso_name }}"
       register: image_stat
 
     - name: Download ISO if it does not exist
-      get_url:
+      ansible.builtin.get_url:
         url: "{{ iso_url }}"
-        dest: "/tmp/{{ iso_name }}"
+        dest: "vyos-images/{{ iso_name }}"
+        mode: '0644'
       when: not image_stat.stat.exists
 
     - name: Upload vyos.iso to router
-      net_put:
-        src: "/tmp/{{ iso_name }}"
+      ansible.netcommon.net_put:
+        src: "vyos-images/{{ iso_name }}"
         dest: "{{ iso_name }}"
 
-    - name: "Installing latest vyos on system"
-      cli_command:
+    - name: Installing latest vyos on system
+      ansible.netcommon.cli_command:
         command: add system image "{{ iso_name }}"
-        newline: True
-        check_all: True
+        newline: true
+        check_all: true
         prompt:
-        - 'What would you like to name this image'
-        - 'Would you like to set the new image as the default one for boot'
-        - 'An active configuration was found'
-        - 'Would you like to copy SSH host keys'
+          - 'What would you like to name this image'
+          - 'Would you like to set the new image as the default one for boot'
+          - 'An active configuration was found'
+          - 'Would you like to copy SSH host keys'
         answer:
-        - ''
-        - 'y'
-        - 'y'
-        - 'y'
+          - ''
+          - 'y'
+          - 'y'
+          - 'y'
 
-    - name: reboot
-      cli_command:
+    - name: Reboot
+      ansible.netcommon.cli_command:
         command: "reboot now"
-      #when: reboot is defined
