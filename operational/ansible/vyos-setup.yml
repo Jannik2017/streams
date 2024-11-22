@@ -1,25 +1,24 @@
 ---
 
-- name: setup vyos config
+- name: Setup vyos config
   hosts: router
+  vars:
+    ansible_user: vyos
+    ansible_network_os: vyos.vyos.vyos
   connection: network_cli
   gather_facts: false
 
   tasks:
-  - debug: msg='{{ ansible_run_tags }}'
-    tags: ['debug']
-    when: "'debug' in ansible_run_tags"
+    - name: Write config to device using jinja2
+      vyos.vyos.vyos_config:
+        src: ../templates/vyos-setup.j2
+        save: true
 
-  - name: Write config to device using jinja2
-    vyos.vyos.vyos_config:
-      src: vyos-setup.j2
-      save: true
-
-  - name: Write config using jinja2
-    ansible.builtin.template:
-      src: vyos-setup.j2
-      dest: ../out/{{ ansible_hostname }}-ansible.txt
-    delegate_to: localhost
-    tags: ['test']
-    when: "'test' in ansible_run_tags"
-    
+    - name: Write config using jinja2
+      ansible.builtin.template:
+        src: vyos-setup.j2
+        dest: ../out/{{ ansible_hostname }}-ansible.txt
+        mode: '0644'
+      delegate_to: localhost
+      tags: ['test']
+      when: "'test' in ansible_run_tags"

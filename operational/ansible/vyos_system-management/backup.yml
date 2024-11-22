@@ -10,9 +10,9 @@
   connection: network_cli
 
   tasks:
-  - name: Configurable backup path
-    vyos_config:
-      backup: true
-      backup_options:
-        filename: "{{ inventory_hostname }}-backup.txt"
-        dir_path: "backup/"
+    - name: Configurable backup path
+      vyos.vyos.vyos_config:
+        backup: true
+        backup_options:
+          filename: "{{ inventory_hostname }}-backup.txt"
+          dir_path: "backup/"
