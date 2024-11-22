@@ -1,48 +1,53 @@
 ---
 
-- name: teardown vyos config
+- name: Teardown vyos config
   hosts: router
+  vars:
+    ansible_user: vyos
+    ansible_network_os: vyos.vyos.vyos
   connection: network_cli
   gather_facts: false
 
   tasks:
-  - debug: msg='{{ ansible_run_tags }}'
-    tags: ['debug']
-    when: "'debug' in ansible_run_tags"
+    - name: Debug blabla
+      ansible.builtin.debug:
+        msg: '{{ ansible_run_tags }}'
+      tags: ['debug']
+      when: "'debug' in ansible_run_tags"
 
-  - name: set vrf bind-to-all
-    vyos.vyos.vyos_config:
-      lines:
-        - set vrf bind-to-all
-      save: true
+    - name: Set vrf bind-to-all
+      vyos.vyos.vyos_config:
+        lines:
+          - set vrf bind-to-all
+        save: true
 
-  - name: Delete config
-    vyos.vyos.vyos_config:
-      lines:
-        - delete protocols bgp
-        - delete protocols mpls
-        - delete protocols ospf
-        - delete protocols ospfv3
-        - delete protocols isis
-        - delete protocols static
-        - delete policy
-        - delete interfaces wireguard wg0
-        - delete interfaces br100
-        - delete interfaces loopback lo
-        - delete interfaces loopback lo ip
-        - delete interfaces loopback lo ipv6
-        - delete interfaces ethernet eth0 ip
-        - delete interfaces ethernet eth0 ipv6
-        - delete interfaces ethernet eth1
-        - delete interfaces ethernet eth1 ip
-        - delete interfaces ethernet eth1 ipv6
-        - delete interfaces ethernet eth2
-        - delete interfaces ethernet eth2 ip
-        - delete interfaces ethernet eth2 ipv6
-        - delete interfaces ethernet eth3
-        - delete interfaces ethernet eth3 ip
-        - delete interfaces ethernet eth3 ipv6
-        - delete interfaces ethernet eth4
-        - delete interfaces ethernet eth4 ip
-        - delete interfaces ethernet eth4 ipv6
-      save: true
+    - name: Delete config
+      vyos.vyos.vyos_config:
+        lines:
+          - delete protocols bgp
+          - delete protocols mpls
+          - delete protocols ospf
+          - delete protocols ospfv3
+          - delete protocols isis
+          - delete protocols static
+          - delete policy
+          - delete interfaces wireguard wg0
+          - delete interfaces br100
+          - delete interfaces loopback lo
+          - delete interfaces loopback lo ip
+          - delete interfaces loopback lo ipv6
+          - delete interfaces ethernet eth0 ip
+          - delete interfaces ethernet eth0 ipv6
+          - delete interfaces ethernet eth1
+          - delete interfaces ethernet eth1 ip
+          - delete interfaces ethernet eth1 ipv6
+          - delete interfaces ethernet eth2
+          - delete interfaces ethernet eth2 ip
+          - delete interfaces ethernet eth2 ipv6
+          - delete interfaces ethernet eth3
+          - delete interfaces ethernet eth3 ip
+          - delete interfaces ethernet eth3 ipv6
+          - delete interfaces ethernet eth4
+          - delete interfaces ethernet eth4 ip
+          - delete interfaces ethernet eth4 ipv6
+        save: true
