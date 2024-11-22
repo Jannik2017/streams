@@ -3,6 +3,7 @@
   gather_facts: false
   connection: ansible.netcommon.network_cli
   vars:
+    ansible_user: vyos
     ansible_network_os: vyos.vyos.vyos
 
   hosts: router
@@ -43,7 +44,7 @@
 
     - name: Upload vyos.iso to router
       ansible.netcommon.net_put:
-        src: "vyos-images/{{ iso_name }}"
+        src: "../vyos-images/{{ iso_name }}"
         dest: "{{ iso_name }}"
 
     - name: Installing latest vyos on system
