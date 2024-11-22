@@ -1,5 +1,4 @@
 ---
-
 - name: Setup vyos config
   hosts: router
   vars:
