@@ -31,7 +31,7 @@
 
     - name: Check if the image already exists
       stat:
-        path: "/tmp/{{ iso_name }}"
+        path: "../vyos-images/{{ iso_name }}"
       register: image_stat
 
     - name: Download ISO if it does not exist

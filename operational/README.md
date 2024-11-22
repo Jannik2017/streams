@@ -6,6 +6,10 @@ Ich versuche nur funktionierende Stati zu committen.
 Das auth_token gehört zu meiner lokalen staging-Netbox.
 -> also keine Aufregung.
 
-Das Themna Secrets, zb. mit Ansible- oder Hashicorp-Vault
-o. a. ist aber durchaus ein Thema und soll nicht übersehen
-werden.
+Secrets, zb. mit Ansible- oder Hashicorp-Vault
+o. a. sind aber durchaus ein Thema und sollen nicht 
+übersehen werden.
+
+Zwischenzeitlich hat sich hier ein Sammelsurium an
+neuen und älteren Scripten entwickelt das sich langsam
+zu einer kleinen Bibliothek entwickelt.
