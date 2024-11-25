@@ -1,0 +1,51 @@
+- name: Render Jinja template within NetBox and return the result
+  gather_facts: false
+  hosts: localhost
+
+  vars:
+    netbox_endpoint: "{{ lookup('env', 'NETBOX_ENDPOINT') }}"
+    netbox_token: "{{ lookup('env', 'NETBOX_TOKEN') }}"
+
+  tasks:
+    - name: Get route-reflector-client IPs for BGP config
+      ansible.builtin.uri:
+        url: "{{ netbox_endpoint }}/graphql/"
+        method: POST
+        validate_certs: false
+        headers:
+          Authorization: "Token {{ netbox_token }}"
+          Content-Type: "application/json"
+          Accept: "application/json"
+        body:
+          query: |
+            {
+              ip_address_list(filters: { tag: "route-reflector" }) {
+                id
+                address
+                tags {
+                    id
+                    name
+                }
+              }
+            }
+        body_format: json
+        return_content: true
+        status_code: 200
+      delegate_to: localhost
+      register: response
+
+    - name: Debug list of items
+      ansible.builtin.debug:
+        msg:
+          - "{{ response.json.data.ip_address_list }}"
+
+    - name: Debug IP addresses in the response
+      ansible.builtin.debug:
+        msg:
+          - "Debug Output:"
+          - "{{ item.tags }}"
+          - "IP Address: {{ item.address }}, Tags: {{ item.tags | map(attribute='name') | join(', ') }}"
+      loop: "{{ response.json.data.ip_address_list | selectattr('tags', 'search', 'ISP1') }}"
+      when:
+        - response.json.data is defined
+        - response.json.data.ip_address_list is defined
