@@ -13,3 +13,5 @@ o. a. sind aber durchaus ein Thema und sollen nicht
 Zwischenzeitlich hat sich hier ein Sammelsurium an
 neuen und älteren Scripten entwickelt das sich langsam
 zu einer kleinen Bibliothek entwickelt.
+
+renamed to "ops"
