@@ -15,4 +15,4 @@
 
     - name: Loop over the dictionary
       debug: msg="Key={{ item.key }} value={{ item.value }}"
-      with_dict: "{{ config_context[0].routing_information }}"
+      with_dict: "{{ config_context[0].routing_protocols }}"
