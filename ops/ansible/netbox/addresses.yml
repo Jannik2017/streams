@@ -43,7 +43,6 @@
       ansible.builtin.debug:
         msg:
           - "Debug Output:"
-          - "{{ item.tags }}"
           - "IP Address: {{ item.address }}, Tags: {{ item.tags | map(attribute='name') | join(', ') }}"
       loop: "{{ response.json.data.ip_address_list | selectattr('tags', 'search', 'ISP1') }}"
       when:
