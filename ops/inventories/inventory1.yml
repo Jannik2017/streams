@@ -236,7 +236,7 @@ router:
           interface_type: ethernet
           description: customer::opnsense1
           ipv4_addresses: 
-            - 198.51.0.1/26
+            - 198.51.100.17/28
           ipv6_addresses: 
             - 2001:470:731b:4802::1/64
           mtu: 1500
@@ -359,6 +359,7 @@ router:
           server: 10.1.11.2
           listen_interfaces:
             - eth2
+            - eth6
           upstream_interfaces:
             - eth1
             - eth4

@@ -16,13 +16,17 @@
   set_fact:
     current_iface_ips: "{{ iface_config.stdout_lines | regex_findall(' address \\S([\\d.]+/\\d+)') }}"
 
+- name: Debug current_iface_ips
+  debug:
+    var: current_iface_ips
+
 - name: Debug iface_config.stdout_lines
   debug:
     var: iface_config.stdout_lines
 
 - name: Find surplus IPv4 addresses on iface.interface
   set_fact:
-    surplus_iface_ips: "{{ current_iface_ips | difference(iface.ipv4_address) }}"
+    surplus_iface_ips: "{{ current_iface_ips | difference(iface.ipv4_addresses) }}"
 
 - name: Delete surplus IPs from iface.interface
   vyos.vyos.vyos_config:
@@ -39,8 +43,8 @@
       - name: "{{ item.0.interface }}"
         ipv4:
           - address: "{{ item.1 }}"
-  loop: "{{ hostvars[inventory_hostname]['interfaces'] | subelements('ipv4_address') }}"
+  loop: "{{ hostvars[inventory_hostname]['interfaces'] | subelements('ipv4_addresses') }}"
   loop_control:
     loop_var: 'item'
-  when: item.0.interface == iface.interface
+  when: ( item.0.interface == iface.interface )
 

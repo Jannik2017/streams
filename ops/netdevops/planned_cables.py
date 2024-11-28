@@ -17,7 +17,7 @@ url = f"{netbox_url}/graphql/"
 def query_planned_cables():
     query_planned_cables = '''
         query planned_cables {
-            cable_list(filters: { status: "planned" }) {
+            cable_list(filters: { status: "connected" }) {
                 id
                 display
                 label
@@ -51,18 +51,19 @@ response_planned_cables = requests.post(url, json={"query": query_planned_cables
 
 for planned_cable in response_planned_cables.json()['data']['cable_list']:
 
-    # get the a_termination of each planned cable
-    if len(planned_cable['a_terminations']) > 1:
-        pprint("more than one termination for a_termination")
-    else:
-        a_termination = planned_cable['a_terminations'][0]
+    a_terminations = planned_cable['a_terminations']
+    b_terminations = planned_cable['b_terminations']
 
-    # get the b_termination of each planned cable
-    if len(planned_cable['b_terminations']) > 1:
-        pprint("more than one termination for b_termination")
-    else:
-        b_termination = planned_cable['b_terminations'][0]
+    if len(a_terminations) != 1:
+        pprint(f"Unexpected number of terminations for a_termination: {len(a_terminations)}")
+        continue
+
+    if len(b_terminations) != 1:
+        pprint(f"Unexpected number of terminations for b_termination: {len(b_terminations)}")
+        continue
+
+    a_termination = a_terminations[0]
+    b_termination = b_terminations[0]
 
     # get the device of each termination-endpoint
-    for a_termination in planned_cable['a_terminations']:
-        print(f"Cable-ID: #{planned_cable['id']}, A-Ende: {a_termination['device']['name']}: {a_termination['name']}, B-Ende: {b_termination['device']['name']}: {b_termination['name']}")
+    print(f"Cable-ID: #{planned_cable['id']}, A-Ende: {a_termination['device']['name']}: {a_termination['name']}, B-Ende: {b_termination['device']['name']}: {b_termination['name']}")
