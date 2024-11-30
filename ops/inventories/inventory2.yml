@@ -11,27 +11,33 @@ router:
       interfaces:
         - interface: lo
           interface_type: loopback
-          ipv4_address: 10.2.255.21/32
+          ipv4_addresses: 
+            - 10.2.255.21/32
         - interface: eth0
           interface_type: ethernet
-          ipv4_address: dhcp
+          ipv4_addresses: 
+            - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
-          ipv4_address: 192.168.111.109/24
+          ipv4_addresses: 
+            - 192.168.111.109/24
           mtu: 1500
         - interface: eth3
           interface_type: ethernet
-          ipv4_address: 10.2.12.1/24
+          ipv4_addresses: 
+            - 10.2.12.1/24
           mtu: 1528
         - interface: eth4
           interface_type: ethernet
-          ipv4_address: 10.2.15.1/24
+          ipv4_addresses: 
+            - 10.2.15.1/24
           mtu: 1528
         - interface: wg0
           interface_type: wireguard
-          ipv4_address: 172.17.21.2/30
+          ipv4_addresses: 
+            - 172.17.21.2/30
           peers:
             - peer: streampf
               address: 78.47.154.241
@@ -42,25 +48,40 @@ router:
           private_key: 'QHMqK4UK7pMiV/iWTDb5G39axuYpnjxLJ/0Mnw/RbX4='
           mtu: 1400
       policy:
+        - prefix_lists:
+            - prefix_list: PL_INTERNAL_NETWORKS
+              description: AIBIXHQ
+              rules:
+                - rule: 100
+                  action: permit
+                  ge: 16
+                  prefixes:
+                    - 192.168.0.0/16
         - route_maps:
-          - route_map: NACH_EXTERN
-            description: 'nach_extern_beigebracht'
-            rules:
-              - rule: 100
-                action: permit
-                match: 'local-preference 100'
-          - route_map: VON_EXTERN
-            description: 'von_extern_gelernt'
-            rules:
-              - rule: 100
-                action: permit
-                set: 'local-preference 50'
+            - route_map: RM_NACH_EXTERN
+              description: 'nach_extern_beigebracht'
+              rules:
+                - rule: 50
+                  action: deny
+                  match: 'ip address prefix-list PL_INTERNAL_NETWORKS'
+                - rule: 100
+                  action: permit
+                  match: 'local-preference 100'
+            - route_map: RM_VON_EXTERN
+              description: 'von_extern_gelernt'
+              rules:
+                - rule: 50
+                  action: deny
+                  match: 'ip address prefix-list PL_INTERNAL_NETWORKS'
+                - rule: 100
+                  action: permit
+                  set: 'local-preference 50'
       bgp:
         router_id: 10.2.255.21
         as: 65002
         afis:
           - afi: 'ipv4-unicast'
-            aggregate:
+            aggregates:
               - 10.2.0.0/16
             #networks:
         neighbors:
@@ -77,12 +98,24 @@ router:
             update_source: wg0
             afis:
               - afi: 'ipv4-unicast'
+                route_maps:
+                  route_map_import: 'RM_VON_EXTERN'
+                  route_map_export: 'RM_NACH_EXTERN'
           - ipv4_address: 192.168.111.44
             description: OPNsense
             remote_as: 65005
             update_source: eth1
             afis:
               - afi: 'ipv4-unicast'
+                route_maps:
+                  route_map_import: 'RM_VON_EXTERN'
+                  route_map_export: 'RM_NACH_EXTERN'
+      isis:
+        interfaces:
+          - interface: eth3
+          - interface: eth4
+        level: level-1
+        net: 49.1111.0100.0225.5021.00
       mpls:
         interfaces:
           - interface: eth3
@@ -96,25 +129,25 @@ router:
       ospf:
         router_id: 10.2.255.21
         areas:
-        - area: 0
-          networks:
-            - 10.2.0.0/16
-          #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
+          - area: 0
+            networks:
+              - 10.2.0.0/16
+            #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
         interfaces:
           - interface: eth3
           - interface: eth4
           - interface: lo
       static:
-        - routes:
+        routes:
           - destination: 78.47.154.241/32
             next_hop: 192.168.111.1
       vrfs:
-      - vrf: mgmt
-        table: 1020
+        - vrf: mgmt
+          table: 1020
       services:
-      - service: ssh
-        vrf: mgmt
-        port: 22
+        - service: ssh
+          vrf: mgmt
+          port: 22
 
 
     p2r2v:
@@ -124,23 +157,28 @@ router:
       interfaces:
         - interface: lo
           interface_type: loopback
-          ipv4_address: 10.2.255.22/32
+          ipv4_addresses: 
+            - 10.2.255.22/32
         - interface: eth0
           interface_type: ethernet
-          ipv4_address: dhcp
+          ipv4_addresses: 
+            - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
-          ipv4_address: 10.2.12.2/24
+          ipv4_addresses: 
+            - 10.2.12.2/24
           mtu: 1528
         - interface: eth3
           interface_type: ethernet
-          ipv4_address: 10.2.23.2/24
+          ipv4_addresses: 
+            - 10.2.23.2/24
           mtu: 1528
         - interface: eth4
           interface_type: ethernet
-          ipv4_address: 10.2.26.2/24
+          ipv4_addresses: 
+            - 10.2.26.2/24
           mtu: 1528
       bgp:
         router_id: 10.2.255.22
@@ -153,6 +191,13 @@ router:
             afis:
               - afi: 'ipv4-unicast'
                 next_hop: 'nexthop-self'
+      isis:
+        interfaces:
+          - interface: eth1
+          - interface: eth3
+          - interface: eth4
+        level: level-1
+        net: 49.1111.0100.0225.5022.00
       mpls:
         interfaces:
           - interface: eth1
@@ -168,22 +213,22 @@ router:
       ospf:
         router_id: 10.2.255.22
         areas:
-        - area: 0
-          networks:
-            - 10.2.0.0/16
-          #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
+          - area: 0
+            networks:
+              - 10.2.0.0/16
+            #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
         interfaces:
           - interface: eth1
           - interface: eth3
           - interface: eth4
           - interface: lo
       vrfs:
-      - vrf: mgmt
-        table: 1020
+        - vrf: mgmt
+          table: 1020
       services:
-      - service: ssh
-        vrf: mgmt
-        port: 22
+        - service: ssh
+          vrf: mgmt
+          port: 22
 
 
     p2r3v:
@@ -193,27 +238,33 @@ router:
       interfaces:
         - interface: lo
           interface_type: loopback
-          ipv4_address: 10.2.255.23/32
+          ipv4_addresses: 
+            - 10.2.255.23/32
         - interface: eth0
           interface_type: ethernet
-          ipv4_address: dhcp
+          ipv4_addresses: 
+            - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
-          ipv4_address: 10.2.23.3/24
+          ipv4_addresses: 
+            - 10.2.23.3/24
           mtu: 1528
         - interface: eth2
           interface_type: ethernet
-          ipv4_address: 10.123.2.1/24
+          ipv4_addresses: 
+            - 10.123.2.1/24
           mtu: 1500
         - interface: eth3
           interface_type: ethernet
-          ipv4_address: 10.2.34.3/24
+          ipv4_addresses: 
+            - 10.2.34.3/24
           mtu: 1528
         - interface: eth4
           interface_type: ethernet
-          ipv4_address: 10.2.37.2/24
+          ipv4_addresses: 
+            - 10.2.37.2/24
           mtu: 1528
       bgp:
         router_id: 10.2.255.23
@@ -231,6 +282,13 @@ router:
             afis:
               - afi: 'ipv4-unicast'
                 next_hop: 'nexthop-self'
+      isis:
+        interfaces:
+          - interface: eth1
+          - interface: eth3
+          - interface: eth4
+        level: level-1
+        net: 49.1111.0100.0225.5023.00
       mpls:
         interfaces:
           - interface: eth1
@@ -246,22 +304,22 @@ router:
       ospf:
         router_id: 10.2.255.23
         areas:
-        - area: 0
-          networks:
-            - 10.2.0.0/16
-          #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
+          - area: 0
+            networks:
+              - 10.2.0.0/16
+            #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
         interfaces:
           - interface: eth1
           - interface: eth3
           - interface: eth4
           - interface: lo
       vrfs:
-      - vrf: mgmt
-        table: 1020
+        - vrf: mgmt
+          table: 1020
       services:
-      - service: ssh
-        vrf: mgmt
-        port: 22
+        - service: ssh
+          vrf: mgmt
+          port: 22
 
 
     p2r4v:
@@ -271,27 +329,33 @@ router:
       interfaces:
         - interface: lo
           interface_type: loopback
-          ipv4_address: 10.2.255.24/32
+          ipv4_addresses: 
+            - 10.2.255.24/32
         - interface: eth0
           interface_type: ethernet
-          ipv4_address: dhcp
+          ipv4_addresses: 
+            - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
-          ipv4_address: 10.2.34.4/24
+          ipv4_addresses: 
+            - 10.2.34.4/24
           mtu: 1528
         - interface: eth2
           interface_type: ethernet
-          ipv4_address: 10.124.2.1/24
+          ipv4_addresses: 
+            - 10.124.2.1/24
           mtu: 1500
         - interface: eth3
           interface_type: ethernet
-          ipv4_address: 10.124.3.1/24
+          ipv4_addresses: 
+            - 10.124.3.1/24
           mtu: 1500
         - interface: eth4
           interface_type: ethernet
-          ipv4_address: 10.2.48.2/24
+          ipv4_addresses: 
+            - 10.2.48.2/24
           mtu: 1528
       bgp:
         router_id: 10.2.255.24
@@ -328,6 +392,12 @@ router:
             afis:
               - afi: 'ipv4-unicast'
                 next_hop: 'nexthop-self'
+      isis:
+        interfaces:
+          - interface: eth1
+          - interface: eth4
+        level: level-1
+        net: 49.1111.0100.0225.5024.00
       mpls:
         interfaces:
           - interface: eth1
@@ -341,21 +411,21 @@ router:
       ospf:
         router_id: 10.2.255.24
         areas:
-        - area: 0
-          networks:
-            - 10.2.0.0/16
-          #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
+          - area: 0
+            networks:
+              - 10.2.0.0/16
+            #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
         interfaces:
           - interface: eth1
           - interface: eth4
           - interface: lo
       vrfs:
-      - vrf: mgmt
-        table: 1020
+        - vrf: mgmt
+          table: 1020
       services:
-      - service: ssh
-        vrf: mgmt
-        port: 22
+        - service: ssh
+          vrf: mgmt
+          port: 22
 
 
     p2r5v:
@@ -365,31 +435,38 @@ router:
       interfaces:
         - interface: lo
           interface_type: loopback
-          ipv4_address: 10.2.255.25/32
+          ipv4_addresses: 
+            - 10.2.255.25/32
         - interface: eth0
           interface_type: ethernet
-          ipv4_address: dhcp
+          ipv4_addresses: 
+            - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
-          ipv4_address: 192.168.111.110/24
+          ipv4_addresses: 
+            - 192.168.111.110/24
           mtu: 1500
         - interface: eth2
           interface_type: ethernet
-          ipv4_address: 10.2.15.5/24
+          ipv4_addresses: 
+            - 10.2.15.5/24
           mtu: 1528
         - interface: eth3
           interface_type: ethernet
-          ipv4_address: 10.2.56.5/24
+          ipv4_addresses: 
+            - 10.2.56.5/24
           mtu: 1528
         - interface: eth4
           interface_type: ethernet
-          ipv4_address: 10.125.4.1/24
+          ipv4_addresses: 
+            - 10.125.4.1/24
           mtu: 1500
         - interface: wg0
           interface_type: wireguard
-          ipv4_address: 172.17.25.2/30
+          ipv4_addresses: 
+            - 172.17.25.2/30
           peers:
             - peer: streampf
               address: 78.47.154.241
@@ -400,19 +477,34 @@ router:
           private_key: 'WKVjCPf/8gPrQHdimzC5D0A9ZjJ6x2GBLp5gUAQjXHU='
           mtu: 1400
       policy:
+        - prefix_lists:
+            - prefix_list: PL_INTERNAL_NETWORKS
+              description: AIBIXHQ
+              rules:
+                - rule: 100
+                  action: permit
+                  ge: 16
+                  prefixes:
+                    - 192.168.0.0/16
         - route_maps:
-          - route_map: NACH_EXTERN
-            description: 'nach_extern_beigebracht'
-            rules:
-              - rule: 100
-                action: permit
-                match: 'local-preference 100'
-          - route_map: VON_EXTERN
-            description: 'von_extern_gelernt'
-            rules:
-              - rule: 100
-                action: permit
-                set: 'local-preference 50'
+            - route_map: RM_NACH_EXTERN
+              description: 'nach_extern_beigebracht'
+              rules:
+                - rule: 50
+                  action: deny
+                  match: 'ip address prefix-list PL_INTERNAL_NETWORKS'
+                - rule: 100
+                  action: permit
+                  match: 'local-preference 100'
+            - route_map: RM_VON_EXTERN
+              description: 'von_extern_gelernt'
+              rules:
+                - rule: 50
+                  action: deny
+                  match: 'ip address prefix-list PL_INTERNAL_NETWORKS'
+                - rule: 100
+                  action: permit
+                  set: 'local-preference 50'
       bgp:
         router_id: 10.2.255.25
         as: 65002
@@ -462,6 +554,12 @@ router:
                 route_maps:
                   route_map_import: 'VON_EXTERN'
                   route_map_export: 'NACH_EXTERN'
+      isis:
+        interfaces:
+          - interface: eth2
+          - interface: eth3
+        level: level-1
+        net: 49.1111.0100.0225.5025.00
       mpls:
         interfaces:
           - interface: eth2
@@ -475,10 +573,10 @@ router:
       ospf:
         router_id: 10.2.255.25
         areas:
-        - area: 0
-          networks:
-            - 10.2.0.0/16
-          #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
+          - area: 0
+            networks:
+              - 10.2.0.0/16
+            #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
         interfaces:
           - interface: eth2
           - interface: eth3
@@ -488,12 +586,12 @@ router:
           - destination: 78.47.154.241/32
             next_hop: 192.168.111.1
       vrfs:
-      - vrf: mgmt
-        table: 1020
+        - vrf: mgmt
+          table: 1020
       services:
-      - service: ssh
-        vrf: mgmt
-        port: 22
+        - service: ssh
+          vrf: mgmt
+          port: 22
 
 
     p2r6v:
@@ -503,27 +601,38 @@ router:
       interfaces:
         - interface: lo
           interface_type: loopback
-          ipv4_address: 10.2.255.26/32
+          ipv4_addresses: 
+            - 10.2.255.26/32
         - interface: eth0
           interface_type: ethernet
-          ipv4_address: dhcp
+          ipv4_addresses: 
+            - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
-          ipv4_address: 10.2.56.6/24
+          ipv4_addresses: 
+            - 10.2.56.6/24
           mtu: 1528
         - interface: eth2
           interface_type: ethernet
-          ipv4_address: 10.2.26.6/24
+          ipv4_addresses: 
+            - 10.2.26.6/24
           mtu: 1528
         - interface: eth3
           interface_type: ethernet
-          ipv4_address: 10.2.67.6/24
+          ipv4_addresses: 
+            - 10.2.67.6/24
           mtu: 1528
       bgp:
         router_id: 10.2.255.26
         as: 65002
+        afis:
+          - afi: 'ipv4-unicast'
+          - afi: 'ipv6-unicast'
+            redistribute: 
+              - static
+              - connected
         neighbors:
           - ipv4_address: 10.2.255.21
             description: p2r1v
@@ -574,6 +683,13 @@ router:
             afis:
               - afi: 'ipv4-unicast'
                 rr: route-reflector-client
+      isis:
+        interfaces:
+          - interface: eth1
+          - interface: eth2
+          - interface: eth3
+        level: level-1
+        net: 49.1111.0100.0225.5026.00
       mpls:
         interfaces:
           - interface: eth1
@@ -589,22 +705,22 @@ router:
       ospf:
         router_id: 10.2.255.26
         areas:
-        - area: 0
-          networks:
-            - 10.2.0.0/16
-          #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
+          - area: 0
+            networks:
+              - 10.2.0.0/16
+            #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
         interfaces:
           - interface: eth1
           - interface: eth2
           - interface: eth3
           - interface: lo
       vrfs:
-      - vrf: mgmt
-        table: 1020
+        - vrf: mgmt
+          table: 1020
       services:
-      - service: ssh
-        vrf: mgmt
-        port: 22
+        - service: ssh
+          vrf: mgmt
+          port: 22
 
 
     p2r7v:
@@ -614,24 +730,36 @@ router:
       interfaces:
         - interface: lo
           interface_type: loopback
-          ipv4_address: 10.2.255.27/32
+          ipv4_addresses: 
+            - 10.2.255.27/32
         - interface: eth0
           interface_type: ethernet
-          ipv4_address: dhcp
+          ipv4_addresses: 
+            - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
-          ipv4_address: 10.2.67.7/24
+          ipv4_addresses: 
+            - 10.2.67.7/24
           mtu: 1528
         - interface: eth2
           interface_type: ethernet
-          ipv4_address: 10.2.37.7/24
+          ipv4_addresses: 
+            - 10.2.37.7/24
           mtu: 1528
         - interface: eth3
           interface_type: ethernet
-          ipv4_address: 10.2.78.7/24
+          ipv4_addresses: 
+            - 10.2.78.7/24
           mtu: 1528
+      isis:
+        interfaces:
+          - interface: eth1
+          - interface: eth2
+          - interface: eth3
+        level: level-1
+        net: 49.1111.0100.0225.5027.00
       ospf:
         router_id: 10.2.255.27
         areas:
@@ -668,12 +796,12 @@ router:
               - afi: 'ipv4-unicast'
                 next_hop: 'nexthop-self'
       vrfs:
-      - vrf: mgmt
-        table: 1020
+        - vrf: mgmt
+          table: 1020
       services:
-      - service: ssh
-        vrf: mgmt
-        port: 22
+        - service: ssh
+          vrf: mgmt
+          port: 22
 
 
     p2r8v:
@@ -683,23 +811,28 @@ router:
       interfaces:
         - interface: lo
           interface_type: loopback
-          ipv4_address: 10.2.255.28/32
+          ipv4_addresses: 
+            - 10.2.255.28/32
         - interface: eth0
           interface_type: ethernet
-          ipv4_address: dhcp
+          ipv4_addresses: 
+            - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
-          ipv4_address: 10.2.78.8/24
+          ipv4_addresses: 
+            - 10.2.78.8/24
           mtu: 1528
         - interface: eth2
           interface_type: ethernet
-          ipv4_address: 10.2.48.8/24
+          ipv4_addresses: 
+            - 10.2.48.8/24
           mtu: 1528
         - interface: eth3
           interface_type: ethernet
-          ipv4_address: 198.51.0.1/24
+          ipv4_addresses: 
+            - 198.51.0.1/24
           mtu: 1500
       bgp:
         router_id: 10.2.255.28
@@ -717,6 +850,12 @@ router:
             afis:
               - afi: 'ipv4-unicast'
                 next_hop: 'nexthop-self'
+      isis:
+        interfaces:
+          - interface: eth1
+          - interface: eth2
+        level: level-1
+        net: 49.1111.0100.0225.5028.00
       mpls:
         interfaces:
           - interface: eth1
@@ -730,19 +869,18 @@ router:
       ospf:
         router_id: 10.2.255.28
         areas:
-        - area: 0
-          networks:
-            - 10.2.0.0/16
-          #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
+          - area: 0
+            networks:
+              - 10.2.0.0/16
+            #default_information: always <!!! LOOKUP AND IMPLEMENT !!!>
         interfaces:
           - interface: eth1
           - interface: eth2
           - interface: lo
       vrfs:
-      - vrf: mgmt
-        table: 1020
+        - vrf: mgmt
+          table: 1020
       services:
-      - service: ssh
-        vrf: mgmt
-        port: 22
-
+        - service: ssh
+          vrf: mgmt
+          port: 22

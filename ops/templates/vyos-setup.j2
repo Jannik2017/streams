@@ -155,6 +155,15 @@ set protocols bgp neighbor {{ n.ipv6_address }} address-family {{ af.afi }} rout
     {% endif %}
 {% endif -%}
 
+{# is-is #}
+{% if isis is defined  %}
+set protocols isis net {{ isis.net }}
+set protocols isis level {{ isis.level }}
+    {% for i in isis.interfaces %}
+set protocols isis interface {{ i.interface }}
+    {% endfor  %}
+{% endif  %}
+
 {# mpls #}
 {% if mpls is defined %}
     {% for i in mpls.interfaces %}

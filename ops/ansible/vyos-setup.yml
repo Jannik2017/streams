@@ -15,7 +15,7 @@
 
     - name: Write config using jinja2
       ansible.builtin.template:
-        src: vyos-setup.j2
+        src: ../templates/vyos-setup.j2
         dest: ../out/{{ ansible_hostname }}-ansible.txt
         mode: '0644'
       delegate_to: localhost

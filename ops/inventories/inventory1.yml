@@ -161,6 +161,12 @@ router:
             afis:
               - afi: 'ipv6-unicast'
                 next_hop: 'nexthop-self'
+      isis:
+        interfaces:
+          - interface: eth3
+          - interface: eth4
+        level: level-1
+        net: 49.1111.0100.0125.5011.00
       mpls:
         interfaces:
           - interface: eth3
@@ -308,6 +314,13 @@ router:
             afis:
               - afi: 'ipv6-unicast'
                 next_hop: 'nexthop-self'
+      isis:
+        interfaces:
+          - interface: eth1
+          - interface: eth3
+          - interface: eth4
+        level: level-1
+        net: 49.1111.0100.0125.5012.00
       mpls:
         interfaces:
           - interface: eth1
@@ -446,6 +459,13 @@ router:
             afis:
               - afi: 'ipv6-unicast'
                 next_hop: 'nexthop-self'
+      isis:
+        interfaces:
+          - interface: eth1
+          - interface: eth3
+          - interface: eth4
+        level: level-1
+        net: 49.1111.0100.0125.5013.00
       mpls:
         interfaces:
           - interface: eth1
@@ -560,6 +580,12 @@ router:
             afis:
               - afi: 'ipv6-unicast'
                 next_hop: 'nexthop-self'
+      isis:
+        interfaces:
+          - interface: eth1
+          - interface: eth4
+        level: level-1
+        net: 49.1111.0100.0125.5014.00
       mpls:
         interfaces:
           - interface: eth1
@@ -742,6 +768,12 @@ router:
             afis:
               - afi: 'ipv6-unicast'
                 next_hop: 'nexthop-self'
+      isis:
+        interfaces:
+          - interface: eth2
+          - interface: eth3
+        level: level-1
+        net: 49.1111.0100.0125.5015.00
       mpls:
         interfaces:
           - interface: eth2
@@ -966,6 +998,13 @@ router:
             afis:
               - afi: 'ipv6-unicast'
                 rr: route-reflector-client
+      isis:
+        interfaces:
+          - interface: eth1
+          - interface: eth2
+          - interface: eth3
+        level: level-1
+        net: 49.1111.0100.0125.5016.00
       mpls:
         interfaces:
           - interface: eth1
@@ -1112,6 +1151,13 @@ router:
             afis:
               - afi: 'ipv6-unicast'
                 next_hop: 'nexthop-self'
+      isis:
+        interfaces:
+          - interface: eth1
+          - interface: eth2
+          - interface: eth3
+        level: level-1
+        net: 49.1111.0100.0125.5017.00
       mpls:
         interfaces:
           - interface: eth1
@@ -1247,6 +1293,12 @@ router:
             afis:
               - afi: 'ipv6-unicast'
                 next_hop: 'nexthop-self'
+      isis:
+        interfaces:
+          - interface: eth1
+          - interface: eth2
+        level: level-1
+        net: 49.1111.0100.0125.5018.00
       mpls:
         interfaces:
           - interface: eth1
