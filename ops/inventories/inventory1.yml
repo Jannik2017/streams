@@ -2,7 +2,8 @@ router:
   vars:
     ansible_user: vyos
     ansible_network_os: vyos.vyos.vyos
-    
+
+
   hosts:
     p1r1v:
       os: "vyos"
@@ -163,6 +164,7 @@ router:
                 next_hop: 'nexthop-self'
       isis:
         interfaces:
+          - interface: lo
           - interface: eth3
           - interface: eth4
         level: level-1
@@ -177,25 +179,6 @@ router:
             - interface: lo
             - interface: eth3
             - interface: eth4
-      ospf:
-        router_id: 10.1.255.11
-        areas:
-          - area: 0
-            networks:
-              - 10.1.0.0/16
-        interfaces:
-          - interface: eth3
-          - interface: eth4
-          - interface: lo
-      ospfv3:
-        router_id: 10.1.255.11
-        areas:
-          - area: 0
-            default_information: always
-        interfaces:
-          - interface: eth3
-          - interface: eth4
-          - interface: lo
       static:
         routes:
           - destination: 78.47.154.241/32
@@ -316,6 +299,7 @@ router:
                 next_hop: 'nexthop-self'
       isis:
         interfaces:
+          - interface: lo
           - interface: eth1
           - interface: eth3
           - interface: eth4
@@ -333,26 +317,6 @@ router:
             - interface: eth1
             - interface: eth3
             - interface: eth4
-      ospf:
-        router_id: 10.1.255.12
-        areas:
-          - area: 0
-            networks:
-              - 10.1.0.0/16
-        interfaces:
-          - interface: eth1
-          - interface: eth3
-          - interface: eth4
-          - interface: lo
-      ospfv3:
-        router_id: 10.1.255.12
-        areas:
-          - area: 0
-        interfaces:
-          - interface: eth1
-          - interface: eth3
-          - interface: eth4
-          - interface: lo
       static:
         routes6:
           # für Hoster /56 routing Demo
@@ -461,6 +425,7 @@ router:
                 next_hop: 'nexthop-self'
       isis:
         interfaces:
+          - interface: lo
           - interface: eth1
           - interface: eth3
           - interface: eth4
@@ -478,26 +443,6 @@ router:
             - interface: eth1
             - interface: eth3
             - interface: eth4
-      ospf:
-        router_id: 10.1.255.13
-        areas:
-          - area: 0
-            networks:
-              - 10.1.0.0/16
-        interfaces:
-          - interface: eth1
-          - interface: eth3
-          - interface: eth4
-          - interface: lo
-      ospfv3:
-        router_id: 10.1.255.13
-        areas:
-          - area: 0
-        interfaces:
-          - interface: eth1
-          - interface: eth3
-          - interface: eth4
-          - interface: lo
       vrfs:
         - vrf: mgmt
           table: 1020
@@ -582,6 +527,7 @@ router:
                 next_hop: 'nexthop-self'
       isis:
         interfaces:
+          - interface: lo
           - interface: eth1
           - interface: eth4
         level: level-1
@@ -596,24 +542,6 @@ router:
             - interface: lo
             - interface: eth1
             - interface: eth4
-      ospf:
-        router_id: 10.1.255.14
-        areas:
-          - area: 0
-            networks:
-              - 10.1.0.0/16
-        interfaces:
-          - interface: eth1
-          - interface: eth4
-          - interface: lo
-      ospfv3:
-        router_id: 10.1.255.14
-        areas:
-          - area: 0
-        interfaces:
-          - interface: eth1
-          - interface: eth4
-          - interface: lo
       vrfs:
         - vrf: mgmt
           table: 1020
@@ -770,6 +698,7 @@ router:
                 next_hop: 'nexthop-self'
       isis:
         interfaces:
+          - interface: lo
           - interface: eth2
           - interface: eth3
         level: level-1
@@ -784,24 +713,6 @@ router:
             - interface: lo
             - interface: eth2
             - interface: eth3
-      ospf:
-        router_id: 10.1.255.15
-        areas:
-          - area: 0
-            networks:
-              - 10.1.0.0/16
-        interfaces:
-          - interface: eth2
-          - interface: eth3
-          - interface: lo
-      ospfv3:
-        router_id: 10.1.255.15
-        areas:
-          - area: 0
-        interfaces:
-          - interface: eth2
-          - interface: eth3
-          - interface: lo
       static:
         routes:
           - destination: 78.47.154.241/32
@@ -1000,6 +911,7 @@ router:
                 rr: route-reflector-client
       isis:
         interfaces:
+          - interface: lo
           - interface: eth1
           - interface: eth2
           - interface: eth3
@@ -1017,26 +929,6 @@ router:
             - interface: eth1
             - interface: eth2
             - interface: eth3
-      ospf:
-        router_id: 10.1.255.16
-        areas:
-          - area: 0
-            networks:
-              - 10.1.0.0/16
-        interfaces:
-          - interface: eth1
-          - interface: eth2
-          - interface: eth3
-          - interface: lo
-      ospfv3:
-        router_id: 10.1.255.16
-        areas:
-          - area: 0
-        interfaces:
-          - interface: eth1
-          - interface: eth2
-          - interface: eth3
-          - interface: lo
       vrfs:
         - vrf: mgmt
           table: 1020
@@ -1153,6 +1045,7 @@ router:
                 next_hop: 'nexthop-self'
       isis:
         interfaces:
+          - interface: lo
           - interface: eth1
           - interface: eth2
           - interface: eth3
@@ -1170,26 +1063,6 @@ router:
             - interface: eth1
             - interface: eth2
             - interface: eth3
-      ospf:
-        router_id: 10.1.255.17
-        areas:
-          - area: 0
-            networks:
-              - 10.1.0.0/16
-        interfaces:
-          - interface: eth1
-          - interface: eth2
-          - interface: eth3
-          - interface: lo
-      ospfv3:
-        router_id: 10.1.255.17
-        areas:
-          - area: 0
-        interfaces:
-          - interface: eth1
-          - interface: eth2
-          - interface: eth3
-          - interface: lo
       vrfs:
         - vrf: mgmt
           table: 1020
@@ -1295,6 +1168,7 @@ router:
                 next_hop: 'nexthop-self'
       isis:
         interfaces:
+          - interface: lo
           - interface: eth1
           - interface: eth2
         level: level-1
@@ -1309,24 +1183,6 @@ router:
             - interface: lo
             - interface: eth1
             - interface: eth2
-      ospf:
-        router_id: 10.1.255.18
-        areas:
-          - area: 0
-            networks:
-              - 10.1.0.0/16
-        interfaces:
-          - interface: eth1
-          - interface: eth4
-          - interface: lo
-      ospfv3:
-        router_id: 10.1.255.18
-        areas:
-          - area: 0
-        interfaces:
-          - interface: eth1
-          - interface: eth4
-          - interface: lo
       vrfs:
         - vrf: mgmt
           table: 1020
