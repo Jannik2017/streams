@@ -171,7 +171,8 @@ set protocols mpls interface '{{ i.interface }}'
     {% endfor %}
     {% if mpls.ldp is defined %}
 set protocols mpls ldp router-id '{{ mpls.ldp.router_id }}'
-set protocols mpls ldp discovery transport-ipv4-address '{{ mpls.ldp.router_id }}'
+set protocols mpls ldp discovery transport-ipv4-address '{{ mpls.ldp.transport_ipv4_address }}'
+set protocols mpls ldp discovery transport-ipv6-address '{{ mpls.ldp.transport_ipv6_address }}'
         {% if mpls.ldp.interfaces is defined %}
             {% for i in mpls.ldp.interfaces %}
 set protocols mpls ldp interface '{{ i.interface }}'
