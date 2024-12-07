@@ -3,7 +3,7 @@ import urllib3
 from urllib3.exceptions import InsecureRequestWarning
 urllib3.disable_warnings(InsecureRequestWarning)
 
-netbox_url = "https://192.168.111.205"
+netbox_url = "https://192.168.111.8"
 auth_token = "584149a859ea8e7a7f5e2d610c7235a3e2d2460c"
 tag_names = ["route-reflector-client", "route-reflector"]
 isp_names = ["isp1", "isp2", "isp3"]

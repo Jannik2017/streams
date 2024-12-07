@@ -1151,6 +1151,14 @@ router:
           ipv4_addresses: 
             - 192.0.2.1/24
           mtu: 1500
+        - interface: eth4
+          interface_type: ethernet
+          description: client::netbird_server
+          ipv4_addresses: 
+            - 203.0.113.17/28
+          ipv6_addresses:
+            - 2001:0470:731b:7804::1/64
+          mtu: 1500
         - interface: eth5
           interface_type: ethernet
           description: core::p1r8v-p2r8v (b-plane)
@@ -1164,6 +1172,10 @@ router:
           - afi: 'ipv4-unicast'
             networks:
               - 192.0.2.0/24
+              - 203.0.113.16/28
+          - afi: 'ipv6-unicast'
+            networks:
+              - 2001:470:731b:7804::/64
         neighbors:
           - ipv4_address: 10.1.255.16
             description: core::p1r6v
@@ -1206,3 +1218,31 @@ router:
         - service: ssh
           vrf: mgmt
           port: 22
+        - service: dhcp-relay
+          relay_options:
+            - relay-agents-packets replace
+          server: 10.1.11.2
+          listen_interfaces:
+            - eth4
+          upstream_interfaces:
+            - eth1
+            - eth2
+        - service: dhcpv6-relay
+          listen_interfaces: 
+            - eth4
+          upstream_interfaces:
+            - eth1
+            - eth2
+          address: 2001:470:731b:7804::2
+          options:
+            - use-interface-id-option
+        - service: router-advert
+          interfaces:
+            - interface: eth4
+              default_preference: high
+              name_servers:
+                - 2001:4860:4860::8888
+                - 2001:4860:4860::8844
+              config_flags: 
+                - other-config-flag
+              prefix: 2001:470:731b:7804::/64
