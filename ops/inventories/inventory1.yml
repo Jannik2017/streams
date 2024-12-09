@@ -82,6 +82,22 @@ router:
                   ge: 16
                   prefixes:
                     - 192.168.0.0/16
+        - prefix_lists6:
+            - prefix_list6: PL_NACH_EXTERN6
+              description6: P1V6PREFIXES
+              rules6:
+                - rule6: 100
+                  description6: 'P1V6SLASH50'
+                  action6: permit
+                  ge6: 50
+                  prefixes6:
+                    - 2001:470:731b:4000::/50
+                - rule6: 999
+                  description6: '::'
+                  action6: deny
+                  ge6: 0
+                  prefixes6:
+                    - ::/0
         - route_maps:
             - route_map: RM_NACH_EXTERN
               description: 'nach_extern_beigebracht'
@@ -101,6 +117,13 @@ router:
                 - rule: 100
                   action: permit
                   set: 'local-preference 50'
+        - route_maps6:
+            - route_map6: RM_NACH_EXTERN6
+              description6: 'nach_extern_beigebracht_v6'
+              rules6:
+                - rule6: 100
+                  action6: permit
+                  match6: 'ipv6 address prefix-list PL_NACH_EXTERN6'
       bgp:
         router_id: 10.1.255.11
         as: 65001
@@ -162,6 +185,20 @@ router:
             afis:
               - afi: 'ipv6-unicast'
                 next_hop: 'nexthop-self'
+          - ipv6_address: 2001:470:731b::15be
+            description: ext::opn.lab
+            remote_as: 65005
+            update_source: eth1
+            afis:
+              - afi: 'ipv6-unicast'
+          - ipv6_address: 2a09:04c0:03e0:03af::1:1:1
+            description: streampf
+            remote_as: 65009
+            update_source: wg0
+            afis:
+              - afi: 'ipv6-unicast'
+                route_maps:
+                  route_map_export: 'RM_NACH_EXTERN6'
       isis:
         interfaces:
           - interface: lo
@@ -607,6 +644,8 @@ router:
           description: transit (hetzner-streampf)
           ipv4_addresses: 
             - 172.17.15.2/30
+          ipv6_addresses: 
+            - 2a09:4c0:3e0:3af:0:1:5:2/126
           peers:
             - peer: streampf
               address: 78.47.154.241
@@ -626,6 +665,22 @@ router:
                   ge: 16
                   prefixes:
                     - 192.168.0.0/16
+        - prefix_lists6:
+            - prefix_list6: PL_NACH_EXTERN6
+              description6: P1V6PREFIXES
+              rules6:
+                - rule6: 100
+                  description6: 'P1V6SLASH50'
+                  action6: permit
+                  ge6: 50
+                  prefixes6:
+                    - 2001:470:731b:4000::/50
+                - rule6: 999
+                  description6: '::'
+                  action6: deny
+                  ge6: 0
+                  prefixes6:
+                    - ::/0
         - route_maps:
             - route_map: RM_NACH_EXTERN
               description: 'nach_extern_beigebracht'
@@ -645,6 +700,13 @@ router:
                 - rule: 100
                   action: permit
                   set: 'local-preference 50'
+        - route_maps6:
+            - route_map6: RM_NACH_EXTERN6
+              description6: 'nach_extern_beigebracht_v6'
+              rules6:
+                - rule6: 100
+                  action6: permit
+                  match6: 'ipv6 address prefix-list PL_NACH_EXTERN6'
       bgp:
         router_id: 10.1.255.15
         as: 65001
@@ -704,6 +766,14 @@ router:
             afis:
               - afi: 'ipv6-unicast'
                 next_hop: 'nexthop-self'
+          - ipv6_address: 2a09:04c0:03e0:03af::1:5:1
+            description: streampf
+            remote_as: 65009
+            update_source: wg0
+            afis:
+              - afi: 'ipv6-unicast'
+                route_maps:
+                  route_map_export: 'RM_NACH_EXTERN6'
       isis:
         interfaces:
           - interface: lo
@@ -1037,6 +1107,8 @@ router:
             networks: 
               - 203.0.113.0/28
           - afi: 'ipv6-unicast'
+            redistribute:
+              - static
             networks:
               - 2001:470:731b:7004::/64
         neighbors:
@@ -1077,6 +1149,12 @@ router:
             - interface: eth1
             - interface: eth2
             - interface: eth3
+      static:
+        routes6:
+          # für Hoster /56 routing Demo
+          - destination: 2001:0470:731b:7700::/64
+            next_hop: fe80::be24:11ff:fe4e:a258
+            interface: eth4
       vrfs:
         - vrf: mgmt
           table: 1020
@@ -1233,7 +1311,7 @@ router:
           upstream_interfaces:
             - eth1
             - eth2
-          address: 2001:470:731b:7804::2
+          address: 2001:470:731b:4002::2
           options:
             - use-interface-id-option
         - service: router-advert

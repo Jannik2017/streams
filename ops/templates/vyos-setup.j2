@@ -1,4 +1,4 @@
-#jinja2: lstrip_blocks: True
+#jinja2: lstrip_blocks: True, trim_blocks: True
 {# interfaces #}
 {% for i in interfaces %}
     {% if i.interface_type == "bridge" %}
@@ -18,7 +18,7 @@ set interfaces wireguard wg0 peer {{ p.peer }} public-key '{{ p.public_key }}'
     {% endif %}
     {% if i.mtu is defined %}
 set interfaces {{ i.interface_type }} {{ i.interface }} mtu '{{ i.mtu }}'
-        {% if i.mtu < 1500 %} {# e.g. wireguard-interfaces and other vpn-type #}
+        {% if i.mtu < 1500 -%} {# e.g. wireguard-interfaces and other vpn-type #}
 set interfaces {{ i.interface_type }} {{ i.interface }} ip adjust-mss '{{ i.mtu - 40 }}'
 set interfaces {{ i.interface_type }} {{ i.interface }} ipv6 adjust-mss '{{ i.mtu - 60 }}'
         {% endif %}
@@ -44,7 +44,7 @@ delete interfaces {{ i.interface_type }} {{ i.interface }} description
 {% endfor -%}
 
 {# policy #}
-{% if policy is defined %}
+{%- if policy is defined %}
     {% for p in policy %}
     {# prefix-list #}
         {% if p.prefix_lists is defined %}
@@ -61,9 +61,23 @@ set policy prefix-list {{ pl.prefix_list }} rule {{ r.rule }} prefix {{ pfx }}
                 {% endfor %}
             {% endfor %}  
         {% endif %}
+        {% if p.prefix_lists6 is defined %}
+            {% for pl6 in p.prefix_lists6 %}      
+set policy prefix-list6 {{ pl6.prefix_list6 }} description {{ pl6.description6 }}
+                {% for r6 in pl6.rules6 %}
+set policy prefix-list6 {{ pl6.prefix_list6 }} rule {{ r6.rule6 }} action {{ r6.action6 }}
+                    {% if r6.ge6 is defined %}
+set policy prefix-list6 {{ pl6.prefix_list6 }} rule {{ r6.rule6 }} ge {{ r6.ge6 }}                  
+                    {% endif %}
+                    {% for pfx6 in r6.prefixes6 %}
+set policy prefix-list6 {{ pl6.prefix_list6 }} rule {{ r6.rule6 }} prefix {{ pfx6 }}                    
+                    {% endfor %}
+                {% endfor %}
+            {% endfor %}  
+        {% endif -%}
 
     {# route-map #}
-        {% if p.route_maps is defined %}
+        {%- if p.route_maps is defined %}
             {% for rm in p.route_maps %}
 set policy route-map {{ rm.route_map }} description {{ rm.description }}
                 {% for r in rm.rules %}
@@ -73,6 +87,20 @@ set policy route-map {{ rm.route_map }} rule {{ r.rule }} match {{ r.match }}
                     {% endif %}
                     {% if r.set is defined %}
 set policy route-map {{ rm.route_map }} rule {{ r.rule }} set {{ r.set }}
+                    {% endif %}
+                {% endfor -%}
+            {% endfor -%}
+        {% endif -%}
+        {%- if p.route_maps6 is defined %}
+            {% for rm6 in p.route_maps6 %}
+set policy route-map {{ rm6.route_map6 }} description {{ rm6.description6 }}
+                {% for r6 in rm6.rules6 %}
+set policy route-map {{ rm6.route_map6 }} rule {{ r6.rule6 }} action {{ r6.action6 }}
+                    {% if r6.match6 is defined %}
+set policy route-map {{ rm6.route_map6 }} rule {{ r6.rule6}} match {{ r6.match6 }}
+                    {% endif %}
+                    {% if r6.set6 is defined %}
+set policy route-map {{ rm6.route_map6 }} rule {{ r6.rule6 }} set {{ r6.set6 }}
                     {% endif %}
                 {% endfor %}
             {% endfor %}
@@ -137,6 +165,7 @@ set protocols bgp neighbor {{ n.ipv6_address }} update-source '{{ n.update_sourc
             {% if n.afis is defined %}
                 {% for af in n.afis %}
 {#set protocols bgp neighbor {{ n.ipv6_address }} address-family {{ af.afi }}#}
+set protocols bgp neighbor {{ n.ipv6_address }} address-family {{ af.afi }}
                     {% if af.next_hop is defined %}
 set protocols bgp neighbor {{ n.ipv6_address }} address-family {{ af.afi }} {{ af.next_hop }}
                     {% endif %}
