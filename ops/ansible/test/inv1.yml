@@ -1,0 +1,255 @@
+all:
+  children:
+    routers:
+      hosts:
+        p1r1v:
+          ansible_host: 10.20.30.11
+          ansible_hostname: p1r1v
+          interfaces:
+            - interface: lo
+              interface_type: loopback
+              description: loopback
+              ipv4_addresses: 
+                - 10.1.255.11/32
+              ipv6_addresses: 
+                - 2001:0470:731b:4000:10:1:255:11/128
+            - interface: eth0
+              interface_type: ethernet
+              description: mgmt-vrf
+              ipv4_addresses: 
+                - dhcp
+              mtu: 1500
+              vrf: mgmt
+            - interface: eth1
+              interface_type: ethernet
+              description: uplink
+              ipv4_addresses: 
+                - 192.168.111.67/24
+              mtu: 1500
+            - interface: eth2
+              interface_type: ethernet
+              description: infra-dhcp
+              ipv4_addresses: 
+                - 10.1.11.1/24
+              ipv6_addresses: 
+                - 2001:470:731b:4002::1/64
+              mtu: 1500
+            - interface: eth3
+              interface_type: ethernet
+              description: core::p1r1v-p1r2v
+              ipv4_addresses: 
+                - 10.1.12.1/24
+              mtu: 1528
+            - interface: eth4
+              interface_type: ethernet
+              description: core::p1r1v-p1r5v
+              ipv4_addresses: 
+                - 10.1.15.1/24
+              mtu: 1528
+            - interface: eth5
+              interface_type: ethernet
+              description: core::p1r1v-p2r1v (b-plane)
+              ipv4_addresses: 
+                - 10.12.11.1/24
+              mtu: 1528
+            - interface: wg0
+              interface_type: wireguard
+              description: transit (hetzner-streampf)
+              ipv4_addresses: 
+                - 172.17.11.2/30
+              ipv6_addresses: 
+                - 2a09:4c0:3e0:3af:0:1:1:2/126
+              peers:
+                - peer: streampf
+                  address: 78.47.154.241
+                  port: 50011
+                  allowed_ips: 0.0.0.0/0
+                  public_key: 'xTLgLyv2Tuavto8fa9UhMR+komJD0UZclb3T9yFAejw='
+              port: 50011
+              private_key: 'aO0PCJUIQohTnfYfJXZ8gZzJHK5Ec+5O3ATCKq4TPl4='
+              mtu: 1400
+          policy:
+            - prefix_lists:
+                - prefix_list: PL_INTERNAL_NETWORKS
+                  description: AIBIXHQ
+                  rules:
+                    - rule: 100
+                      action: permit
+                      ge: 16
+                      prefixes:
+                        - 192.168.0.0/16
+            - prefix_lists6:
+                - prefix_list6: PL_NACH_EXTERN6
+                  description6: P1V6PREFIXES
+                  rules6:
+                    - rule6: 100
+                      description6: 'P1V6SLASH50'
+                      action6: permit
+                      ge6: 50
+                      prefixes6:
+                        - 2001:470:731b:4000::/50
+                    - rule6: 999
+                      description6: '::'
+                      action6: deny
+                      ge6: 0
+                      prefixes6:
+                        - ::/0
+            - route_maps:
+                - route_map: RM_NACH_EXTERN
+                  description: 'nach_extern_beigebracht'
+                  rules:
+                    - rule: 50
+                      action: deny
+                      match: 'ip address prefix-list PL_INTERNAL_NETWORKS'
+                    - rule: 100
+                      action: permit
+                      match: 'local-preference 100'
+                - route_map: RM_VON_EXTERN
+                  description: 'von_extern_gelernt'
+                  rules:
+                    - rule: 50
+                      action: deny
+                      match: 'ip address prefix-list PL_INTERNAL_NETWORKS'
+                    - rule: 100
+                      action: permit
+                      set: 'local-preference 50'
+            - route_maps6:
+                - route_map6: RM_NACH_EXTERN6
+                  description6: 'nach_extern_beigebracht_v6'
+                  rules6:
+                    - rule6: 100
+                      action6: permit
+                      match6: 'ipv6 address prefix-list PL_NACH_EXTERN6'
+          bgp:
+            router_id: 10.1.255.11
+            as: 65001
+            afis:
+              - afi: 'ipv4-unicast'
+                aggregates:
+                  - 192.0.2.0/24
+                  - 198.51.100.0/24
+                  - 203.0.113.0/24
+                networks:
+                  - 10.1.11.0/24
+                redistribute:
+                  - static
+              - afi: 'ipv6-unicast'
+                networks:
+                  - 2001:470:731b:4000::/50
+                redistribute:
+                  - connected
+            neighbors:
+              - ipv4_address: 10.1.255.16
+                description: core::p1r6v
+                remote_as: 65001
+                update_source: lo
+                afis:
+                  - afi: 'ipv4-unicast'
+                    next_hop: 'nexthop-self'
+              - ipv4_address: 172.17.11.1
+                description: streampf
+                remote_as: 65009
+                update_source: wg0
+                afis:
+                  - afi: 'ipv4-unicast'
+                    route_maps:
+                      route_map_import: 'RM_VON_EXTERN'
+                      route_map_export: 'RM_NACH_EXTERN'
+              - ipv4_address: 192.168.111.14
+                description: p3r1v
+                remote_as: 65003
+                update_source: eth1
+                afis:
+                  - afi: 'ipv4-unicast'
+                    route_maps:
+                      route_map_import: 'RM_VON_EXTERN'
+                      route_map_export: 'RM_NACH_EXTERN'
+              - ipv4_address: 192.168.111.109
+                description: p2r1v
+                remote_as: 65002
+                update_source: eth1
+                afis:
+                  - afi: 'ipv4-unicast'
+                    route_maps:
+                      route_map_import: 'RM_VON_EXTERN'
+                      route_map_export: 'RM_NACH_EXTERN'
+            neighbors6:
+              - ipv6_address: 2001:0470:731b:4000:10:1:255:16
+                description: core::p1r6v
+                remote_as: 65001
+                update_source: lo
+                afis:
+                  - afi: 'ipv6-unicast'
+                    next_hop: 'nexthop-self'
+              - ipv6_address: 2001:470:731b::15be
+                description: ext::opn.lab
+                remote_as: 65005
+                update_source: eth1
+                afis:
+                  - afi: 'ipv6-unicast'
+              - ipv6_address: 2a09:04c0:03e0:03af::1:1:1
+                description: streampf
+                remote_as: 65009
+                update_source: wg0
+                afis:
+                  - afi: 'ipv6-unicast'
+                    route_maps:
+                      route_map_export: 'RM_NACH_EXTERN6'
+          isis:
+            interfaces:
+              - interface: lo
+              - interface: eth3
+              - interface: eth4
+            level: level-1
+            net: 49.1111.0100.0125.5011.00
+          mpls:
+            interfaces:
+              - interface: eth3
+              - interface: eth4
+            ldp:
+              router_id: 10.1.255.11
+              transport_ipv4_address: 10.1.255.11
+              transport_ipv6_address: 2001:0470:731b:4000:10:1:255:11
+              interfaces:
+                - interface: lo
+                - interface: eth3
+                - interface: eth4
+          static:
+            routes:
+              - destination: 78.47.154.241/32
+                next_hop: 192.168.111.1
+              - destination: 192.168.68.5/32
+                next_hop: 192.168.111.1
+              - destination: 192.168.112.0/24
+                next_hop: 192.168.111.1
+          services:
+            - service: fantasy
+              port: 4711
+      vars:
+        os: "vyos"
+        ansible_user: vyos
+        ansible_network_os: vyos.vyos.vyos
+        vrfs:
+          - vrf: mgmt
+            table: 1020
+    services1:
+      hosts:
+        p1r1v:
+          override_services:
+            - service: ssh
+              vrf: mgmt
+              port: 22
+            - service: vrf
+              name: mgmt
+              table: 1020
+    services2:
+      hosts:
+        p1r2v:
+          override_services:
+            - bla:
+                name: blubb
+                port: 1111
+
+
+
+

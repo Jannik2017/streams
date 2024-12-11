@@ -1,0 +1,12 @@
+- hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Merge base services with overrides
+      set_fact:
+        final_services: "{{ (hostvars[inventory_hostname]['services'] | default([])) + (override_services | default([])) }}"
+        #final_services: "{{ override_services | default([]) }}"
+
+    - name: Debug final services
+      debug:
+        var: final_services

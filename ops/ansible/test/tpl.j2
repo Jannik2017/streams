@@ -1,0 +1,9 @@
+{% set base_servicess = hostvars[inventory_hostname].services | default([]) %}
+{% set group_services = groups['services1'][inventory_hostname].services | default([]) %}
+
+{% set final_services = group_services + base_services %}
+Host: {{ inventory_hostname }}
+services:
+{% for srv in final_services %}
+  - service: {{ srv.service }}
+{% endfor %}
