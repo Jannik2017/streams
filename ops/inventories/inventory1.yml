@@ -29,6 +29,8 @@ router:
           description: uplink
           ipv4_addresses: 
             - 192.168.111.67/24
+          ipv6_addresses:
+            - 2001:470:731b::192:168:111:67/64
           mtu: 1500
         - interface: eth2
           interface_type: ethernet
@@ -226,6 +228,10 @@ router:
             next_hop: 192.168.111.1
           - destination: 192.168.112.0/24
             next_hop: 192.168.111.1
+        routes6:
+          - destination: 2001:470:5135::/64
+            next_hop: 2001:470:731b::0
+            interface: eth1
       vrfs:
         - vrf: mgmt
           table: 1020
@@ -620,6 +626,8 @@ router:
           description: uplink
           ipv4_addresses: 
             - 192.168.111.68/24
+          ipv6_addresses:
+            - 2001:470:731b::192:168:111:68/64
           mtu: 1500
         - interface: eth2
           interface_type: ethernet
@@ -801,6 +809,10 @@ router:
             next_hop: 192.168.111.1
           - destination: 192.168.112.0/24
             next_hop: 192.168.111.1
+        routes6:
+          - destination: 2001:470:5135::/64
+            next_hop: 2001:470:731b::0
+            interface: eth1
       vrfs:
         - vrf: mgmt
           table: 1020
