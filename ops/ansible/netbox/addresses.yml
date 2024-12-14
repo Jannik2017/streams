@@ -7,6 +7,10 @@
     netbox_token: "{{ lookup('env', 'NETBOX_TOKEN') }}"
 
   tasks:
+    - name: Debug netbox_endpoint variable
+      debug:
+        var: netbox_endpoint
+    
     - name: Get route-reflector-client IPs for BGP config
       ansible.builtin.uri:
         url: "{{ netbox_endpoint }}/graphql/"

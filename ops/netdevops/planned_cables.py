@@ -5,7 +5,8 @@ from urllib3.exceptions import InsecureRequestWarning
 urllib3.disable_warnings(InsecureRequestWarning)
 
 netbox_url = "https://192.168.111.8"
-auth_token = "584149a859ea8e7a7f5e2d610c7235a3e2d2460c"
+#auth_token = "584149a859ea8e7a7f5e2d610c7235a3e2d2460c"
+auth_token = "721ba2ad61e33c6f20b15af3b3d0725d8a3adaff"
 headers = {
     'Authorization': f"Token {auth_token}",
     'Content-Type': f'application/json',
