@@ -1133,6 +1133,7 @@ all:
     mgmt_services:
       hosts:
         p1r1v:
+        p1r2v:
       vars:
         mgmt_service:
           - service: ssh
