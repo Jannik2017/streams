@@ -1,0 +1,164 @@
+set interfaces ethernet eth0 address 'dhcp'
+set interfaces ethernet eth0 description 'mgmt-vrf'
+set interfaces ethernet eth0 hw-id '00:24:18:a1:01:00'
+set interfaces ethernet eth0 mtu '1500'
+set interfaces ethernet eth0 offload gro
+set interfaces ethernet eth0 offload gso
+set interfaces ethernet eth0 offload sg
+set interfaces ethernet eth0 offload tso
+set interfaces ethernet eth0 vrf 'mgmt'
+set interfaces ethernet eth1 address '172.31.111.67/24'
+set interfaces ethernet eth1 address '2001:470:731b::172:31:111:67/64'
+set interfaces ethernet eth1 description 'uplink'
+set interfaces ethernet eth1 hw-id '00:44:18:f1:01:01'
+set interfaces ethernet eth1 mtu '1500'
+set interfaces ethernet eth1 offload gro
+set interfaces ethernet eth1 offload gso
+set interfaces ethernet eth1 offload sg
+set interfaces ethernet eth1 offload tso
+set interfaces ethernet eth2 address '10.1.11.1/24'
+set interfaces ethernet eth2 address '2001:470:731b:4002::1/64'
+set interfaces ethernet eth2 description 'infra-dhcp'
+set interfaces ethernet eth2 hw-id '00:44:18:f1:01:02'
+set interfaces ethernet eth2 mtu '1500'
+set interfaces ethernet eth2 offload gro
+set interfaces ethernet eth2 offload gso
+set interfaces ethernet eth2 offload sg
+set interfaces ethernet eth2 offload tso
+set interfaces ethernet eth3 address '10.1.12.1/24'
+set interfaces ethernet eth3 description 'core::p1r1v-p1r2v'
+set interfaces ethernet eth3 hw-id '00:44:18:f1:01:03'
+set interfaces ethernet eth3 mtu '1528'
+set interfaces ethernet eth3 offload gro
+set interfaces ethernet eth3 offload gso
+set interfaces ethernet eth3 offload sg
+set interfaces ethernet eth3 offload tso
+set interfaces ethernet eth4 address '10.1.15.1/24'
+set interfaces ethernet eth4 description 'core::p1r1v-p1r5v'
+set interfaces ethernet eth4 hw-id '00:44:18:f1:01:04'
+set interfaces ethernet eth4 mtu '1528'
+set interfaces ethernet eth4 offload gro
+set interfaces ethernet eth4 offload gso
+set interfaces ethernet eth4 offload sg
+set interfaces ethernet eth4 offload tso
+set interfaces ethernet eth5 address '10.12.11.1/24'
+set interfaces ethernet eth5 description 'core::p1r1v-p2r1v (b-plane)'
+set interfaces ethernet eth5 hw-id 'bc:24:11:4e:71:25'
+set interfaces ethernet eth5 mtu '1528'
+set interfaces ethernet eth5 offload gro
+set interfaces ethernet eth5 offload gso
+set interfaces ethernet eth5 offload sg
+set interfaces ethernet eth5 offload tso
+set interfaces loopback lo address '10.1.255.11/32'
+set interfaces loopback lo address '2001:0470:731b:4000:10:1:255:11/128'
+set interfaces loopback lo description 'loopback'
+set policy prefix-list PL_INTERNAL_NETWORKS description 'AIBIXHQ'
+set policy prefix-list PL_INTERNAL_NETWORKS rule 100 action 'permit'
+set policy prefix-list PL_INTERNAL_NETWORKS rule 100 ge '16'
+set policy prefix-list PL_INTERNAL_NETWORKS rule 100 prefix '192.168.0.0/16'
+set policy prefix-list6 PL_NACH_EXTERN6 description 'P1V6PREFIXES'
+set policy prefix-list6 PL_NACH_EXTERN6 rule 100 action 'permit'
+set policy prefix-list6 PL_NACH_EXTERN6 rule 100 description 'P1V6SLASH50'
+set policy prefix-list6 PL_NACH_EXTERN6 rule 100 ge '50'
+set policy prefix-list6 PL_NACH_EXTERN6 rule 100 prefix '2001:470:731b:4000::/50'
+set policy prefix-list6 PL_NACH_EXTERN6 rule 999 action 'deny'
+set policy prefix-list6 PL_NACH_EXTERN6 rule 999 description '::'
+set policy prefix-list6 PL_NACH_EXTERN6 rule 999 ge '0'
+set policy prefix-list6 PL_NACH_EXTERN6 rule 999 prefix '::/0'
+set policy route-map RM_NACH_EXTERN description 'nach_extern_beigebracht'
+set policy route-map RM_NACH_EXTERN rule 50 action 'deny'
+set policy route-map RM_NACH_EXTERN rule 50 match ip address prefix-list 'PL_INTERNAL_NETWORKS'
+set policy route-map RM_NACH_EXTERN rule 100 action 'permit'
+set policy route-map RM_NACH_EXTERN rule 100 match local-preference '100'
+set policy route-map RM_NACH_EXTERN6 description 'nach_extern_beigebracht_v6'
+set policy route-map RM_NACH_EXTERN6 rule 100 action 'permit'
+set policy route-map RM_NACH_EXTERN6 rule 100 match ipv6 address prefix-list 'PL_NACH_EXTERN6'
+set policy route-map RM_VON_EXTERN description 'von_extern_gelernt'
+set policy route-map RM_VON_EXTERN rule 50 action 'deny'
+set policy route-map RM_VON_EXTERN rule 50 match ip address prefix-list 'PL_INTERNAL_NETWORKS'
+set policy route-map RM_VON_EXTERN rule 100 action 'permit'
+set policy route-map RM_VON_EXTERN rule 100 set local-preference '50'
+set protocols bgp address-family ipv4-unicast aggregate-address 192.0.2.0/24
+set protocols bgp address-family ipv4-unicast aggregate-address 198.51.100.0/24
+set protocols bgp address-family ipv4-unicast aggregate-address 203.0.113.0/24
+set protocols bgp address-family ipv4-unicast network 10.1.11.0/24
+set protocols bgp address-family ipv4-unicast redistribute static
+set protocols bgp address-family ipv6-unicast network 2001:470:731b:4000::/50
+set protocols bgp address-family ipv6-unicast redistribute connected
+set protocols bgp neighbor 10.1.255.16 address-family ipv4-unicast nexthop-self
+set protocols bgp neighbor 10.1.255.16 description 'core::p1r6v'
+set protocols bgp neighbor 10.1.255.16 remote-as '65001'
+set protocols bgp neighbor 10.1.255.16 update-source 'lo'
+set protocols bgp neighbor 172.31.111.1 address-family ipv4-unicast route-map export 'RM_NACH_EXTERN'
+set protocols bgp neighbor 172.31.111.1 address-family ipv4-unicast route-map import 'RM_VON_EXTERN'
+set protocols bgp neighbor 172.31.111.1 description 'pflab'
+set protocols bgp neighbor 172.31.111.1 remote-as '65009'
+set protocols bgp neighbor 172.31.111.1 update-source 'eth1'
+set protocols bgp neighbor 172.31.111.14 address-family ipv4-unicast route-map export 'RM_NACH_EXTERN'
+set protocols bgp neighbor 172.31.111.14 address-family ipv4-unicast route-map import 'RM_VON_EXTERN'
+set protocols bgp neighbor 172.31.111.14 description 'p3r1v'
+set protocols bgp neighbor 172.31.111.14 remote-as '65003'
+set protocols bgp neighbor 172.31.111.14 update-source 'eth1'
+set protocols bgp neighbor 172.31.111.109 address-family ipv4-unicast route-map export 'RM_NACH_EXTERN'
+set protocols bgp neighbor 172.31.111.109 address-family ipv4-unicast route-map import 'RM_VON_EXTERN'
+set protocols bgp neighbor 172.31.111.109 description 'p2r1v'
+set protocols bgp neighbor 172.31.111.109 remote-as '65002'
+set protocols bgp neighbor 172.31.111.109 update-source 'eth1'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:16 address-family ipv6-unicast default-originate
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:16 address-family ipv6-unicast nexthop-self
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:16 description 'core::p1r6v'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:16 remote-as '65001'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:16 update-source 'lo'
+set protocols bgp neighbor 2001:470:731b::15be address-family ipv6-unicast route-map export 'RM_NACH_EXTERN6'
+set protocols bgp neighbor 2001:470:731b::15be description 'ext::opn.lab'
+set protocols bgp neighbor 2001:470:731b::15be remote-as '65005'
+set protocols bgp neighbor 2001:470:731b::15be update-source 'eth1'
+set protocols bgp neighbor 2001:470:731b::172:31:111:1 address-family ipv6-unicast route-map export 'RM_NACH_EXTERN6'
+set protocols bgp neighbor 2001:470:731b::172:31:111:1 description 'pflab'
+set protocols bgp neighbor 2001:470:731b::172:31:111:1 remote-as '65009'
+set protocols bgp neighbor 2001:470:731b::172:31:111:1 update-source 'eth1'
+set protocols bgp parameters router-id '10.1.255.11'
+set protocols bgp system-as '65001'
+set protocols isis interface eth3
+set protocols isis interface eth4
+set protocols isis interface lo
+set protocols isis level 'level-1'
+set protocols isis net '49.1111.0100.0125.5011.00'
+set protocols mpls interface 'eth3'
+set protocols mpls interface 'eth4'
+set protocols mpls ldp discovery transport-ipv4-address '10.1.255.11'
+set protocols mpls ldp discovery transport-ipv6-address '2001:0470:731b:4000:10:1:255:11'
+set protocols mpls ldp interface 'lo'
+set protocols mpls ldp interface 'eth3'
+set protocols mpls ldp interface 'eth4'
+set protocols mpls ldp router-id '10.1.255.11'
+set protocols static route 192.168.68.5/32 next-hop 172.31.111.1 interface 'eth1'
+set service ntp allow-client address '0.0.0.0/0'
+set service ntp allow-client address '::/0'
+set service ntp server 1.pool.ntp.org
+set service ntp server 2.pool.ntp.org
+set service ssh client-keepalive-interval '180'
+set service ssh port '22'
+set service ssh vrf 'mgmt'
+set system config-management commit-revisions '100'
+set system conntrack modules ftp
+set system conntrack modules h323
+set system conntrack modules nfs
+set system conntrack modules pptp
+set system conntrack modules sip
+set system conntrack modules sqlnet
+set system conntrack modules tftp
+set system host-name 'p1r1v'
+set system login user vyos authentication encrypted-password '$6$rounds=656000$CWY1wUUSPCiVP6GE$H2/lBXL1XH4XY7wpY1FcwBle5BwC96hCoqQJBfQsaBahJUFQsRAtlc5jL6di6e.ZvrB7HBtbjG8POy69SKnfX.'
+set system login user vyos authentication public-keys aibix@AUTOMATION key 'AAAAC3NzaC1lZDI1NTE5AAAAIHcH6rEhepn76QcVDpRYc/s4i0FIHdFXejYoq4dGinKu'
+set system login user vyos authentication public-keys aibix@AUTOMATION type 'ssh-ed25519'
+set system login user vyos authentication public-keys aibix@minismox key 'AAAAC3NzaC1lZDI1NTE5AAAAIJPRSV+ocoYTP26UwMYUXsd0gVKSmrFC3WaOVJwEY0L1'
+set system login user vyos authentication public-keys aibix@minismox type 'ssh-ed25519'
+set system login user vyos authentication public-keys aibix@pve key 'AAAAC3NzaC1lZDI1NTE5AAAAINaS0Jnd22MMvRMUyBlndxv7VzYWXfl7PbnpeUpNBtlL'
+set system login user vyos authentication public-keys aibix@pve type 'ssh-ed25519'
+set system login user vyos authentication public-keys aibix@ubuntu-cluster key 'AAAAC3NzaC1lZDI1NTE5AAAAIFpwtLpKPNExRVDiBNmXwvkrw7DMnkPB7R8B39pcurea'
+set system login user vyos authentication public-keys aibix@ubuntu-cluster type 'ssh-ed25519'
+set system sysctl parameter net.ipv6.conf.eth1.accept_ra_defrtr value '0'
+set system syslog global facility all level 'notice'
+set system syslog global facility local7 level 'debug'
+set vrf name mgmt table '1020'

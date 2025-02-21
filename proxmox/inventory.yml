@@ -1,10 +1,10 @@
 ---
 hosts:
-  umox:
-    ansible_host: 192.168.112.3
-  picomox:
-    ansible_host: 192.168.112.90
-  dell:
-    ansible_host: 192.168.112.130
+  pmx1:
+    ansible_host: 192.168.111.181
+  pmx2:
+    ansible_host: 192.168.111.182
+  pmx3:
+    ansible_host: 192.168.111.183
   vars:
     ansible_user: root

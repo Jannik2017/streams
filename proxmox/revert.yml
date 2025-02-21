@@ -7,17 +7,17 @@
     - name: Remove all "mtu 2000" lines from /etc/network/interfaces
       lineinfile:
         path: /etc/network/interfaces
-        regexp: 'mtu 2000'
+        regexp: 'mtu 1800'
         state: absent
         backup: yes
 
-    # - name: Remove installed software packages
-    #   apt:
-    #     name:
-    #       - libpve-network-perl
-    #       - dnsmasq
-    #       - frr-pythontools
-    #     state: absent
-    #     purge: yes
-    #     autoremove: yes
-    #     force_apt_get: yes
+    - name: Remove installed software packages
+      apt:
+        name:
+          - libpve-network-perl
+          - dnsmasq
+          - frr-pythontools
+        state: absent
+        purge: yes
+        autoremove: yes
+        force_apt_get: yes

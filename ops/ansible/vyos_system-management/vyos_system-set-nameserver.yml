@@ -1,0 +1,17 @@
+---
+
+- name: Vyos Kram
+  hosts: all
+  vars:
+    ansible_user: vyos
+    ansible_network_os: vyos.vyos.vyos
+  # throttle: 1
+  gather_facts: false
+  connection: ansible.netcommon.network_cli
+
+  tasks:
+    - name: Set name-server
+      vyos.vyos.vyos_config:
+        lines:
+          - set system name-server 192.168.10.11
+        save: true

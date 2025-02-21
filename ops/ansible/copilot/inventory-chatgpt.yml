@@ -3,6 +3,115 @@ router:
     ansible_user: vyos
     ansible_network_os: vyos.vyos.vyos
 
+    # Gemeinsame VRF-Konfiguration (Management)
+    mgmt_vrf: &mgmt_vrf
+      - vrf: mgmt
+        table: 1020
+
+    # Gemeinsamer SSH-Service (Management)
+    ssh_service: &ssh_service
+      - service: ssh
+        vrf: mgmt
+        port: 22
+
+    # Policy für interne Netzwerke (IPv4) – z. B. für p1r1v und p1r5v
+    policy_internal_v4: &policy_internal_v4
+      - prefix_list: PL_INTERNAL_NETWORKS
+        description: AIBIXHQ
+        rules:
+          - rule: 100
+            action: permit
+            ge: 16
+            prefixes:
+              - 192.168.0.0/16
+
+    # Policy für externe IPv6-Prefixes
+    policy_internal_v6: &policy_internal_v6
+      - prefix_list6: PL_NACH_EXTERN6
+        description6: P1V6PREFIXES
+        rules6:
+          - rule6: 100
+            description6: 'P1V6SLASH50'
+            action6: permit
+            ge6: 50
+            prefixes6:
+              - 2001:470:731b:4000::/50
+          - rule6: 999
+            description6: '::'
+            action6: deny
+            ge6: 0
+            prefixes6:
+              - ::/0
+
+    # Route-Maps für externe IPv4-Routen (intern)
+    policy_internal_route_maps_v4: &policy_internal_route_maps_v4
+      - route_map: RM_NACH_EXTERN
+        description: 'nach_extern_beigebracht'
+        rules:
+          - rule: 50
+            action: deny
+            match: 'ip address prefix-list PL_INTERNAL_NETWORKS'
+          - rule: 100
+            action: permit
+            match: 'local-preference 100'
+      - route_map: RM_VON_EXTERN
+        description: 'von_extern_gelernt'
+        rules:
+          - rule: 50
+            action: deny
+            match: 'ip address prefix-list PL_INTERNAL_NETWORKS'
+          - rule: 100
+            action: permit
+            set: 'local-preference 50'
+
+    # Route-Map für externe IPv6-Routen
+    policy_internal_route_maps_v6: &policy_internal_route_maps_v6
+      - route_map6: RM_NACH_EXTERN6
+        description6: 'nach_extern_beigebracht_v6'
+        rules6:
+          - rule6: 100
+            action6: permit
+            match6: 'ipv6 address prefix-list PL_NACH_EXTERN6'
+
+    # Policy für BGP Redistribute (Standard, z. B. p1r2v und p1r4v: IPv4-Prefix 198.51.100.0/24)
+    policy_bgp_redistribute_std: &policy_bgp_redistribute_std
+      - prefix_list: PL_BGP_redistribute_v4
+        description: IPv4 prefixes we want redistributed in BGP
+        rules:
+          - rule: 100
+            action: permit
+            ge: 24
+            prefixes:
+              - 198.51.100.0/24
+      - route_map: RM_BGP_redistribute_v4
+        description: route-map to redistribute filtered IPv4 prefixes into BGP
+        rules:
+          - rule: 100
+            action: permit
+            match: 'ip address prefix-list PL_BGP_redistribute_v4'
+
+    # Policy für BGP Redistribute alternativ (z. B. p1r3v: IPv4-Prefix 203.0.113.0/24)
+    policy_bgp_redistribute_alt: &policy_bgp_redistribute_alt
+      - prefix_list: PL_BGP_redistribute_v4
+        description: IPv4 prefixes we want redistributed in BGP
+        rules:
+          - rule: 100
+            action: permit
+            ge: 24
+            prefixes:
+              - 203.0.113.0/24
+      - route_map: RM_BGP_redistribute_v4
+        description: route-map to redistribute filtered IPv4 prefixes into BGP
+        rules:
+          - rule: 100
+            action: permit
+            match: 'ip address prefix-list PL_BGP_redistribute_v4'
+
+    # Gemeinsame Aggregates (IPv4) – verwendet z. B. in p1r1v und p1r5v
+    aggregates4: &aggregates4
+      - 192.0.2.0/24
+      - 198.51.100.0/24
+      - 203.0.113.0/24
 
   hosts:
     p1r1v:
@@ -13,21 +122,21 @@ router:
         - interface: lo
           interface_type: loopback
           description: loopback
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.255.11/32
-          ipv6_addresses: 
+          ipv6_addresses:
             - 2001:0470:731b:4000:10:1:255:11/128
         - interface: eth0
           interface_type: ethernet
           description: mgmt-vrf
-          ipv4_addresses: 
+          ipv4_addresses:
             - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
           description: uplink
-          ipv4_addresses: 
+          ipv4_addresses:
             - 172.31.111.67/24
           ipv6_addresses:
             - 2001:470:731b::172:31:111:67/64
@@ -35,94 +144,40 @@ router:
         - interface: eth2
           interface_type: ethernet
           description: infra-dhcp
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.11.1/24
-          ipv6_addresses: 
+          ipv6_addresses:
             - 2001:470:731b:4002::1/64
           mtu: 1500
         - interface: eth3
           interface_type: ethernet
           description: core::p1r1v-p1r2v
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.12.1/24
           mtu: 1528
         - interface: eth4
           interface_type: ethernet
           description: core::p1r1v-p1r5v
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.15.1/24
           mtu: 1528
         - interface: eth5
           interface_type: ethernet
           description: core::p1r1v-p2r1v (b-plane)
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.12.11.1/24
           mtu: 1528
       policy:
-        - prefix_lists:
-            - prefix_list: PL_INTERNAL_NETWORKS
-              description: AIBIXHQ
-              rules:
-                - rule: 100
-                  action: permit
-                  ge: 16
-                  prefixes:
-                    - 192.168.0.0/16
-                - rule: 200
-                  action: permit
-                  prefixes:
-                    - 10.20.30.0/24
-        - prefix_lists6:
-            - prefix_list6: PL_NACH_EXTERN6
-              description6: P1V6PREFIXES
-              rules6:
-                - rule6: 100
-                  description6: 'P1V6SLASH50'
-                  action6: permit
-                  ge6: 50
-                  prefixes6:
-                    - 2001:470:731b:4000::/50
-                - rule6: 999
-                  description6: '::'
-                  action6: deny
-                  ge6: 0
-                  prefixes6:
-                    - ::/0
-        - route_maps:
-            - route_map: RM_NACH_EXTERN
-              description: 'nach_extern_beigebracht'
-              rules:
-                - rule: 50
-                  action: deny
-                  match: 'ip address prefix-list PL_INTERNAL_NETWORKS'
-                - rule: 100
-                  action: permit
-                  match: 'local-preference 100'
-            - route_map: RM_VON_EXTERN
-              description: 'von_extern_gelernt'
-              rules:
-                - rule: 50
-                  action: deny
-                  match: 'ip address prefix-list PL_INTERNAL_NETWORKS'
-                - rule: 100
-                  action: permit
-                  set: 'local-preference 50'
-        - route_maps6:
-            - route_map6: RM_NACH_EXTERN6
-              description6: 'nach_extern_beigebracht_v6'
-              rules6:
-                - rule6: 100
-                  action6: permit
-                  match6: 'ipv6 address prefix-list PL_NACH_EXTERN6'
+        - prefix_lists: *policy_internal_v4
+        - prefix_lists6: *policy_internal_v6
+        - route_maps: *policy_internal_route_maps_v4
+        - route_maps6: *policy_internal_route_maps_v6
       bgp:
         router_id: 10.1.255.11
         as: 65001
         afis:
           - afi: 'ipv4-unicast'
-            aggregates:
-              - 192.0.2.0/24
-              - 198.51.100.0/24
-              - 203.0.113.0/24
+            aggregates: *aggregates4
             networks:
               - 10.1.11.0/24
             redistribute:
@@ -147,8 +202,8 @@ router:
             afis:
               - afi: 'ipv4-unicast'
                 route_maps:
-                  route_map_import: 'RM_VON_EXTERN'
-                  route_map_export: 'RM_NACH_EXTERN'
+                  route_map_import: RM_VON_EXTERN
+                  route_map_export: RM_NACH_EXTERN
           - ipv4_address: 172.31.111.14
             description: p3r1v
             remote_as: 65003
@@ -156,8 +211,8 @@ router:
             afis:
               - afi: 'ipv4-unicast'
                 route_maps:
-                  route_map_import: 'RM_VON_EXTERN'
-                  route_map_export: 'RM_NACH_EXTERN'
+                  route_map_import: RM_VON_EXTERN
+                  route_map_export: RM_NACH_EXTERN
           - ipv4_address: 172.31.111.109
             description: p2r1v
             remote_as: 65002
@@ -165,8 +220,8 @@ router:
             afis:
               - afi: 'ipv4-unicast'
                 route_maps:
-                  route_map_import: 'RM_VON_EXTERN'
-                  route_map_export: 'RM_NACH_EXTERN'
+                  route_map_import: RM_VON_EXTERN
+                  route_map_export: RM_NACH_EXTERN
         neighbors6:
           - ipv6_address: 2001:0470:731b:4000:10:1:255:16
             description: core::p1r6v
@@ -188,7 +243,7 @@ router:
             afis:
               - afi: 'ipv6-unicast'
                 route_maps:
-                  route_map_export: 'RM_NACH_EXTERN6'
+                  route_map_export: RM_NACH_EXTERN6
       isis:
         interfaces:
           - interface: lo
@@ -208,92 +263,81 @@ router:
             - interface: lo
             - interface: eth3
             - interface: eth4
-      vrfs:
-        - vrf: mgmt
-          table: 1020
+      vrfs: *mgmt_vrf
       services:
-        - service: ssh
-          vrf: mgmt
-          port: 22
-
+        - <<: *ssh_service
+        - service: router-advert
+          interfaces:
+            - interface: eth2
+              default_preference: high
+              name_servers:
+                - 2001:4860:4860::8888
+                - 2001:4860:4860::8844
+              config_flags:
+                - other-config-flag
+              prefix: 2001:470:731b:5002::/64
 
     p1r2v:
       os: "vyos"
       ansible_host: 10.20.30.12
-      ansible_hostname: "p1r2v"
+      ansible_hostname: p1r2v
       interfaces:
         - interface: lo
           interface_type: loopback
           description: loopback
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.255.12/32
-          ipv6_addresses: 
+          ipv6_addresses:
             - 2001:0470:731b:4000:10:1:255:12/128
         - interface: eth0
           interface_type: ethernet
           description: mgmt-vrf
-          ipv4_addresses: 
+          ipv4_addresses:
             - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
           description: core::p1r2v-p1r1v
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.12.2/24
           mtu: 1528
         - interface: eth2
           interface_type: ethernet
           description: customer::opnsense1
-          ipv4_addresses: 
+          ipv4_addresses:
             - 198.51.100.17/28
-          ipv6_addresses: 
+          ipv6_addresses:
             - 2001:470:731b:4802::1/64
           mtu: 1500
         - interface: eth3
           interface_type: ethernet
           description: core::p1r2v-p1r3v
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.23.2/24
           mtu: 1528
         - interface: eth4
           interface_type: ethernet
           description: core::p1r2v-p1r6v
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.26.2/24
           mtu: 1528
         - interface: eth5
           interface_type: ethernet
           description: core::p1r2v-p2r2v (b-plane)
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.12.22.1/24
           mtu: 1528
-      policy:
-        - prefix_lists:
-            - prefix_list: PL_BGP_redistribute_v4
-              description: IPv4 prefixes we want redistributed in BGP
-              rules:
-                - rule: 100
-                  action: permit
-                  ge: 24
-                  prefixes:
-                    - 198.51.100.0/24
-        - route_maps:
-            - route_map: RM_BGP_redistribute_v4
-              description: route-map to redistribute filtered IPv4 prefixes into BGP
-              rules:
-                - rule: 100
-                  action: permit
-                  match: 'ip address prefix-list PL_BGP_redistribute_v4'
+      policy: *policy_bgp_redistribute_std
       bgp:
         router_id: 10.1.255.12
         as: 65001
         afis:
           - afi: 'ipv4-unicast'
             redistribute:
-              - 'connected route-map RM_BGP_redistribute_v4'
+              - "connected route-map RM_BGP_redistribute_v4"
           - afi: 'ipv6-unicast'
-            redistribute: 
+            redistribute:
               - static
               - connected
         neighbors:
@@ -302,16 +346,16 @@ router:
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv4-unicast'
-                next_hop: 'nexthop-self'
+              - afi: "ipv4-unicast"
+                next_hop: "nexthop-self"
         neighbors6:
           - ipv6_address: 2001:0470:731b:4000:10:1:255:16
             description: core::p1r6v
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv6-unicast'
-                next_hop: 'nexthop-self'
+              - afi: "ipv6-unicast"
+                next_hop: "nexthop-self"
       isis:
         interfaces:
           - interface: lo
@@ -336,17 +380,12 @@ router:
             - interface: eth4
       static:
         routes6:
-          # für prefix-delegations
           - destination: 2001:0470:731b:4800::/53
             next_hop: fe80::be24:11ff:fef7:d9d4
             interface: eth2
-      vrfs:
-        - vrf: mgmt
-          table: 1020
+      vrfs: *mgmt_vrf
       services:
-        - service: ssh
-          vrf: mgmt
-          port: 22
+        - <<: *ssh_service
         - service: dhcp-relay
           relay_options:
             - relay-agents-packets replace
@@ -373,34 +412,33 @@ router:
               name_servers:
                 - 2001:4860:4860::8888
                 - 2001:4860:4860::8844
-              config_flags: 
+              config_flags:
                 - other-config-flag
               prefix: 2001:470:731b:4802::/64
-
 
     p1r3v:
       os: "vyos"
       ansible_host: 10.20.30.13
-      ansible_hostname: "p1r3v"
+      ansible_hostname: p1r3v
       interfaces:
         - interface: lo
           interface_type: loopback
           description: loopback
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.255.13/32
-          ipv6_addresses: 
+          ipv6_addresses:
             - 2001:0470:731b:4000:10:1:255:13/128
         - interface: eth0
           interface_type: ethernet
           description: mgmt-vrf
-          ipv4_addresses: 
+          ipv4_addresses:
             - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
           description: core::p1r3v-p1r2v
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.23.3/24
           mtu: 1528
         - interface: eth2
@@ -413,47 +451,31 @@ router:
         - interface: eth3
           interface_type: ethernet
           description: core::p1r3v-p1r4v
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.34.3/24
           mtu: 1528
         - interface: eth4
           interface_type: ethernet
           description: core::p1r3v-p1r7v
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.37.3/24
           mtu: 1528
         - interface: eth5
           interface_type: ethernet
           description: core::p1r3v-p2r3v (b-plane)
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.12.33.1/24
           mtu: 1528
-      policy:
-        - prefix_lists:
-            - prefix_list: PL_BGP_redistribute_v4
-              description: 'IPv4 prefixes we want redistributed in BGP'
-              rules:
-                - rule: 100
-                  action: permit
-                  ge: 24
-                  prefixes:
-                    - 203.0.113.0/24
-        - route_maps:
-            - route_map: RM_BGP_redistribute_v4
-              description: 'route-map to redistribute filtered IPv4 prefixes into BGP'
-              rules:
-                - rule: 100
-                  action: permit
-                  match: 'ip address prefix-list PL_BGP_redistribute_v4'
+      policy: *policy_bgp_redistribute_alt
       bgp:
         router_id: 10.1.255.13
         as: 65001
         afis:
           - afi: 'ipv4-unicast'
             redistribute:
-              - 'connected route-map RM_BGP_redistribute_v4'
+              - "connected route-map RM_BGP_redistribute_v4"
           - afi: 'ipv6-unicast'
-            redistribute: 
+            redistribute:
               - static
               - connected
         neighbors:
@@ -462,16 +484,16 @@ router:
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv4-unicast'
-                next_hop: 'nexthop-self'
+              - afi: "ipv4-unicast"
+                next_hop: "nexthop-self"
         neighbors6:
           - ipv6_address: 2001:0470:731b:4000:10:1:255:16
             description: core::p1r6v
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv6-unicast'
-                next_hop: 'nexthop-self'
+              - afi: "ipv6-unicast"
+                next_hop: "nexthop-self"
       isis:
         interfaces:
           - interface: lo
@@ -496,17 +518,12 @@ router:
             - interface: eth4
       static:
         routes6:
-          # für prefix-delegations
           - destination: 2001:0470:731b:5000::/53
             next_hop: fe80::be24:11ff:fef7:f02c
             interface: eth2
-      vrfs:
-        - vrf: mgmt
-          table: 1020
+      vrfs: *mgmt_vrf
       services:
-        - service: ssh
-          vrf: mgmt
-          port: 22
+        - <<: *ssh_service
         - service: dhcp-relay
           relay_options:
             - relay-agents-packets replace
@@ -532,34 +549,33 @@ router:
               name_servers:
                 - 2001:4860:4860::8888
                 - 2001:4860:4860::8844
-              config_flags: 
+              config_flags:
                 - other-config-flag
               prefix: 2001:470:731b:5002::/64
-
 
     p1r4v:
       os: "vyos"
       ansible_host: 10.20.30.14
-      ansible_hostname: "p1r4v"
+      ansible_hostname: p1r4v
       interfaces:
         - interface: lo
           interface_type: loopback
           description: loopback
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.255.14/32
-          ipv6_addresses: 
+          ipv6_addresses:
             - 2001:0470:731b:4000:10:1:255:14/128
         - interface: eth0
           interface_type: ethernet
           description: mgmt-vrf
-          ipv4_addresses: 
+          ipv4_addresses:
             - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
           description: core::p1r4v-p1r3v
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.34.4/24
           mtu: 1528
         - interface: eth2
@@ -572,42 +588,24 @@ router:
         - interface: eth3
           interface_type: ethernet
           description: customer (obsolete?)
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.114.3.1/24
-          # fe80::1/64 muss konfiguriert werden, wenn Clients diese als GW nutzen können sollen
-          # für Hoster /56 Demo
-          ipv6_addresses: 
+          ipv6_addresses:
             - fe80::1/64
           mtu: 1500
         - interface: eth4
           interface_type: ethernet
           description: core::p1r4v-p1r8v
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.48.4/24
           mtu: 1528
         - interface: eth5
           interface_type: ethernet
           description: core::p1r4v-p2r4v (b-plane)
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.12.44.1/24
           mtu: 1528
-      policy:
-        - prefix_lists:
-            - prefix_list: PL_BGP_redistribute_v4
-              description: 'IPv4 prefixes we want redistributed in BGP'
-              rules:
-                - rule: 100
-                  action: permit
-                  ge: 24
-                  prefixes:
-                    - 198.51.100.0/24
-        - route_maps:
-            - route_map: RM_BGP_redistribute_v4
-              description: 'route-map to redistribute filtered IPv4 prefixes into BGP'
-              rules:
-                - rule: 100
-                  action: permit
-                  match: 'ip address prefix-list PL_BGP_redistribute_v4'
+      policy: *policy_bgp_redistribute_std
       bgp:
         router_id: 10.1.255.14
         as: 65001
@@ -616,9 +614,9 @@ router:
             networks:
               - 10.114.3.0/24
             redistribute:
-              - 'connected route-map RM_BGP_redistribute_v4'
+              - "connected route-map RM_BGP_redistribute_v4"
           - afi: 'ipv6-unicast'
-            redistribute: 
+            redistribute:
               - static
               - connected
         neighbors:
@@ -627,16 +625,16 @@ router:
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv4-unicast'
-                next_hop: 'nexthop-self'
+              - afi: "ipv4-unicast"
+                next_hop: "nexthop-self"
         neighbors6:
           - ipv6_address: 2001:0470:731b:4000:10:1:255:16
             description: core::p1r6v
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv6-unicast'
-                next_hop: 'nexthop-self'
+              - afi: "ipv6-unicast"
+                next_hop: "nexthop-self"
       isis:
         interfaces:
           - interface: lo
@@ -658,17 +656,12 @@ router:
             - interface: eth4
       static:
         routes6:
-          # für prefix-delegations
           - destination: 2001:0470:731b:5800::/53
             next_hop: fe80::be24:11ff:fe9f:eace
             interface: eth2
-      vrfs:
-        - vrf: mgmt
-          table: 1020
+      vrfs: *mgmt_vrf
       services:
-        - service: ssh
-          vrf: mgmt
-          port: 22
+        - <<: *ssh_service
         - service: dhcp-relay
           relay_options:
             - relay-agents-packets replace
@@ -694,34 +687,33 @@ router:
               name_servers:
                 - 2001:4860:4860::8888
                 - 2001:4860:4860::8844
-              config_flags: 
+              config_flags:
                 - other-config-flag
               prefix: 2001:470:731b:5802::/64
-
 
     p1r5v:
       os: "vyos"
       ansible_host: 10.20.30.15
-      ansible_hostname: "p1r5v"
+      ansible_hostname: p1r5v
       interfaces:
         - interface: lo
           interface_type: loopback
           description: loopback
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.255.15/32
-          ipv6_addresses: 
+          ipv6_addresses:
             - 2001:0470:731b:4000:10:1:255:15/128
         - interface: eth0
           interface_type: ethernet
           description: mgmt-vrf
-          ipv4_addresses: 
+          ipv4_addresses:
             - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
           description: uplink
-          ipv4_addresses: 
+          ipv4_addresses:
             - 172.31.111.68/24
           ipv6_addresses:
             - 2001:470:731b::172:31:111:68/64
@@ -729,13 +721,13 @@ router:
         - interface: eth2
           interface_type: ethernet
           description: core::p1r5v-p1r1v
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.15.5/24
           mtu: 1528
         - interface: eth3
           interface_type: ethernet
           description: core::p1r5v-p1r6v
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.56.5/24
           mtu: 1528
         - interface: eth4
@@ -749,70 +741,20 @@ router:
         - interface: eth5
           interface_type: ethernet
           description: core::p1r5v-p2r5v (b-plane)
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.12.55.1/24
           mtu: 1528
       policy:
-        - prefix_lists:
-            - prefix_list: PL_INTERNAL_NETWORKS
-              description: AIBIXHQ
-              rules:
-                - rule: 100
-                  action: permit
-                  ge: 16
-                  prefixes:
-                    - 192.168.0.0/16
-        - prefix_lists6:
-            - prefix_list6: PL_NACH_EXTERN6
-              description6: P1V6PREFIXES
-              rules6:
-                - rule6: 100
-                  description6: 'P1V6SLASH50'
-                  action6: permit
-                  ge6: 50
-                  prefixes6:
-                    - 2001:470:731b:4000::/50
-                - rule6: 999
-                  description6: '::'
-                  action6: deny
-                  ge6: 0
-                  prefixes6:
-                    - ::/0
-        - route_maps:
-            - route_map: RM_NACH_EXTERN
-              description: 'nach_extern_beigebracht'
-              rules:
-                - rule: 50
-                  action: deny
-                  match: 'ip address prefix-list PL_INTERNAL_NETWORKS'
-                - rule: 100
-                  action: permit
-                  match: 'local-preference 100'
-            - route_map: RM_VON_EXTERN
-              description: 'von_extern_gelernt'
-              rules:
-                - rule: 50
-                  action: deny
-                  match: 'ip address prefix-list PL_INTERNAL_NETWORKS'
-                - rule: 100
-                  action: permit
-                  set: 'local-preference 50'
-        - route_maps6:
-            - route_map6: RM_NACH_EXTERN6
-              description6: 'nach_extern_beigebracht_v6'
-              rules6:
-                - rule6: 100
-                  action6: permit
-                  match6: 'ipv6 address prefix-list PL_NACH_EXTERN6'
+        - prefix_lists: *policy_internal_v4
+        - prefix_lists6: *policy_internal_v6
+        - route_maps: *policy_internal_route_maps_v4
+        - route_maps6: *policy_internal_route_maps_v6
       bgp:
         router_id: 10.1.255.15
         as: 65001
         afis:
           - afi: 'ipv4-unicast'
-            aggregates:
-              - 192.0.2.0/24
-              - 198.51.100.0/24
-              - 203.0.113.0/24
+            aggregates: *aggregates4
             networks:
               - 203.0.113.48/28
             redistribute:
@@ -837,8 +779,8 @@ router:
             afis:
               - afi: 'ipv4-unicast'
                 route_maps:
-                  route_map_import: 'RM_VON_EXTERN'
-                  route_map_export: 'RM_NACH_EXTERN'
+                  route_map_import: RM_VON_EXTERN
+                  route_map_export: RM_NACH_EXTERN
           - ipv4_address: 172.31.111.15
             description: p3r5v
             remote_as: 65003
@@ -846,8 +788,8 @@ router:
             afis:
               - afi: 'ipv4-unicast'
                 route_maps:
-                  route_map_import: 'RM_VON_EXTERN'
-                  route_map_export: 'RM_NACH_EXTERN'
+                  route_map_import: RM_VON_EXTERN
+                  route_map_export: RM_NACH_EXTERN
           - ipv4_address: 172.31.111.110
             description: p2r5v
             remote_as: 65002
@@ -855,8 +797,8 @@ router:
             afis:
               - afi: 'ipv4-unicast'
                 route_maps:
-                  route_map_import: 'RM_VON_EXTERN'
-                  route_map_export: 'RM_NACH_EXTERN'
+                  route_map_import: RM_VON_EXTERN
+                  route_map_export: RM_NACH_EXTERN
         neighbors6:
           - ipv6_address: 2001:0470:731b:4000:10:1:255:16
             description: core::p1r6v
@@ -865,14 +807,14 @@ router:
             afis:
               - afi: 'ipv6-unicast'
                 next_hop: 'nexthop-self'
-          - ipv6_address: '2001:470:731b::'
+          - ipv6_address: "2001:470:731b::"
             description: pflab
             remote_as: 65009
             update_source: wg0
             afis:
               - afi: 'ipv6-unicast'
                 route_maps:
-                  route_map_export: 'RM_NACH_EXTERN6'
+                  route_map_export: RM_NACH_EXTERN6
       isis:
         interfaces:
           - interface: lo
@@ -894,17 +836,12 @@ router:
             - interface: eth3
       static:
         routes6:
-          # für prefix-delegations
           - destination: 2001:0470:731b:6000::/53
             next_hop: fe80::be24:11ff:fee3:d0a4
             interface: eth4
-      vrfs:
-        - vrf: mgmt
-          table: 1020
+      vrfs: *mgmt_vrf
       services:
-        - service: ssh
-          vrf: mgmt
-          port: 22
+        - <<: *ssh_service
         - service: dhcp-relay
           relay_options:
             - relay-agents-packets replace
@@ -915,7 +852,7 @@ router:
             - eth1
             - eth2
         - service: dhcpv6-relay
-          listen_interfaces: 
+          listen_interfaces:
             - eth4
           upstream_interfaces:
             - eth1
@@ -930,87 +867,71 @@ router:
               name_servers:
                 - 2001:4860:4860::8888
                 - 2001:4860:4860::8844
-              config_flags: 
+              config_flags:
                 - other-config-flag
               prefix: 2001:470:731b:6004::/64
 
     p1r6v:
       os: "vyos"
       ansible_host: 10.20.30.16
-      ansible_hostname: "p1r6v"
+      ansible_hostname: p1r6v
       interfaces:
         - interface: lo
           interface_type: loopback
           description: loopback
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.255.16/32
-          ipv6_addresses: 
+          ipv6_addresses:
             - 2001:0470:731b:4000:10:1:255:16/128
         - interface: eth0
           interface_type: ethernet
           description: mgmt-vrf
-          ipv4_addresses: 
+          ipv4_addresses:
             - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
           description: core::p1r6v-p1r5v
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.56.6/24
           mtu: 1528
         - interface: eth2
           interface_type: ethernet
           description: core::p1r6v-p1r2v
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.26.6/24
           mtu: 1528
         - interface: eth3
           interface_type: ethernet
           description: core::p1r6v-p1r7v
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.67.6/24
           mtu: 1528
         - interface: eth4
           interface_type: ethernet
           description: opnsense2
-          ipv4_addresses: 
+          ipv4_addresses:
             - 198.51.100.33/28
-          ipv6_addresses: 
+          ipv6_addresses:
             - 2001:470:731b:6804::1/64
           mtu: 1500
         - interface: eth5
           interface_type: ethernet
           description: core::p1r6v-p2r6v (b-plane)
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.12.66.1/24
           mtu: 1528
-      policy:
-        - prefix_lists:
-            - prefix_list: PL_BGP_redistribute_v4
-              description: IPv4 prefixes we want redistributed in BGP
-              rules:
-                - rule: 100
-                  action: permit
-                  ge: 24
-                  prefixes:
-                    - 198.51.100.0/24
-        - route_maps:
-            - route_map: RM_BGP_redistribute_v4
-              description: route-map to redistribute filtered IPv4 prefixes into BGP
-              rules:
-                - rule: 100
-                  action: permit
-                  match: 'ip address prefix-list PL_BGP_redistribute_v4'
+      policy: *policy_bgp_redistribute_std
       bgp:
         router_id: 10.1.255.16
         as: 65001
         afis:
           - afi: 'ipv4-unicast'
             redistribute:
-              - 'connected route-map RM_BGP_redistribute_v4'
+              - "connected route-map RM_BGP_redistribute_v4"
           - afi: 'ipv6-unicast'
-            redistribute: 
+            redistribute:
               - static
               - connected
         neighbors:
@@ -1019,49 +940,49 @@ router:
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv4-unicast'
+              - afi: "ipv4-unicast"
                 rr: route-reflector-client
           - ipv4_address: 10.1.255.12
             description: core::p1r2v
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv4-unicast'
+              - afi: "ipv4-unicast"
                 rr: route-reflector-client
           - ipv4_address: 10.1.255.13
             description: core::p1r3v
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv4-unicast'
+              - afi: "ipv4-unicast"
                 rr: route-reflector-client
           - ipv4_address: 10.1.255.14
             description: core::p1r4v
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv4-unicast'
+              - afi: "ipv4-unicast"
                 rr: route-reflector-client
           - ipv4_address: 10.1.255.15
             description: core::p1r5v
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv4-unicast'
+              - afi: "ipv4-unicast"
                 rr: route-reflector-client
           - ipv4_address: 10.1.255.17
             description: core::p1r7v
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv4-unicast'
+              - afi: "ipv4-unicast"
                 rr: route-reflector-client
           - ipv4_address: 10.1.255.18
             description: core::p1r8v
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv4-unicast'
+              - afi: "ipv4-unicast"
                 rr: route-reflector-client
         neighbors6:
           - ipv6_address: 2001:0470:731b:4000:10:1:255:11
@@ -1069,49 +990,49 @@ router:
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv6-unicast'
+              - afi: "ipv6-unicast"
                 rr: route-reflector-client
           - ipv6_address: 2001:0470:731b:4000:10:1:255:12
             description: core::p1r2v
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv6-unicast'
+              - afi: "ipv6-unicast"
                 rr: route-reflector-client
           - ipv6_address: 2001:0470:731b:4000:10:1:255:13
             description: core::p1r3v
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv6-unicast'
+              - afi: "ipv6-unicast"
                 rr: route-reflector-client
           - ipv6_address: 2001:0470:731b:4000:10:1:255:14
             description: core::p1r4v
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv6-unicast'
+              - afi: "ipv6-unicast"
                 rr: route-reflector-client
           - ipv6_address: 2001:0470:731b:4000:10:1:255:15
             description: core::p1r5v
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv6-unicast'
+              - afi: "ipv6-unicast"
                 rr: route-reflector-client
           - ipv6_address: 2001:0470:731b:4000:10:1:255:17
             description: core::p1r7v
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv6-unicast'
+              - afi: "ipv6-unicast"
                 rr: route-reflector-client
           - ipv6_address: 2001:0470:731b:4000:10:1:255:18
             description: core::p1r8v
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv6-unicast'
+              - afi: "ipv6-unicast"
                 rr: route-reflector-client
       isis:
         interfaces:
@@ -1137,17 +1058,12 @@ router:
             - interface: eth3
       static:
         routes6:
-          # für prefix-delegations
           - destination: 2001:0470:731b:6800::/53
             next_hop: fe80::be24:11ff:fe5c:2843
             interface: eth4
-      vrfs:
-        - vrf: mgmt
-          table: 1020
+      vrfs: *mgmt_vrf
       services:
-        - service: ssh
-          vrf: mgmt
-          port: 22
+        - <<: *ssh_service
         - service: dhcp-relay
           relay_options:
             - relay-agents-packets replace
@@ -1158,7 +1074,7 @@ router:
             - eth1
             - eth2
         - service: dhcpv6-relay
-          listen_interfaces: 
+          listen_interfaces:
             - eth4
           upstream_interfaces:
             - eth1
@@ -1173,60 +1089,59 @@ router:
               name_servers:
                 - 2001:4860:4860::8888
                 - 2001:4860:4860::8844
-              config_flags: 
+              config_flags:
                 - other-config-flag
               prefix: 2001:470:731b:6804::/64
-
 
     p1r7v:
       os: "vyos"
       ansible_host: 10.20.30.17
-      ansible_hostname: "p1r7v"
+      ansible_hostname: p1r7v
       interfaces:
         - interface: lo
           interface_type: loopback
           description: loopback
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.255.17/32
-          ipv6_addresses: 
+          ipv6_addresses:
             - 2001:0470:731b:4000:10:1:255:17/128
         - interface: eth0
           interface_type: ethernet
           description: mgmt-vrf
-          ipv4_addresses: 
+          ipv4_addresses:
             - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
           description: core::p1r7v-p1r6v
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.67.7/24
           mtu: 1528
         - interface: eth2
           interface_type: ethernet
           description: core::p1r7v-p1r3v
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.37.7/24
           mtu: 1528
         - interface: eth3
           interface_type: ethernet
           description: core::p1r7v-p1r8v
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.78.7/24
           mtu: 1528
         - interface: eth4
           interface_type: ethernet
           description: pfsense2
-          ipv4_addresses: 
+          ipv4_addresses:
             - 203.0.113.1/28
-          ipv6_addresses: 
+          ipv6_addresses:
             - 2001:470:731b:7004::1/64
           mtu: 1500
         - interface: eth5
           interface_type: ethernet
           description: core::p1r7v-p2r7v (b-plane)
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.12.77.1/24
           mtu: 1528
       bgp:
@@ -1234,7 +1149,7 @@ router:
         as: 65001
         afis:
           - afi: 'ipv4-unicast'
-            networks: 
+            networks:
               - 203.0.113.0/28
           - afi: 'ipv6-unicast'
             redistribute:
@@ -1247,16 +1162,16 @@ router:
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv4-unicast'
-                next_hop: 'nexthop-self'
+              - afi: "ipv4-unicast"
+                next_hop: "nexthop-self"
         neighbors6:
           - ipv6_address: 2001:0470:731b:4000:10:1:255:16
             description: core::p1r6v
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv6-unicast'
-                next_hop: 'nexthop-self'
+              - afi: "ipv6-unicast"
+                next_hop: "nexthop-self"
       isis:
         interfaces:
           - interface: lo
@@ -1281,17 +1196,12 @@ router:
             - interface: eth3
       static:
         routes6:
-          # für Hoster /56 routing Demo
           - destination: 2001:0470:731b:7000::/53
             next_hop: fe80::be24:11ff:fed2:958c
             interface: eth4
-      vrfs:
-        - vrf: mgmt
-          table: 1020
+      vrfs: *mgmt_vrf
       services:
-        - service: ssh
-          vrf: mgmt
-          port: 22
+        - <<: *ssh_service
         - service: dhcp-relay
           relay_options:
             - relay-agents-packets replace
@@ -1302,7 +1212,7 @@ router:
             - eth1
             - eth2
         - service: dhcpv6-relay
-          listen_interfaces: 
+          listen_interfaces:
             - eth4
           upstream_interfaces:
             - eth1
@@ -1317,52 +1227,51 @@ router:
               name_servers:
                 - 2001:4860:4860::8888
                 - 2001:4860:4860::8844
-              config_flags: 
+              config_flags:
                 - other-config-flag
               prefix: 2001:470:731b:7004::/64
-
 
     p1r8v:
       os: "vyos"
       ansible_host: 10.20.30.18
-      ansible_hostname: "p1r8v"
+      ansible_hostname: p1r8v
       interfaces:
         - interface: lo
           interface_type: loopback
           description: loopback
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.255.18/32
-          ipv6_addresses: 
+          ipv6_addresses:
             - 2001:0470:731b:4000:10:1:255:18/128
         - interface: eth0
           interface_type: ethernet
           description: mgmt-vrf
-          ipv4_addresses: 
+          ipv4_addresses:
             - dhcp
           mtu: 1500
           vrf: mgmt
         - interface: eth1
           interface_type: ethernet
           description: core::p1r8v-p1r7v
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.78.8/24
           mtu: 1528
         - interface: eth2
           interface_type: ethernet
           description: core::p1r8v-p1r4v
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.1.48.8/24
           mtu: 1528
         - interface: eth3
           interface_type: ethernet
           description: customer (obsolete?)
-          ipv4_addresses: 
+          ipv4_addresses:
             - 192.0.2.1/24
           mtu: 1500
         - interface: eth4
           interface_type: ethernet
           description: client::netbird_server
-          ipv4_addresses: 
+          ipv4_addresses:
             - 203.0.113.17/28
           ipv6_addresses:
             - 2001:0470:731b:7804::1/64
@@ -1370,7 +1279,7 @@ router:
         - interface: eth5
           interface_type: ethernet
           description: core::p1r8v-p2r8v (b-plane)
-          ipv4_addresses: 
+          ipv4_addresses:
             - 10.12.88.1/24
           mtu: 1528
       bgp:
@@ -1390,16 +1299,16 @@ router:
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv4-unicast'
-                next_hop: 'nexthop-self'
+              - afi: "ipv4-unicast"
+                next_hop: "nexthop-self"
         neighbors6:
           - ipv6_address: 2001:0470:731b:4000:10:1:255:16
             description: core::p1r6v
             remote_as: 65001
             update_source: lo
             afis:
-              - afi: 'ipv6-unicast'
-                next_hop: 'nexthop-self'
+              - afi: "ipv6-unicast"
+                next_hop: "nexthop-self"
       isis:
         interfaces:
           - interface: lo
@@ -1419,13 +1328,9 @@ router:
             - interface: lo
             - interface: eth1
             - interface: eth2
-      vrfs:
-        - vrf: mgmt
-          table: 1020
+      vrfs: *mgmt_vrf
       services:
-        - service: ssh
-          vrf: mgmt
-          port: 22
+        - <<: *ssh_service
         - service: dhcp-relay
           relay_options:
             - relay-agents-packets replace
@@ -1436,7 +1341,7 @@ router:
             - eth1
             - eth2
         - service: dhcpv6-relay
-          listen_interfaces: 
+          listen_interfaces:
             - eth4
           upstream_interfaces:
             - eth1
@@ -1451,6 +1356,6 @@ router:
               name_servers:
                 - 2001:4860:4860::8888
                 - 2001:4860:4860::8844
-              config_flags: 
+              config_flags:
                 - other-config-flag
               prefix: 2001:470:731b:7804::/64

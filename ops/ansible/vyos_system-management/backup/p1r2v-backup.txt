@@ -1,0 +1,133 @@
+set interfaces ethernet eth0 address 'dhcp'
+set interfaces ethernet eth0 description 'mgmt-vrf'
+set interfaces ethernet eth0 hw-id '00:24:18:a1:02:00'
+set interfaces ethernet eth0 mtu '1500'
+set interfaces ethernet eth0 offload gro
+set interfaces ethernet eth0 offload gso
+set interfaces ethernet eth0 offload sg
+set interfaces ethernet eth0 offload tso
+set interfaces ethernet eth0 vrf 'mgmt'
+set interfaces ethernet eth1 address '10.1.12.2/24'
+set interfaces ethernet eth1 description 'core::p1r2v-p1r1v'
+set interfaces ethernet eth1 hw-id '00:44:18:f1:02:01'
+set interfaces ethernet eth1 mtu '1528'
+set interfaces ethernet eth1 offload gro
+set interfaces ethernet eth1 offload gso
+set interfaces ethernet eth1 offload sg
+set interfaces ethernet eth1 offload tso
+set interfaces ethernet eth2 address '2001:470:731b:4802::1/64'
+set interfaces ethernet eth2 address '198.51.100.17/28'
+set interfaces ethernet eth2 description 'customer::opnsense1'
+set interfaces ethernet eth2 hw-id '00:44:18:f1:02:02'
+set interfaces ethernet eth2 mtu '1500'
+set interfaces ethernet eth2 offload gro
+set interfaces ethernet eth2 offload gso
+set interfaces ethernet eth2 offload sg
+set interfaces ethernet eth2 offload tso
+set interfaces ethernet eth3 address '10.1.23.2/24'
+set interfaces ethernet eth3 description 'core::p1r2v-p1r3v'
+set interfaces ethernet eth3 hw-id '00:44:18:f1:02:03'
+set interfaces ethernet eth3 mtu '1528'
+set interfaces ethernet eth3 offload gro
+set interfaces ethernet eth3 offload gso
+set interfaces ethernet eth3 offload sg
+set interfaces ethernet eth3 offload tso
+set interfaces ethernet eth4 address '10.1.26.2/24'
+set interfaces ethernet eth4 description 'core::p1r2v-p1r6v'
+set interfaces ethernet eth4 hw-id '00:44:18:f1:02:04'
+set interfaces ethernet eth4 mtu '1528'
+set interfaces ethernet eth4 offload gro
+set interfaces ethernet eth4 offload gso
+set interfaces ethernet eth4 offload sg
+set interfaces ethernet eth4 offload tso
+set interfaces ethernet eth5 address '10.12.22.1/24'
+set interfaces ethernet eth5 description 'core::p1r2v-p2r2v (b-plane)'
+set interfaces ethernet eth5 hw-id 'bc:24:11:79:70:9b'
+set interfaces ethernet eth5 mtu '1528'
+set interfaces ethernet eth5 offload gro
+set interfaces ethernet eth5 offload gso
+set interfaces ethernet eth5 offload sg
+set interfaces ethernet eth5 offload tso
+set interfaces loopback lo address '2001:0470:731b:4000:10:1:255:12/128'
+set interfaces loopback lo address '10.1.255.12/32'
+set interfaces loopback lo description 'loopback'
+set policy prefix-list PL_BGP_redistribute_v4 description 'IPv4 prefixes we want redistributed in BGP'
+set policy prefix-list PL_BGP_redistribute_v4 rule 100 action 'permit'
+set policy prefix-list PL_BGP_redistribute_v4 rule 100 ge '24'
+set policy prefix-list PL_BGP_redistribute_v4 rule 100 prefix '198.51.100.0/24'
+set policy route-map RM_BGP_redistribute_v4 description 'route-map to redistribute filtered IPv4 prefixes into BGP'
+set policy route-map RM_BGP_redistribute_v4 rule 100 action 'permit'
+set policy route-map RM_BGP_redistribute_v4 rule 100 match ip address prefix-list 'PL_BGP_redistribute_v4'
+set protocols bgp address-family ipv4-unicast redistribute connected route-map 'RM_BGP_redistribute_v4'
+set protocols bgp address-family ipv6-unicast redistribute connected
+set protocols bgp address-family ipv6-unicast redistribute static
+set protocols bgp neighbor 10.1.255.16 address-family ipv4-unicast nexthop-self
+set protocols bgp neighbor 10.1.255.16 description 'core::p1r6v'
+set protocols bgp neighbor 10.1.255.16 remote-as '65001'
+set protocols bgp neighbor 10.1.255.16 update-source 'lo'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:16 address-family ipv6-unicast nexthop-self
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:16 description 'core::p1r6v'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:16 remote-as '65001'
+set protocols bgp neighbor 2001:0470:731b:4000:10:1:255:16 update-source 'lo'
+set protocols bgp parameters router-id '10.1.255.12'
+set protocols bgp system-as '65001'
+set protocols isis interface eth1
+set protocols isis interface eth3
+set protocols isis interface eth4
+set protocols isis interface lo
+set protocols isis level 'level-1'
+set protocols isis net '49.1111.0100.0125.5012.00'
+set protocols mpls interface 'eth1'
+set protocols mpls interface 'eth3'
+set protocols mpls interface 'eth4'
+set protocols mpls ldp discovery transport-ipv4-address '10.1.255.12'
+set protocols mpls ldp discovery transport-ipv6-address '2001:0470:731b:4000:10:1:255:12'
+set protocols mpls ldp interface 'lo'
+set protocols mpls ldp interface 'eth1'
+set protocols mpls ldp interface 'eth3'
+set protocols mpls ldp interface 'eth4'
+set protocols mpls ldp router-id '10.1.255.12'
+set protocols static route6 2001:470:731b:4800::/53 next-hop fe80::be24:11ff:fef7:d9d4 interface 'eth2'
+set service dhcp-relay listen-interface 'eth2'
+set service dhcp-relay listen-interface 'eth6'
+set service dhcp-relay relay-options relay-agents-packets 'replace'
+set service dhcp-relay server '10.1.11.2'
+set service dhcp-relay upstream-interface 'eth1'
+set service dhcp-relay upstream-interface 'eth4'
+set service dhcpv6-relay listen-interface eth2
+set service dhcpv6-relay upstream-interface eth1 address '2001:470:731b:4002::2'
+set service dhcpv6-relay upstream-interface eth4 address '2001:470:731b:4002::2'
+set service dhcpv6-relay use-interface-id-option
+set service ntp allow-client address '0.0.0.0/0'
+set service ntp allow-client address '::/0'
+set service ntp server 1.pool.ntp.org
+set service ntp server 2.pool.ntp.org
+set service router-advert interface eth2 default-preference 'high'
+set service router-advert interface eth2 name-server '2001:4860:4860::8888'
+set service router-advert interface eth2 name-server '2001:4860:4860::8844'
+set service router-advert interface eth2 other-config-flag
+set service router-advert interface eth2 prefix 2001:470:731b:4802::/64
+set service ssh client-keepalive-interval '180'
+set service ssh port '22'
+set service ssh vrf 'mgmt'
+set system config-management commit-revisions '100'
+set system conntrack modules ftp
+set system conntrack modules h323
+set system conntrack modules nfs
+set system conntrack modules pptp
+set system conntrack modules sip
+set system conntrack modules sqlnet
+set system conntrack modules tftp
+set system host-name 'p1r2v'
+set system login user vyos authentication encrypted-password '$6$rounds=656000$OQkVKmg3ckgpH4jk$FE4fij3WigSseBO9bG0701JhJ9xMU2tg.qxDangX3q6dMuiu/ZOhNVID1d7FXQsleRyQIo5ajLkYm9e1xmXug1'
+set system login user vyos authentication public-keys aibix@AUTOMATION key 'AAAAC3NzaC1lZDI1NTE5AAAAIHcH6rEhepn76QcVDpRYc/s4i0FIHdFXejYoq4dGinKu'
+set system login user vyos authentication public-keys aibix@AUTOMATION type 'ssh-ed25519'
+set system login user vyos authentication public-keys aibix@minismox key 'AAAAC3NzaC1lZDI1NTE5AAAAIJPRSV+ocoYTP26UwMYUXsd0gVKSmrFC3WaOVJwEY0L1'
+set system login user vyos authentication public-keys aibix@minismox type 'ssh-ed25519'
+set system login user vyos authentication public-keys aibix@pve key 'AAAAC3NzaC1lZDI1NTE5AAAAINaS0Jnd22MMvRMUyBlndxv7VzYWXfl7PbnpeUpNBtlL'
+set system login user vyos authentication public-keys aibix@pve type 'ssh-ed25519'
+set system login user vyos authentication public-keys aibix@ubuntu-cluster key 'AAAAC3NzaC1lZDI1NTE5AAAAIFpwtLpKPNExRVDiBNmXwvkrw7DMnkPB7R8B39pcurea'
+set system login user vyos authentication public-keys aibix@ubuntu-cluster type 'ssh-ed25519'
+set system syslog global facility all level 'notice'
+set system syslog global facility local7 level 'debug'
+set vrf name mgmt table '1020'
