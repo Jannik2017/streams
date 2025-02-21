@@ -1,5 +1,5 @@
 - name: Install SDN prerequisites on Proxmox Host
-  hosts: all
+  hosts: pmxs
   vars:
     bridge_port: ""
 
@@ -7,11 +7,15 @@
     - name: Update the apt package index
       apt:
         update_cache: yes
+      environment:
+        http_proxy: http://194.164.48.10:3128
 
     - name: Upgrade all apt packages to the latest version
       apt:
         upgrade: dist
         force_apt_get: yes
+      environment:
+        http_proxy: http://194.164.48.10:3128
 
     - name: Install packages
       apt:
@@ -27,6 +31,8 @@
           - dnsmasq
           - frr-pythontools
         state: present
+      environment:
+        http_proxy: http://194.164.48.10:3128
 
     - name: Ensure dnsmasq is disabled
       systemd:
@@ -81,3 +87,7 @@
           value: 1800
           backup: true
           state: present
+
+      - name: Reload interfaces to apply MTU setting
+        ansible.builtin.shell:
+          cmd: ifreload -a

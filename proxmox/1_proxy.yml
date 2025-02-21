@@ -1,0 +1,12 @@
+- name: Copy proxy.sh
+  hosts: all
+
+  tasks:
+    - name: Copy proxy.sh
+      ansible.builtin.copy:
+        src: proxy.sh
+        dest: /etc/profile.d/proxy.sh
+        owner: root
+        group: root
+        mode: '0644'
+        

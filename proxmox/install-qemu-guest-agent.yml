@@ -1,0 +1,16 @@
+- name: Set community repositories and update
+  hosts: all
+
+  tasks:
+    - name: Install qemu-guest-agent
+      apt:
+        name:
+          - qemu-guest-agent
+        state: present
+      environment:
+        http_proxy: http://194.164.48.10:3128
+
+    - name: Start qemu-guest-agent.service
+      ansible.builtin.systemd_service:
+        name: qemu-guest-agent
+        state: started
