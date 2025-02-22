@@ -1,0 +1,38 @@
+- name: Set community repositories and update
+  hosts: rpis
+
+  tasks:
+    - name: Enable community repository
+      lineinfile:
+        path: /etc/apt/sources.list
+        line: "{{ repo }}"
+        state: present
+        create: no
+        insertafter: EOF
+
+    - name: Remove pve-enterprise repo
+      ansible.builtin.file:
+        path: /etc/apt/sources.list.d/pve-enterprise.list
+        state: absent
+
+    - name: Remove pbs-enterprise repo
+      ansible.builtin.file:
+        path: /etc/apt/sources.list.d/pbs-enterprise.list
+        state: absent
+
+    - name: Remove ceph repo
+      ansible.builtin.file:
+        path: /etc/apt/sources.list.d/ceph.list
+        state: absent
+
+    - name: Update the apt package index
+      apt:
+        update_cache: yes
+
+    - name: Upgrade all apt packages to the latest version
+      apt:
+        upgrade: dist
+        force_apt_get: yes
+
+    - name: Reboot the system
+      reboot:
