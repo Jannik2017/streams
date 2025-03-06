@@ -1,7 +1,7 @@
 ---
 
 - name: Install SDN prerequisites on Proxmox Host
-  hosts: pmxs
+  hosts: pves
   vars_files:
     - vault.yml
   vars:
