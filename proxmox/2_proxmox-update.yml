@@ -28,15 +28,11 @@
     - name: Update the apt package index
       apt:
         update_cache: yes
-      environment:
-        http_proxy: http://194.164.48.10:3128
 
     - name: Upgrade all apt packages to the latest version
       apt:
         upgrade: dist
         force_apt_get: yes
-      environment:
-        http_proxy: http://194.164.48.10:3128
 
     - name: Reboot the system
       reboot:
