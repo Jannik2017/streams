@@ -571,12 +571,13 @@ router:
             - 2001:470:731b:5802::1/64
         - interface: eth3
           interface_type: ethernet
-          description: customer (obsolete?)
+          description: customer::pfsense3
           ipv4_addresses: 
-            - 10.114.3.1/24
+            - 198.19.43.1/24
           # fe80::1/64 muss konfiguriert werden, wenn Clients diese als GW nutzen können sollen
           # für Hoster /56 Demo
           ipv6_addresses: 
+            - 2001:470:731b:5803::1/64
             - fe80::1/64
           mtu: 1500
         - interface: eth4
@@ -600,6 +601,7 @@ router:
                   action: permit
                   ge: 24
                   prefixes:
+                    - 198.19.43.0/24
                     - 198.51.100.0/24
         - route_maps:
             - route_map: RM_BGP_redistribute_v4
@@ -662,6 +664,9 @@ router:
           - destination: 2001:0470:731b:5800::/53
             next_hop: fe80::be24:11ff:fe9f:eace
             interface: eth2
+          - destination: 2001:0470:5135:9800::/53
+            next_hop: fe80::be24:11ff:fef3:a773
+            interface: eth3
       vrfs:
         - vrf: mgmt
           table: 1020
@@ -675,12 +680,14 @@ router:
           server: 10.1.11.2
           listen_interfaces:
             - eth2
+            - eth3
           upstream_interfaces:
             - eth1
             - eth4
         - service: dhcpv6-relay
           listen_interfaces:
             - eth2
+            - eth3
           upstream_interfaces:
             - eth1
             - eth4
@@ -697,7 +704,14 @@ router:
               config_flags: 
                 - other-config-flag
               prefix: 2001:470:731b:5802::/64
-
+            - interface: eth3
+              default_preference: high
+              name_servers:
+                - 2001:4860:4860::8888
+                - 2001:4860:4860::8844
+              config_flags: 
+                - other-config-flag
+              prefix: 2001:470:731b:5803::/64
 
     p1r5v:
       os: "vyos"
@@ -1355,9 +1369,13 @@ router:
           mtu: 1528
         - interface: eth3
           interface_type: ethernet
-          description: customer (obsolete?)
+          description: customer::pfsense3
           ipv4_addresses: 
-            - 192.0.2.1/24
+            - 198.19.83.1/24
+          ipv6_addresses:
+            - 2001:0470:731b:7803::1/64
+          # fe80::1/64 muss konfiguriert werden, wenn Clients diese als GW nutzen können sollen
+          # für Hoster /56 Demo
           mtu: 1500
         - interface: eth4
           interface_type: ethernet
@@ -1419,6 +1437,12 @@ router:
             - interface: lo
             - interface: eth1
             - interface: eth2
+      static:
+        routes6:
+          # für prefix-delegations
+          - destination: 2001:0470:5135:b800::/53
+            next_hop: fe80::be24:11ff:fe59:a236
+            interface: eth3
       vrfs:
         - vrf: mgmt
           table: 1020
@@ -1431,12 +1455,14 @@ router:
             - relay-agents-packets replace
           server: 10.1.11.2
           listen_interfaces:
+            - eth3
             - eth4
           upstream_interfaces:
             - eth1
             - eth2
         - service: dhcpv6-relay
-          listen_interfaces: 
+          listen_interfaces:
+            - eth3
             - eth4
           upstream_interfaces:
             - eth1
@@ -1446,6 +1472,14 @@ router:
             - use-interface-id-option
         - service: router-advert
           interfaces:
+            - interface: eth3
+              default_preference: high
+              name_servers:
+                - 2001:4860:4860::8888
+                - 2001:4860:4860::8844
+              config_flags: 
+                - other-config-flag
+              prefix: 2001:470:731b:7803::/64
             - interface: eth4
               default_preference: high
               name_servers:
