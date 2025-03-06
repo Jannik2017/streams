@@ -1,36 +1,14 @@
-all:
+---
+
+pves:
   vars:
     ansible_user: root
-
-pmxs:
-  hosts:
-    pmx1:
-      ansible_host: 192.168.111.181
-    pmx2:
-      ansible_host: 192.168.111.182
-    pmx3:
-      ansible_host: 192.168.111.183
-
-  vars:
     repo: "deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription"
 
-rpis:
   hosts:
-    rpi1:
-      ansible_host: 116.202.172.239
-    rpi2:
-      ansible_host: 136.243.39.89
-    rpi3:
-      ansible_host: 136.243.74.45
-
-  vars:
-    repo: "deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription"
-
-pbss:
-  hosts:
-    pbs:
-      ansible_host: 192.168.111.189
-
-  vars:
-    repo: "deb http://download.proxmox.com/debian/pbs bookworm pbs-no-subscription"
-      
+    pve1:
+      ansible_host: 192.168.174.41
+    pve2:
+      ansible_host: 192.168.174.42
+    pve3:
+      ansible_host: 192.168.174.43

@@ -1,7 +1,14 @@
+---
+
 - name: Install SDN prerequisites on Proxmox Host
   hosts: pmxs
+  vars_files:
+    - vault.yml
   vars:
     bridge_port: ""
+    cli:
+      username: "{{ username }}"
+      password: "{{ password }}"
 
   tasks:
     - name: Update the apt package index

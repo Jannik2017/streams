@@ -1,5 +1,13 @@
+---
+
 - name: Set community repositories and update
   hosts: all
+  vars_files:
+    - vault.yml
+  vars:
+    cli:
+      username: "{{ username }}"
+      password: "{{ password }}"
 
   tasks:
     - name: Enable community repository
